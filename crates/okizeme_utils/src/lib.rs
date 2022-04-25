@@ -43,6 +43,3 @@ impl MotionGroups for u8 {
     }
 }
 
-pub trait Tick {
-    fn countdown_value<T>(&self) -> T;
-}
