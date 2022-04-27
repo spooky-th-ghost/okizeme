@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 use serde::{Deserialize, Serialize};
 use okizeme_utils::*;
+use okizeme_types::PlayerId;
 use okizeme_defense::{
   Hurtbox,
   BlockState,
@@ -175,6 +176,7 @@ impl StunValues {
 pub struct HitboxBundle {
   #[bundle]
   sprite_bundle: SpriteBundle,
+  player_id: PlayerId,
   attack_property: AttackProperty,
   attack_level: AttackLevel,
   damage: Damage,

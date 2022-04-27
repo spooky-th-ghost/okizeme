@@ -11,6 +11,6 @@ bevy-inspector-egui = { version = "0.8", optional = true }
 serde_json = "1.0"
 serde = "1.0.136"
 
-okizeme_defense = {path = "../okizeme_defense"}
-okizeme_types = {path = "../okizeme_types"}
-okizeme_utils = {path = "../okizeme_utils"}
+okizeme_defense = {path = "../okizeme_defense", version="0.1.0"}
+okizeme_types = {path = "../okizeme_types", version="0.1.0"}
+okizeme_utils = {path = "../okizeme_utils", version="0.1.0"}

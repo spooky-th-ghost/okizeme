@@ -9,5 +9,5 @@ edition = "2021"
 bevy = "0.7"
 regex = "1.4.6"
 lazy_static = "1.4.0"
-okizeme_types = {path = "../okizeme_types"}
-okizeme_utils = {path = "../okizeme_utils"}
+okizeme_types = {path = "../okizeme_types", version="0.1.0"}
+okizeme_utils = {path = "../okizeme_utils", version="0.1.0"}

@@ -2,7 +2,7 @@
 name = "okizeme"
 version = "0.1.0"
 edition = "2021"
-
+repository = "https://github.com/spooky-th-ghost/okizeme"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [workspace]
@@ -15,7 +15,7 @@ lazy_static = "1.4.0"
 serde_json = "1.0"
 serde = "1.0.136"
 bevy-inspector-egui = { version = "0.8", optional = true }
-okizeme_core = {path ="crates/okizeme_core"}
+okizeme_core = {path ="crates/okizeme_core", version="0.1.0"}
 
 [profile.dev]
 opt-level = 1
