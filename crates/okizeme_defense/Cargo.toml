@@ -2,7 +2,8 @@
 name = "okizeme_defense"
 version = "0.1.0"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/spooky-th-ghost/okizeme/tree/main/crates/okizeme_defense"
+description = "a crate handling defense, hurtboxes, and damage in okizeme"
 
 [dependencies]
