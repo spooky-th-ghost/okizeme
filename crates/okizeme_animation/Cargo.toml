@@ -7,3 +7,5 @@ repository = "https://github.com/spooky-th-ghost/okizeme/tree/main/crates/okizem
 description = "crate for handling animation in okizeme"
 
 [dependencies]
+bevy = "0.7"
+okizeme_types = {path = "../okizeme_types", version = "0.1.0"}
