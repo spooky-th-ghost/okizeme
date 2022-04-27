@@ -8,5 +8,8 @@ edition = "2021"
 [dependencies]
 okizeme_input = {path = "../okizeme_input"}
 okizeme_player = {path = "../okizeme_player"}
+okizeme_animation = {path = "../okizeme_animation"}
+okizeme_offense = {path = "../okizeme_offense"}
+okizeme_defense = {path = "../okizeme_defense"}
 okizeme_utils = {path = "../okizeme_utils"}
 okizeme_types = {path = "../okizeme_types"}

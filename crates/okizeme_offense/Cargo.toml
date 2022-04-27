@@ -1,5 +1,5 @@
 [package]
-name = "okizeme_collision"
+name = "okizeme_offense"
 version = "0.1.0"
 edition = "2021"
 
@@ -11,5 +11,6 @@ bevy-inspector-egui = { version = "0.8", optional = true }
 serde_json = "1.0"
 serde = "1.0.136"
 
+okizeme_defense = {path = "../okizeme_defense"}
 okizeme_types = {path = "../okizeme_types"}
 okizeme_utils = {path = "../okizeme_utils"}

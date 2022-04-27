@@ -13,3 +13,7 @@ pub mod types {
 pub mod utils {
     pub use okizeme_utils::*;
 }
+
+pub mod offense {
+    pub use okizeme_offense::*;
+}

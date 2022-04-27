@@ -1,10 +1,8 @@
-mod hitbox;
-mod hurtbox;
 use okizeme_types::PlayerId;
 
-pub use hitbox::*;
-pub use hurtbox::*;
-
+use crate::{
+  Hitbox
+};
 
 pub struct Collision {
   pub hitbox: Hitbox,
@@ -19,13 +17,6 @@ impl Collision {
     }
   }
 }
-
-impl Default for HitState {
-  fn default() -> Self {
-    Self::None
-  }
-}
-
 
 pub struct CollisionEvent{
   pub collision: Collision,

@@ -1,5 +1,3 @@
-
-
 pub struct Hurtbox {
   pub is_grounded: bool,
   pub block_state: BlockState,

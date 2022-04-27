@@ -1,9 +1,11 @@
 use bevy::prelude::*;
 use serde::{Deserialize, Serialize};
 use okizeme_utils::*;
-use crate::{
+use okizeme_defense::{
   Hurtbox,
   BlockState,
+};
+use crate::{
   Collision
 };
 
@@ -24,7 +26,7 @@ pub struct Hitbox {
   /// Can the hitbox be blocked in the air
   air_blockable: bool,
   /// The block property of the hitbox
-  property: HitboxProperty,
+  property: AttackProperty,
   /// How many frames will this hitbox stay out
   duration: u8,
   /// Does this hitbox cause damage when blocked
@@ -36,23 +38,6 @@ pub struct Hitbox {
 }
 
 impl Hitbox {
-  /// Create a hitbox from it's serialized counterpart
-  pub fn from_serialized(s: HitboxSerialized) -> Self {
-    Hitbox {
-      attack_level: s.attack_level,
-      damage: s.damage,
-      proration: s.proration,
-      force: s.force.to_vec2(),
-      air_blockable: s.air_blockable,
-      property: s.property,
-      duration: s.duration,
-      chip: s.chip,
-      projectile: s.projectile,
-      hit_state: HitState::None,
-      active: false
-    }
-  }
-
   /// if possible, lower the hitboxes duration by 1 frame
   pub fn tick(&mut self) {
     self.duration = countdown(self.duration);
@@ -69,7 +54,7 @@ impl Hitbox {
 
   /// Returns if a Hitbox is blocked by a Hurtbox it overlaps
   pub fn is_blocked(&self, hurtbox: &Hurtbox) -> bool {
-    use HitboxProperty::*;
+    use AttackProperty::*;
     use BlockState::*;
     match hurtbox.block_state {
       Stand {barrier:_, instant:_} => {
@@ -102,38 +87,17 @@ impl Hitbox {
 
 
 #[cfg_attr(feature = "debug", derive(bevy_inspector_egui::Inspectable))]
-#[derive(Deserialize, Serialize, Debug, Clone, Copy)]
-pub enum HitboxProperty {
+#[derive(Deserialize, Serialize, Debug, Clone, Copy, Component)]
+pub enum AttackProperty {
   Mid,
   Low,
   High,
 }
 
-impl Default for HitboxProperty {
+impl Default for AttackProperty {
   fn default() -> Self {
-    HitboxProperty::Mid
+    AttackProperty::Mid
   }
-}
-
-/// Serialized version of a hitbox
-#[derive(Deserialize, Serialize)]
-pub struct HitboxSerialized {
-  pub name: String,
-  pub attack_level: u8,
-  pub damage: u8,
-  pub proration: f32,
-  pub force: Vec2Serialzed,
-  pub air_blockable: bool,
-  pub property: HitboxProperty,
-  pub duration: u8,
-  pub chip: bool,
-  pub projectile: bool,
-}
-
-#[derive(Deserialize, Serialize)]
-pub struct Vec2Serialzed {
-  pub x: f32,
-  pub y: f32,
 }
 
 #[cfg_attr(feature = "debug", derive(bevy_inspector_egui::Inspectable))]
@@ -142,4 +106,77 @@ pub enum HitState {
   None,
   Hit,
   Blocked
+}
+
+impl Default for HitState {
+  fn default() -> Self {
+      HitState::None
+  }
+}
+
+#[derive(Component)]
+pub struct Damage(u8);
+
+impl Damage {
+  fn apply_damage(&self) -> u8 {
+    return self.0;
+  }
+}
+
+#[derive(Component)]
+pub enum AttackLevel {
+  L0,
+  L1,
+  L2,
+  L3,
+  L4
+}
+
+#[derive(Component)]
+pub enum Knockdown {
+  None,
+  Stand,
+  Soft,
+  Mid,
+  Hard
+}
+
+pub struct StunValues {
+  hitstop: u8,
+  standing_hitstun: u8,
+  crouching_hitstun: u8,
+  aerial_hitstun: u8,
+  blockstun: u8
+}
+
+impl StunValues {
+  fn new(hitstop: u8, standing_hitstun: u8, crouching_hitstun: u8, aerial_hitstun: u8, blockstun: u8) -> Self {
+    StunValues {
+      hitstop,
+      standing_hitstun,
+      crouching_hitstun,
+      aerial_hitstun,
+      blockstun
+    }
+  }
+
+  pub fn from_attack_level(attack_level: &AttackLevel) -> Self {
+    use AttackLevel::*;
+    match attack_level {
+      L0 => StunValues::new(11, 12, 13, 14, 9),
+      L1 => StunValues::new(12, 14, 15, 16, 11),
+      L2 => StunValues::new(13, 16, 17, 18, 13),
+      L3 => StunValues::new(14, 19, 20, 21, 16),
+      L4 => StunValues::new(15, 21, 22, 23, 18)
+    }
+  }
+}
+#[derive(Bundle)]
+pub struct HitboxBundle {
+  #[bundle]
+  sprite_bundle: SpriteBundle,
+  attack_property: AttackProperty,
+  attack_level: AttackLevel,
+  damage: Damage,
+  knockdown: Knockdown
 }
