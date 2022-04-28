@@ -1,40 +1,39 @@
 use bevy::{
     prelude::*,
-    utils::{tracing::warn, HashMap},
-    reflect::TypeUuid
+    utils::tracing::warn
 };
 use std::ops::Deref;
 
-use okizeme_types::HitPause;
-/// A forked version of bevy's AnimationClip A list of [`VariableCurve`], and the [`EntityPath`] to which they apply.
-#[derive(Clone, TypeUuid, Debug, Default)]
-#[uuid = "d81b7179-0448-4eb0-89fe-c067222725bf"]
-pub struct OkiAnimationClip {
-    curves: HashMap<EntityPath, Vec<VariableCurve>>,
-    duration: f32,
-}
+use okizeme_types::Freeze;
+// /// A forked version of bevy's AnimationClip A list of [`VariableCurve`], and the [`EntityPath`] to which they apply.
+// #[derive(Clone, TypeUuid, Debug, Default)]
+// #[uuid = "d81b7179-0448-4eb0-89fe-c067222725b2"]
+// pub struct OkiAnimationClip {
+//     curves: HashMap<EntityPath, Vec<VariableCurve>>,
+//     duration: f32,
+// }
 
-impl OkiAnimationClip {
-    #[inline]
-    /// Hashmap of the [`VariableCurve`]s per [`EntityPath`].
-    pub fn curves(&self) -> &HashMap<EntityPath, Vec<VariableCurve>> {
-        &self.curves
-    }
+// impl OkiAnimationClip {
+//     #[inline]
+//     /// Hashmap of the [`VariableCurve`]s per [`EntityPath`].
+//     pub fn curves(&self) -> &HashMap<EntityPath, Vec<VariableCurve>> {
+//         &self.curves
+//     }
 
-    /// Add a [`VariableCurve`] to an [`EntityPath`].
-    pub fn add_curve_to_path(&mut self, path: EntityPath, curve: VariableCurve) {
-        // Update the duration of the animation by this curve duration if it's longer
-        self.duration = self
-            .duration
-            .max(*curve.keyframe_timestamps.last().unwrap_or(&0.0));
-        self.curves.entry(path).or_default().push(curve);
-    }
-}
+
+
+//     /// Add a [`VariableCurve`] to an [`EntityPath`].
+//     pub fn add_curve_to_path(&mut self, path: EntityPath, curve: VariableCurve) {
+//         // Update the duration of the animation by this curve duration if it's longer
+//         self.duration = self
+//             .duration
+//             .max(*curve.keyframe_timestamps.last().unwrap_or(&0.0));
+//         self.curves.entry(path).or_default().push(curve);
+//     }
+// }
 
 /// A forked version of bevy's default AnimationPlayer component to 
-/// fit Okizemes specific needs, due to the protection level of bevy's
-/// AnimationClip struct, [`OkiAnimationClip`] is the necessary format that
-/// clips must be loaded and played from
+/// fit Okizemes specific needs
 #[derive(Component, Reflect)]
 #[reflect(Component)]
 pub struct OkiAnimationPlayer {
@@ -42,7 +41,7 @@ pub struct OkiAnimationPlayer {
     repeat: bool,
     speed: f32,
     elapsed: f32,
-    animation_clip: Handle<OkiAnimationClip>,
+    animation_clip: Handle<AnimationClip>,
 }
 
 impl Default for OkiAnimationPlayer {
@@ -59,7 +58,7 @@ impl Default for OkiAnimationPlayer {
 
 impl OkiAnimationPlayer {
     /// Start playing an animation, resetting state of the player
-    pub fn play(&mut self, handle: Handle<OkiAnimationClip>) -> &mut Self {
+    pub fn play(&mut self, handle: Handle<AnimationClip>) -> &mut Self {
         *self = Self {
             animation_clip: handle,
             ..Default::default()
@@ -118,14 +117,14 @@ impl OkiAnimationPlayer {
 }
 
 /// System that will play all animations, using any entity with a [`OkiAnimationPlayer`]
-/// and a [`Handle<OkiAnimationClip>`] as an animation root,
+/// and a [`Handle<AnimationClip>`] as an animation root,
 /// the reason for writing a custom version of this default bevy system
 /// is to ensure that animations only advance one frame at a time and any
-/// [`OkiAnimationPlayer`] components with a currently attached [`HitPause`]
+/// [`OkiAnimationPlayer`] components with a currently attached [`Freeze`]
 /// component will be skipped
 pub fn oki_animation_player(
-    animations: Res<Assets<OkiAnimationClip>>,
-    mut animation_players: Query<(Entity, &mut OkiAnimationPlayer),Without<HitPause>>,
+    animations: Res<Assets<AnimationClip>>,
+    mut animation_players: Query<(Entity, &mut OkiAnimationPlayer),Without<Freeze>>,
     names: Query<&Name>,
     mut transforms: Query<&mut Transform>,
     children: Query<&Children>,
@@ -142,12 +141,12 @@ pub fn oki_animation_player(
             }
             let mut elapsed = player.elapsed;
             if player.repeat {
-                elapsed %= animation_clip.duration;
+                elapsed %= animation_clip.duration();
             }
             if elapsed < 0.0 {
-                elapsed += animation_clip.duration;
+                elapsed += animation_clip.duration();
             }
-            'entity: for (path, curves) in &animation_clip.curves {
+            'entity: for (path, curves) in animation_clip.curves() {
                 // PERF: finding the target entity can be optimised
                 let mut current_entity = entity;
                 // Ignore the first name, it is the root node which we already have

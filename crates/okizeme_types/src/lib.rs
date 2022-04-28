@@ -7,10 +7,9 @@ pub enum PlayerId {
   P2
 }
 
-/// Primarily attached to entities when a hitbox
-/// connects to allow them to
-/// opt out of animation and physics calculations
+/// Primarily attached to enties when they should be skipped for animation 
+/// and physics calculations (i.e. during hitpause or a super flash)
 #[derive(Component)]
-pub struct HitPause {
+pub struct Freeze {
     pub duration: u8
 }
