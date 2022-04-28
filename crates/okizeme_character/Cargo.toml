@@ -6,7 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-bevy = {git = "https://github.com/bevyengine/bevy", rev = "990d5c0879e359d78c24c0b702b330fb759e102c", version = "0.8.0-dev"}
+bevy = {git = "https://github.com/bevyengine/bevy", rev = "8e036344575b4c218f853731eacc7cdea66fc9f6", version = "0.8.0-dev"}
 
 okizeme_input = {path = "../okizeme_input", version = "0.1.0"}
 okizeme_utils = {path = "../okizeme_utils", version = "0.1.0"}

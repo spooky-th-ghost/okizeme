@@ -10,7 +10,7 @@ description = "a micro engine for creationg fighting games in bevy"
 members = ["crates/*"]
 
 [dependencies]
-bevy = {git = "https://github.com/bevyengine/bevy", rev = "990d5c0879e359d78c24c0b702b330fb759e102c", version = "0.8.0-dev"}
+bevy = {git = "https://github.com/bevyengine/bevy", rev = "8e036344575b4c218f853731eacc7cdea66fc9f6", version = "0.8.0-dev"}
 regex = "1.4.6"
 lazy_static = "1.4.0"
 serde_json = "1.0"
@@ -26,3 +26,7 @@ opt-level = 3
 
 [profile.release]
 lto = "thin"
+
+[[example]]
+name = "character_animation"
+path = "examples/character_animation.rs"
