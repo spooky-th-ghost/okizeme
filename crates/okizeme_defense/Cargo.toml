@@ -7,3 +7,4 @@ repository = "https://github.com/spooky-th-ghost/okizeme/tree/main/crates/okizem
 description = "a crate handling defense, hurtboxes, and damage in okizeme"
 
 [dependencies]
+bevy = {git = "https://github.com/spooky-th-ghost/bevy", branch = "animation-clip-public-access", version = "0.8.0-dev"}

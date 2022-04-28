@@ -6,6 +6,7 @@ use okizeme::animation::{
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
+        .add_plugin(WorldInspectorPlugin::new())
         .insert_resource(AmbientLight {
             color: Color::WHITE,
             brightness: 1.0,
@@ -92,6 +93,7 @@ fn keyboard_animation_control(
     mut current_animation: Local<usize>,
 ) {
     if let Ok(mut player) = animation_player.get_single_mut() {
+        println!("Found an animation Player");
         if keyboard_input.just_pressed(KeyCode::Space) {
             if player.is_paused() {
                 player.resume();

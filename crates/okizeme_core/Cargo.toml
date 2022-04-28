@@ -7,7 +7,7 @@ repository = "https://github.com/spooky-th-ghost/okizeme/tree/main/crates/okizem
 description = "crate exposing all of the sub crates for okizeme"
 
 [dependencies]
-bevy = {git = "https://github.com/bevyengine/bevy", rev = "8e036344575b4c218f853731eacc7cdea66fc9f6", version = "0.8.0-dev"}
+bevy = {git = "https://github.com/spooky-th-ghost/bevy", branch = "animation-clip-public-access", version = "0.8.0-dev"}
 okizeme_input = {path = "../okizeme_input", version="0.1.0"}
 okizeme_player = {path = "../okizeme_player", version="0.1.0"}
 okizeme_character = {path = "../okizeme_character", version="0.1.0"}
