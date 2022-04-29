@@ -1,19 +1,25 @@
-use bevy::prelude::*;
-use okizeme::animation::{
-  OkiAnimationPlayer,
-  oki_animation_player
+use bevy::{
+    prelude::*,
+    core::FixedTimestep
+};
+use okizeme::{
+    animation::oki_animation_player,
+    types::{Freeze, manage_freeze},
 };
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
-        .add_plugin(WorldInspectorPlugin::new())
         .insert_resource(AmbientLight {
             color: Color::WHITE,
             brightness: 1.0,
         })
         .add_startup_system(setup)
         .add_system(setup_scene_once_loaded)
-        .add_system(oki_animation_player)
+        .add_stage("oki",SystemStage::single_threaded()
+            .with_run_criteria(FixedTimestep::steps_per_second(60.))
+            .with_system(oki_animation_player)
+            .with_system(manage_freeze)
+        )
         .add_system(keyboard_animation_control)
         .run();
 }
@@ -66,9 +72,7 @@ fn setup(
     scene_spawner.spawn(asset_server.load("models/Oki.glb#Scene0"));
 
     println!("Animation controls:");
-    println!("  - spacebar: play / pause");
-    println!("  - arrow up / down: speed up / slow down animation playback");
-    println!("  - arrow left / right: seek backward / forward");
+    println!("  - spacebar: Add 60 frames of hitpause");
     println!("  - return: change animation");
 }
 
@@ -80,53 +84,29 @@ fn setup_scene_once_loaded(
 ) {
     if !*done {
         if let Ok(mut player) = player.get_single_mut() {
-            player.play(animations.0[0].clone_weak()).repeat();
+            player.play(animations.0[0].clone_weak()).repeat().pause();
             *done = true;
         }
     }
 }
 
 fn keyboard_animation_control(
+    mut coms: Commands,
     keyboard_input: Res<Input<KeyCode>>,
-    mut animation_player: Query<&mut AnimationPlayer>,
+    mut query: Query<(Entity,&mut AnimationPlayer)>,
     animations: Res<Animations>,
     mut current_animation: Local<usize>,
 ) {
-    if let Ok(mut player) = animation_player.get_single_mut() {
-        println!("Found an animation Player");
-        if keyboard_input.just_pressed(KeyCode::Space) {
-            if player.is_paused() {
-                player.resume();
-            } else {
-                player.pause();
-            }
-        }
-
-        if keyboard_input.just_pressed(KeyCode::Up) {
-            let speed = player.speed();
-            player.set_speed(speed * 1.2);
-        }
-
-        if keyboard_input.just_pressed(KeyCode::Down) {
-            let speed = player.speed();
-            player.set_speed(speed * 0.8);
-        }
-
-        if keyboard_input.just_pressed(KeyCode::Left) {
-            let elapsed = player.elapsed();
-            player.set_elapsed(elapsed - 0.1);
-        }
-
-        if keyboard_input.just_pressed(KeyCode::Right) {
-            let elapsed = player.elapsed();
-            player.set_elapsed(elapsed + 0.1);
-        }
-
+    if let Ok((entity,mut player)) = query.get_single_mut() {
         if keyboard_input.just_pressed(KeyCode::Return) {
             *current_animation = (*current_animation + 1) % animations.0.len();
             player
                 .play(animations.0[*current_animation].clone_weak())
-                .repeat();
+                .repeat().pause();
+        }
+
+        if keyboard_input.just_pressed(KeyCode::Space) {
+            coms.entity(entity).insert(Freeze::new(60));
         }
     }
 }

@@ -1,6 +1,3 @@
-use bevy::prelude::*;
-use okizeme_animation::OkiAnimationPlayer;
-
 pub mod animation {
     pub use okizeme_animation::*;
 }
@@ -22,14 +19,5 @@ pub mod utils {
 
 pub mod offense {
     pub use okizeme_offense::*;
-}
-
-#[derive(Default)]
-pub struct OkizemePlugin;
-
-impl Plugin for OkizemePlugin {
-    fn build(&self, app: &mut App) {
-         app.register_type::<OkiAnimationPlayer>();
-    }
 }
 
