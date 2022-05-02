@@ -7,8 +7,8 @@ repository = "https://github.com/spooky-th-ghost/okizeme/tree/main/crates/okizem
 description = "a crate handling attacks, hitboxes, and combos in okizeme"
 
 [dependencies]
-bevy = {git = "https://github.com/spooky-th-ghost/bevy", branch = "animation-clip-public-access", version = "0.8.0-dev"}
-bevy-inspector-egui = { version = "0.8", optional = true }
+bevy = "0.7"
+bevy-inspector-egui = "0.10"
 serde_json = "1.0"
 serde = "1.0.136"
 

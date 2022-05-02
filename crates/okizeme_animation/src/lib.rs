@@ -13,3 +13,11 @@ pub fn oki_animation_player(
         player.set_elapsed( elapsed + (1./60.));
     }
 }
+
+pub struct AnimationController3D {
+
+}
+
+pub struct AnimationController2D {
+
+}

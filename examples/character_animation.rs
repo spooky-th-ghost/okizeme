@@ -2,6 +2,7 @@ use bevy::{
     prelude::*,
     core::FixedTimestep
 };
+use bevy_inspector_egui::WorldInspectorPlugin;
 use okizeme::{
     animation::oki_animation_player,
     types::{Freeze, manage_freeze},
@@ -9,6 +10,7 @@ use okizeme::{
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
+        .add_plugin(WorldInspectorPlugin::new())
         .insert_resource(AmbientLight {
             color: Color::WHITE,
             brightness: 1.0,
@@ -26,6 +28,9 @@ fn main() {
 
 struct Animations(Vec<Handle<AnimationClip>>);
 
+#[derive(Component)]
+struct Player(u8);
+
 fn setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
@@ -35,14 +40,15 @@ fn setup(
 ) {
     // Insert a resource with the current scene information
     commands.insert_resource(Animations(vec![
-        asset_server.load("models/Oki.glb#Animation1"),
-        asset_server.load("models/Oki.glb#Animation0"),
+         asset_server.load("models/Oki_frames.glb#Animation2"),
+        asset_server.load("models/Oki_frames.glb#Animation1"),
+        asset_server.load("models/Oki_frames.glb#Animation0"),
     ]));
 
     // Camera
     commands.spawn_bundle(PerspectiveCameraBundle {
-        transform: Transform::from_xyz(100.0, 100.0, 150.0)
-            .looking_at(Vec3::new(0.0, 20.0, 0.0), Vec3::Y),
+        transform: Transform::from_xyz(0., 30.0, 150.0)
+            .looking_at(Vec3::new(0.0, 15.0, 0.0), Vec3::Y),
         ..Default::default()
     });
 
@@ -69,7 +75,11 @@ fn setup(
     });
 
     // Fox
-    scene_spawner.spawn(asset_server.load("models/Oki.glb#Scene0"));
+    let player = commands.spawn_bundle(TransformBundle::default())
+        .insert(Player(1))
+        .insert(Name::new("Player")).id();
+    scene_spawner.spawn_as_child(asset_server.load("models/Oki_frames.glb#Scene0"),player);
+    // scene_spawner.spawn(asset_server.load("models/Oki_frames.glb#Scene0"));
 
     println!("Animation controls:");
     println!("  - spacebar: Add 60 frames of hitpause");
@@ -90,14 +100,15 @@ fn setup_scene_once_loaded(
     }
 }
 
+
 fn keyboard_animation_control(
     mut coms: Commands,
     keyboard_input: Res<Input<KeyCode>>,
-    mut query: Query<(Entity,&mut AnimationPlayer)>,
+    mut query: Query<(Entity,&mut AnimationPlayer, &mut Transform)>,
     animations: Res<Animations>,
     mut current_animation: Local<usize>,
 ) {
-    if let Ok((entity,mut player)) = query.get_single_mut() {
+    if let Ok((entity,mut player, mut transform)) = query.get_single_mut() {
         if keyboard_input.just_pressed(KeyCode::Return) {
             *current_animation = (*current_animation + 1) % animations.0.len();
             player
