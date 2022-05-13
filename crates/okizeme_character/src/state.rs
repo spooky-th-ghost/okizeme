@@ -1,85 +1,86 @@
-// use bevy::prelude::*;
-// use okizeme_utils::*;
-// use okizeme_input::{
-//   Buffer
-// };
+use bevy::prelude::*;
+use bevy_inspector_egui::Inspectable;
+use okizeme_utils::*;
+use okizeme_offense::*;
+use okizeme_input::{
+  Buffer
+};
 
-// /// Handles the current state of a character
-// #[cfg_attr(feature = "debug", derive(Inspectable))]
-// #[derive(Debug, Clone, Component)]
-// pub enum CharacterState {
-//   Idle,
-//   Walking,
-//   BackWalking,
-//   Attacking {
-//     ///The number of frames until the action completes naturally
-//     duration: u8,
-//     ///The current attack being executed 
-//     attack: Attack,
-//     ///Can the current attack me cancelled prematurely 
-//     cancellable: bool
-//   },
-//   AttackingAirborne {
-//     ///The number of frames until the action completes naturally
-//     duration: u8, 
-//     ///The current attack being executed 
-//     attack: Attack,
-//     ///Can the current attack me cancelled prematurely 
-//     cancellable: bool
-//   },
-//   Crouching,
-//   Jumpsquat {
-//     ///The number of frames until the action completes naturally
-//     duration: u8,
-//     ///The Velocity of the buffered jump 
-//     velocity: Vec2 
-//   },
-//   AirJumpsquat {
-//     ///The number of frames until the action completes naturally
-//     duration: u8,
-//     ///The velocity of the buffered jump  
-//     velocity: Vec2 
-//   },
-//   Rising {
-//     ///The number of frames until the player can act out of the state
-//     busy: u8
-//   },
-//   Falling,
-//   Juggle,
-//   Dashing,
-//   BackDashing {
-//     ///The number of frames until the action completes naturally
-//     duration: u8
-//   },
-//   AirDashing {
-//     ///The number of frames until the player can act out of the state
-//     busy: u8,
-//     ///The number of frames until the action completes naturally
-//     duration: u8,
-//     ///The velocity of the air dash 
-//     velocity: Vec2
-//   },
-//   AirBackDashing {
-//     ///The number of frames until the player can act out of the state
-//     busy: u8,
-//     ///The number of frames until the action completes naturally 
-//     duration: u8,
-//     ///The velocity of the air dash
-//     velocity: Vec2
-//   } 
-// }
+/// Handles the current state of a character
+#[derive(Debug, Clone, Component, Inspectable)]
+pub enum CharacterState {
+  Idle,
+  Walking,
+  BackWalking,
+  Attacking {
+    ///The number of frames until the action completes naturally
+    duration: u8,
+    ///The current attack being executed 
+    attack: Attack,
+    ///Can the current attack me cancelled prematurely 
+    cancellable: bool
+  },
+  AttackingAirborne {
+    ///The number of frames until the action completes naturally
+    duration: u8, 
+    ///The current attack being executed 
+    attack: Attack,
+    ///Can the current attack me cancelled prematurely 
+    cancellable: bool
+  },
+  Crouching,
+  Jumpsquat {
+    ///The number of frames until the action completes naturally
+    duration: u8,
+    ///The Velocity of the buffered jump 
+    velocity: Vec2 
+  },
+  AirJumpsquat {
+    ///The number of frames until the action completes naturally
+    duration: u8,
+    ///The velocity of the buffered jump  
+    velocity: Vec2 
+  },
+  Rising {
+    ///The number of frames until the player can act out of the state
+    busy: u8
+  },
+  Falling,
+  Juggle,
+  Dashing,
+  BackDashing {
+    ///The number of frames until the action completes naturally
+    duration: u8
+  },
+  AirDashing {
+    ///The number of frames until the player can act out of the state
+    busy: u8,
+    ///The number of frames until the action completes naturally
+    duration: u8,
+    ///The velocity of the air dash 
+    velocity: Vec2
+  },
+  AirBackDashing {
+    ///The number of frames until the player can act out of the state
+    busy: u8,
+    ///The number of frames until the action completes naturally 
+    duration: u8,
+    ///The velocity of the air dash
+    velocity: Vec2
+  } 
+}
 
-// impl PartialEq for CharacterState {
-//   fn eq(&self, other: &Self) -> bool {
-//     std::mem::discriminant(self) == std::mem::discriminant(other)
-//   }
-// }
+impl PartialEq for CharacterState {
+  fn eq(&self, other: &Self) -> bool {
+    std::mem::discriminant(self) == std::mem::discriminant(other)
+  }
+}
 
-// impl Default for CharacterState {
-//   fn default() -> Self {
-//     CharacterState::Idle
-//   }
-// }
+impl Default for CharacterState {
+  fn default() -> Self {
+    CharacterState::Idle
+  }
+}
 
 // impl CharacterState {
 //   fn tick(&mut self) {

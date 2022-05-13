@@ -18,6 +18,10 @@ pub struct AnimationController3D {
 
 }
 
+pub struct AnimationMap3D;
+
 pub struct AnimationController2D {
 
 }
+
+pub struct AnimationMap2D;

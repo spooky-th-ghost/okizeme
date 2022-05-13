@@ -34,13 +34,12 @@ struct Player(u8);
 fn setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
-    mut scene_spawner: ResMut<SceneSpawner>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     // Insert a resource with the current scene information
     commands.insert_resource(Animations(vec![
-         asset_server.load("models/Oki_frames.glb#Animation2"),
+        asset_server.load("models/Oki_frames.glb#Animation2"),
         asset_server.load("models/Oki_frames.glb#Animation1"),
         asset_server.load("models/Oki_frames.glb#Animation0"),
     ]));
@@ -74,12 +73,15 @@ fn setup(
         ..default()
     });
 
-    // Fox
-    let player = commands.spawn_bundle(TransformBundle::default())
+    // Oki
+    commands
+        .spawn_bundle(TransformBundle::default())
         .insert(Player(1))
-        .insert(Name::new("Player")).id();
-    scene_spawner.spawn_as_child(asset_server.load("models/Oki_frames.glb#Scene0"),player);
-    // scene_spawner.spawn(asset_server.load("models/Oki_frames.glb#Scene0"));
+        .insert(Name::new("Player"))
+        .with_children(|parent| {
+            parent.spawn_scene(asset_server.load("models/Oki_frames.glb#Scene0"));
+           
+        });
 
     println!("Animation controls:");
     println!("  - spacebar: Add 60 frames of hitpause");
@@ -104,11 +106,11 @@ fn setup_scene_once_loaded(
 fn keyboard_animation_control(
     mut coms: Commands,
     keyboard_input: Res<Input<KeyCode>>,
-    mut query: Query<(Entity,&mut AnimationPlayer, &mut Transform)>,
+    mut query: Query<(Entity,&mut AnimationPlayer)>,
     animations: Res<Animations>,
     mut current_animation: Local<usize>,
 ) {
-    if let Ok((entity,mut player, mut transform)) = query.get_single_mut() {
+    if let Ok((entity,mut player)) = query.get_single_mut() {
         if keyboard_input.just_pressed(KeyCode::Return) {
             *current_animation = (*current_animation + 1) % animations.0.len();
             player
@@ -117,8 +119,7 @@ fn keyboard_animation_control(
         }
 
         if keyboard_input.just_pressed(KeyCode::Space) {
-            coms.entity(entity).insert(Freeze::new(60));
+            coms.entity(entity).insert(Freeze::new(15));
         }
     }
 }
-

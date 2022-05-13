@@ -11,6 +11,7 @@ bevy = "0.7"
 okizeme_input = {path = "../okizeme_input", version="0.1.0"}
 okizeme_player = {path = "../okizeme_player", version="0.1.0"}
 okizeme_character = {path = "../okizeme_character", version="0.1.0"}
+okizeme_physics = {path = "../okizeme_physics"}
 okizeme_animation = {path = "../okizeme_animation", version="0.1.0"}
 okizeme_offense = {path = "../okizeme_offense", version="0.1.0"}
 okizeme_defense = {path = "../okizeme_defense", version="0.1.0"}

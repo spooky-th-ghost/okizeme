@@ -7,5 +7,7 @@ edition = "2021"
 
 [dependencies]
 bevy = "0.7"
+bevy-inspector-egui = "0.10"
 okizeme_input = {path = "../okizeme_input", version = "0.1.0"}
+okizeme_offense = {path ="../okizeme_offense", version = "0.1.0"}
 okizeme_utils = {path = "../okizeme_utils", version = "0.1.0"}

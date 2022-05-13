@@ -41,3 +41,9 @@ pub fn manage_freeze(
   }
 }
 
+#[derive(Debug, Clone, Eq, PartialEq, Hash)]
+pub enum GameState {
+  MainMenu,
+  InGame,
+  PauseMenu,
+}
