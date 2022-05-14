@@ -22,7 +22,7 @@ pub fn cancel_hitboxes(
             remove_hitbox();
           },
           Block | Chain => {
-            if !hitbox.is_projectile() {
+            if !hitbox.projectile() {
               remove_hitbox();
             }
           },
@@ -39,7 +39,7 @@ pub fn detect_collisions(
 ) {
   for (hit_id, mut hitbox, hit_sprite, hit_transform) in hitbox_query.iter_mut() {
     for (hurt_id, hurt_sprite, hurt_transform) in hurtbox_query.iter() {
-      if hitbox.active && hit_id != hurt_id {
+      if hitbox.active() && hit_id != hurt_id {
         let hit_pos = hit_transform.translation.clone();
         let hit_size = if let Some (size) = hit_sprite.custom_size {
           size
@@ -65,4 +65,21 @@ pub fn detect_collisions(
       }
     }
   }
+}
+
+pub fn handle_collisions(
+
+) {
+  // TODO: Handle collisions here
+  // Essentially, need to grab the following things:
+  //  Components:
+  // - Player Id (To find who to apply stun, damage and hitstop to)
+  // - CharacterState (To determine state and whether the hit can be blocked)
+  // Resources:
+  // - Inputs (Part of determining if the hitbox is blocked)
+  // - Health (yet created, to apply damage)
+  // - Combo (if a hit, add to the attackers combo and use it to determine damage/hitstun values, else start a combo)
+  // Events:
+  // - Hit (Reader: Find any collisions generated this frame)
+  // - Transition (Writer: Transition the collision reciever to a blocking or hit state)
 }
