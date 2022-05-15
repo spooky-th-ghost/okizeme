@@ -11,14 +11,14 @@ pub enum PlayerId {
 /// Primarily attached to enties when they should be skipped for animation 
 /// and physics calculations (i.e. during hitpause or a super flash)
 #[derive(Component)]
-pub struct Freeze {
+pub struct Hitstop {
     duration: u8,
     stun_value: Option<u8>
 }
 
-impl Freeze {
+impl Hitstop {
   pub fn new(duration: u8, stun_value: Option<u8>) -> Self {
-    Freeze {duration, stun_value}
+    Hitstop {duration, stun_value}
   }
 
   pub fn is_finished(&mut self) -> bool {
@@ -31,16 +31,16 @@ impl Freeze {
   }
 }
 
-pub fn manage_freeze(
+pub fn manage_hitstop(
   mut coms: Commands,
-  mut query: Query<(Entity,&mut Freeze)>,
+  mut query: Query<(Entity,&mut Hitstop)>,
 ) {
-  for  (entity, mut freeze) in query.iter_mut() {
-    if freeze.is_finished() {
-      if let Some(stun_frames) = freeze.stun_value {
-         coms.entity(entity).remove::<Freeze>().insert(Stun::new(stun_frames));
+  for  (entity, mut hitstop) in query.iter_mut() {
+    if hitstop.is_finished() {
+      if let Some(stun_frames) = hitstop.stun_value {
+         coms.entity(entity).remove::<Hitstop>().insert(Stun::new(stun_frames));
       } else {
-        coms.entity(entity).remove::<Freeze>();
+        coms.entity(entity).remove::<Hitstop>();
       }
     }
   }

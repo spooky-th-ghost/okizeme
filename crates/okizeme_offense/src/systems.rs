@@ -72,6 +72,8 @@ pub fn handle_collisions(
 ) {
   // TODO: Handle collisions here
   // Essentially, need to grab the following things:
+  //  Commands:
+  //  - Used to apply hitstop components
   //  Components:
   // - Player Id (To find who to apply stun, damage and hitstop to)
   // - CharacterState (To determine state and whether the hit can be blocked)

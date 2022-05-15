@@ -5,7 +5,7 @@ use bevy::{
 use bevy_inspector_egui::WorldInspectorPlugin;
 use okizeme::{
     animation::oki_animation_player,
-    types::{Freeze, manage_freeze},
+    types::{Hitstop, manage_hitstop},
 };
 fn main() {
     App::new()
@@ -20,7 +20,7 @@ fn main() {
         .add_stage("oki",SystemStage::single_threaded()
             .with_run_criteria(FixedTimestep::steps_per_second(60.))
             .with_system(oki_animation_player)
-            .with_system(manage_freeze)
+            .with_system(manage_hitstop)
         )
         .add_system(keyboard_animation_control)
         .run();
@@ -119,7 +119,7 @@ fn keyboard_animation_control(
         }
 
         if keyboard_input.just_pressed(KeyCode::Space) {
-            coms.entity(entity).insert(Freeze::new(15, None));
+            coms.entity(entity).insert(Hitstop::new(15, None));
         }
     }
 }
