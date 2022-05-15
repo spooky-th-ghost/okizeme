@@ -75,6 +75,7 @@ pub fn handle_collisions(
   //  Components:
   // - Player Id (To find who to apply stun, damage and hitstop to)
   // - CharacterState (To determine state and whether the hit can be blocked)
+  // - Velocity
   // Resources:
   // - Inputs (Part of determining if the hitbox is blocked)
   // - Health (yet created, to apply damage)

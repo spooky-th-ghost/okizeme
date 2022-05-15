@@ -3,6 +3,7 @@ use crate::{
     StunValues,
     ComboedState
 };
+/// Resource used to track player combos, as well as calculate damage and hitstun for those combos
 pub struct Combo {
     hit_count: u8,
     valid: bool,
@@ -13,7 +14,8 @@ pub struct Combo {
 }
 
 impl Combo {
-    fn new(hitbox: Hitbox) -> Self {
+    /// Create a new combo from a connected hitbox
+    pub fn new(hitbox: Hitbox) -> Self {
         Combo {  
             hit_count: 1, 
             valid: true, 
@@ -24,20 +26,43 @@ impl Combo {
         }
     }
 
-    fn add(&mut self, hitbox: Hitbox, missed_tech: bool) -> u8 {
+    /// Add a hit to a combo and return the damage and hitstun values to apply
+    pub fn add_to_combo(&mut self, hitbox: Hitbox, missed_tech: bool, comboed_state: ComboedState) -> (u8,u8) {
+        let stun_values = StunValues::from_attack_level(hitbox.level());
+        self.add_hit(missed_tech);
+        let adjusted_damage = self.scaled_damage(hitbox.damage());
+        self.total_damage += adjusted_damage;
+        let hit_stun = self.calculate_hitstun(comboed_state, stun_values);
+        (adjusted_damage, hit_stun)
+    }
+
+    fn add_hit(&mut self, missed_tech: bool) {
         if missed_tech {
             self.valid = false;
             self.breakpoints.push(self.hit_count);
+            if self.damage_scaling < 0.7 {
+                self.damage_scaling = 0.7;
+            }
+
+            if self.hitstun_modifier > 5 {
+                self.hitstun_modifier = 5;
+            }
+        } else {
+            self.damage_scaling -= 0.3;
+            self.hitstun_modifier += 3;
         }
-        let stun_values = StunValues::from_attack_level(hitbox.level());
-        // TODO: Add method here to add to the hitcount and re-calculate scaling
-        // possibly reset scaling to some value when a breakpoint occurs
+        self.damage_scaling = self.damage_scaling.clamp(0.3,1.5);
+        self.hitstun_modifier = self.hitstun_modifier.clamp(0, 12);
         self.hit_count += 1;
-        // call scaled damage here to get the adjusted value, add it to the combos total damage
-        // and then return how much damage was dealt
-        let adjusted_damage = self.scaled_damage(hitbox.damage());
-        self.total_damage += adjusted_damage;
-        adjusted_damage
+    }
+
+    fn calculate_hitstun(&self,comboed_state: ComboedState, stun_values: StunValues) -> u8 {
+        use ComboedState::*;
+        match comboed_state {
+            Standing => stun_values.standing_hitstun - self.hitstun_modifier,
+            Crouching => stun_values.crouching_hitstun - self.hitstun_modifier,
+            Juggle => stun_values.aerial_hitstun - self.hitstun_modifier
+        }
     }
 
     fn scaled_damage(&self, base_damage: u8) -> u8 {

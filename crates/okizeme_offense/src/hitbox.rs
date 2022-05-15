@@ -215,8 +215,7 @@ pub enum CancelTrigger{
 pub enum ComboedState{
   Standing,
   Crouching,
-  Juggle,
-  Persist
+  Juggle
 }
 #[derive(Bundle)]
 pub struct HitboxBundle {
