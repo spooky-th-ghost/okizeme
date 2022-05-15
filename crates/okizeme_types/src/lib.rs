@@ -9,7 +9,7 @@ pub enum PlayerId {
 }
 
 /// Primarily attached to enties when they should be skipped for animation 
-/// and physics calculations (i.e. during hitpause or a super flash)
+/// and physics calculations
 #[derive(Component)]
 pub struct Hitstop {
     duration: u8,
@@ -20,7 +20,6 @@ impl Hitstop {
   pub fn new(duration: u8, stun_value: Option<u8>) -> Self {
     Hitstop {duration, stun_value}
   }
-
   pub fn is_finished(&mut self) -> bool {
     if self.duration == 0 {
       true
@@ -38,7 +37,7 @@ pub fn manage_hitstop(
   for  (entity, mut hitstop) in query.iter_mut() {
     if hitstop.is_finished() {
       if let Some(stun_frames) = hitstop.stun_value {
-         coms.entity(entity).remove::<Hitstop>().insert(Stun::new(stun_frames));
+        coms.entity(entity).remove::<Hitstop>().insert(Stun::new(stun_frames));
       } else {
         coms.entity(entity).remove::<Hitstop>();
       }
@@ -50,8 +49,8 @@ pub fn manage_stun(
   mut coms: Commands,
   mut query: Query<(Entity,&mut Stun)>,
 ) {
-  for  (entity, mut hitstun) in query.iter_mut() {
-    if hitstun.is_finished() {
+  for  (entity, mut stun) in query.iter_mut() {
+    if stun.is_finished() {
       coms.entity(entity).remove::<Stun>();
     }
   }
