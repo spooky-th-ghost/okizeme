@@ -8,6 +8,34 @@ pub enum PlayerId {
   P2
 }
 
+pub trait SelfRemoving {
+  fn countdown(&mut self);
+  fn duration(&self) -> u8;
+
+  fn is_finished(&mut self) -> bool {
+    if self.duration() == 0 {
+      true
+    } else {
+      self.countdown();
+      false
+    }
+  }
+}
+
+macro_rules! SelfRemoving {
+  (for $($t:ty),+) => {
+      $(impl SelfRemoving for $t {
+        fn duration(&self) -> u8 {
+          self.duration
+        }
+      
+        fn countdown(&mut self) {
+          self.duration = countdown(self.duration);
+        }
+      })*
+  }
+}
+
 /// Primarily attached to enties when they should be skipped for animation 
 /// and physics calculations
 #[derive(Component)]
@@ -16,19 +44,38 @@ pub struct Hitstop {
     stun_value: Option<u8>
 }
 
+//Component used to pause input reading and state updates while in block or hit stun
+#[derive(Component)]
+pub struct Stun {
+    duration: u8
+}
+
+impl Stun {
+  pub fn new(duration: u8) -> Self {
+    Stun {duration}
+  }
+}
+
+/// Primarily attached to enties when they should be skipped for animation 
+/// and physics calculations
+#[derive(Component)]
+pub struct Busy{
+  duration: u8
+}
+
+impl Busy {
+  pub fn new(duration: u8) -> Self {
+    Busy {duration}
+  }
+}
+
 impl Hitstop {
   pub fn new(duration: u8, stun_value: Option<u8>) -> Self {
     Hitstop {duration, stun_value}
   }
-  pub fn is_finished(&mut self) -> bool {
-    if self.duration == 0 {
-      true
-    } else {
-      self.duration = countdown(self.duration);
-      false
-    }
-  }
 }
+
+SelfRemoving!(for Hitstop, Stun, Busy);
 
 pub fn manage_hitstop(
   mut coms: Commands,
@@ -56,25 +103,19 @@ pub fn manage_stun(
   }
 }
 
-#[derive(Component)]
-pub struct Stun {
-    duration: u8
-}
 
-impl Stun {
-  pub fn new(duration: u8) -> Self {
-    Stun {duration}
-  }
-
-  pub fn is_finished(&mut self) -> bool {
-    if self.duration == 0 {
-      true
-    } else {
-      self.duration = countdown(self.duration);
-      false
+pub fn manage_budy(
+  mut coms: Commands,
+  mut query: Query<(Entity,&mut Busy)>,
+) {
+  for  (entity, mut busy) in query.iter_mut() {
+    if busy.is_finished() {
+      coms.entity(entity).remove::<Busy>();
     }
   }
 }
+
+
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub enum GameState {

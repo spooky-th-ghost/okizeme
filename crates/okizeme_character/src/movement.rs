@@ -32,6 +32,11 @@ impl Movement {
   pub fn spend_airdash(&mut self) {
     self.airdashes_remaining = countdown(self.airdashes_remaining);
   }
+
+  pub fn land(&mut self) {
+    self.air_jumps_remaining = self.air_jumps;
+    self.airdashes_remaining = self.airdashes;
+  }
 }
 
 #[derive(Clone, Copy, Debug, Inspectable)]
