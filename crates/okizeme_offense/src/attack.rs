@@ -6,12 +6,14 @@ use crate::{
 //#[cfg_attr(feature = "debug", derive(bevy_inspector_egui::Inspectable))]
 #[derive(Debug, Clone, Inspectable)]
 pub struct Attack {
+  pub name: String,
+  pub duration: u8,
   pub attack_events: Vec<AttackEvent>
 }
 
 impl Default for Attack {
   fn default() -> Self {
-      Attack { attack_events: Vec::new() }
+      Attack { name: "none".to_string(), duration: 0, attack_events: Vec::new() }
   }
 }
 

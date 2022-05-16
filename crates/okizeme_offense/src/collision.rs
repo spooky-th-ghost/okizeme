@@ -20,6 +20,6 @@ impl Collision {
 
 pub struct CollisionEvent{
   pub collision: Collision,
-  pub player_id: PlayerId,
-  pub recieving_player_id: PlayerId,
+  pub offense_id: PlayerId,
+  pub defense_id: PlayerId,
 }

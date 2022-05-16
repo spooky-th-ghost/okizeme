@@ -39,6 +39,9 @@ impl Velocity {
         self.interpolated_force = Some(interpolated_force);
     }
 
+    pub fn is_falling(&self) -> bool {
+      self.force.y < 0.0
+    }
 }
 
 #[derive(Clone, Copy, Debug)]
