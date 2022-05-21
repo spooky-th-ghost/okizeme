@@ -47,7 +47,6 @@ impl Velocity {
 #[derive(Clone, Copy, Debug)]
 pub struct InterpolatedForce {
   current_velocity: Vec2,
-  starting_velocity: Vec2,
   ending_velocity: Vec2,
   duration: u8,
   frames_elapsed: u8
@@ -55,10 +54,9 @@ pub struct InterpolatedForce {
 
 impl InterpolatedForce {
 
-  pub fn new(starting_velocity: Vec2, ending_velocity: Vec2, duration: u8) -> Self {
+  pub fn new(current_velocity: Vec2, ending_velocity: Vec2, duration: u8) -> Self {
     return InterpolatedForce {
-      current_velocity: starting_velocity,
-      starting_velocity,
+      current_velocity,
       ending_velocity,
       duration,
       frames_elapsed: 0

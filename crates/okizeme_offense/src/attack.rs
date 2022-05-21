@@ -3,7 +3,6 @@ use crate::{
   Hitbox
 };
 
-//#[cfg_attr(feature = "debug", derive(bevy_inspector_egui::Inspectable))]
 #[derive(Debug, Clone, Inspectable)]
 pub struct Attack {
   pub name: String,
@@ -17,7 +16,7 @@ impl Default for Attack {
   }
 }
 
-//#[cfg_attr(feature = "debug", derive(bevy_inspector_egui::Inspectable))]
+
 #[derive(Debug, Clone, Inspectable)]
 pub struct AttackEvent {
   pub frame: u8,
