@@ -11,12 +11,12 @@ pub trait CustomLerp {
 
 impl CustomLerp for Vec2 {
   fn custom_lerp(&self, target: Vec2, t: f32) -> Vec2 {
-    if &self.distance(target) > &0.02 {
+    if self.distance(target) > 0.02 {
       let _x = self.x.lerp(target.x,t);
       let _y = self.y.lerp(target.y,t);
-      return Vec2::new(_x,_y);
+      Vec2::new(_x,_y)
     } else {
-      return target;
+      target
     }
   }
 }
@@ -32,7 +32,7 @@ pub struct Velocity {
 
 impl Velocity {
     pub fn interpolated_force(&self) -> Option<InterpolatedForce> {
-        self.interpolated_force.clone()
+        self.interpolated_force
     }
 
     pub fn set_interpolated_force(&mut self, interpolated_force: InterpolatedForce) {
@@ -55,7 +55,7 @@ pub struct InterpolatedForce {
 impl InterpolatedForce {
 
   pub fn new(current_velocity: Vec2, ending_velocity: Vec2, duration: u8) -> Self {
-    return InterpolatedForce {
+    InterpolatedForce {
       current_velocity,
       ending_velocity,
       duration,
@@ -67,7 +67,7 @@ impl InterpolatedForce {
     self.tick();
     let t = self.frames_elapsed as f32 / self.duration as f32;
     self.current_velocity = self.current_velocity.custom_lerp(self.ending_velocity,t);
-    return self.current_velocity;
+    self.current_velocity
   }
 
   pub fn tick(&mut self) {
@@ -75,6 +75,6 @@ impl InterpolatedForce {
   }
 
   pub fn is_finished(&self) -> bool {
-    return self.duration == self.frames_elapsed;
+    self.duration == self.frames_elapsed
   }
 }

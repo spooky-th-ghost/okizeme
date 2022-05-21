@@ -73,7 +73,7 @@ impl Buffer {
     for motion in self.motions.iter() {
       write!(motions_string,"{:?}",motion).unwrap();
     }
-    return motions_string;
+    motions_string
   }
 
   pub fn consume_motion(&mut self) {
@@ -91,7 +91,7 @@ impl Buffer {
       for command_motion in MOTIONS.iter() {
         if  command_motion.check(&motion_string[..], priority) {
           priority = command_motion.priority;
-          current_command = Some(command_motion.command.clone());
+          current_command = Some(command_motion.command);
         }
       }
 

@@ -69,16 +69,14 @@ impl PlayerData {
 
     if p1_x_pos > p2_x_pos {
       if *player_id == PlayerId::P1 {
-        return -1.0;
+        -1.0
       } else {
-        return 1.0;
+        1.0
       }
+    } else if *player_id == PlayerId::P1 {
+      1.0
     } else {
-      if *player_id == PlayerId::P1 {
-        return 1.0;
-      } else {
-        return -1.0;
-      }
+      -1.0
     }
   }
 
@@ -95,17 +93,16 @@ impl PlayerData {
       PlayerId::P1 => 0,
       PlayerId::P2 => 1,
     };
-    return self.positions[i].get_position()
+    self.positions[i].get_position()
   }
 
   pub fn get_distance(&self) -> f32 {
-    return self.positions[0].get_position().distance(self.positions[1].get_position());
+    self.positions[0].get_position().distance(self.positions[1].get_position())
   }
 
   pub fn get_mid_point(&self) -> Vec2 {
     let p1 = self.positions[0].get_position();
     let p2 = self.positions[1].get_position();
-
-    return Vec2::new(p1.x+p2.x/2.0, p1.y+p2.y/2.0)
+    Vec2::new(p1.x+p2.x/2.0, p1.y+p2.y/2.0)
   }
 }

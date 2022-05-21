@@ -18,7 +18,7 @@ impl CommandMotion {
   }
 
   pub fn check(&self, buffer_string: &str, buffer_priority: u8) -> bool {
-    return self.regular_expression.is_match(buffer_string) && self.priority > buffer_priority;
+    self.regular_expression.is_match(buffer_string) && self.priority > buffer_priority
   }
 
 

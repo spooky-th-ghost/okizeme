@@ -17,19 +17,8 @@ impl Default for Attack {
 }
 
 
-#[derive(Debug, Clone, Inspectable)]
+#[derive(Debug, Default, Clone, Inspectable)]
 pub struct AttackEvent {
   pub frame: u8,
   pub hitbox: Hitbox,
 }
-
-impl Default for AttackEvent {
-  fn default() -> Self {
-      AttackEvent {
-        frame: 0,
-        hitbox: Hitbox::default()
-      }
-  }
-}
-
-

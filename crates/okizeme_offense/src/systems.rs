@@ -40,14 +40,14 @@ pub fn detect_collisions(
   for (hit_id, mut hitbox, hit_sprite, hit_transform) in hitbox_query.iter_mut() {
     for (hurt_id, hurt_sprite, hurt_transform) in hurtbox_query.iter() {
       if hitbox.active() && hit_id != hurt_id {
-        let hit_pos = hit_transform.translation.clone();
+        let hit_pos = hit_transform.translation;
         let hit_size = if let Some (size) = hit_sprite.custom_size {
           size
         } else {
           Vec2::ZERO
         };
 
-        let hurt_pos = hurt_transform.translation.clone();
+        let hurt_pos = hurt_transform.translation;
         let hurt_size = if let Some (size) = hurt_sprite.custom_size {
           size
         } else {

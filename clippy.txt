@@ -1,0 +1,31 @@
+warning: associated function is never used: `new`
+  --> crates\okizeme_input\src\input_event.rs:19:6
+   |
+19 |   fn new(
+   |      ^^^
+   |
+   = note: `#[warn(dead_code)]` on by default
+
+warning: `okizeme_input` (lib) generated 1 warning
+    Checking okizeme_character v0.1.0 (C:\Users\Colin\Documents\Projects\Rust\okizeme\crates\okizeme_character)
+warning: associated function is never used: `buffer_attack`
+   --> crates\okizeme_character\src\state.rs:299:6
+    |
+299 |   fn buffer_attack(&self, attack: Attack) -> Self {
+    |      ^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` on by default
+
+warning: very complex type used. Consider factoring parts into `type` definitions
+  --> crates\okizeme_character\src\systems.rs:19:16
+   |
+19 |     mut query: Query<(&PlayerId, &mut CharacterState, &mut Movement, &mut Velocity), (Without<Hitstop>, Without<Busy>)>,
+   |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(clippy::type_complexity)]` on by default
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#type_complexity
+
+warning: `okizeme_character` (lib) generated 2 warnings
+    Checking okizeme_core v0.1.0 (C:\Users\Colin\Documents\Projects\Rust\okizeme\crates\okizeme_core)
+    Checking okizeme v0.1.0 (C:\Users\Colin\Documents\Projects\Rust\okizeme)
+    Finished dev [optimized + debuginfo] target(s) in 1.84s

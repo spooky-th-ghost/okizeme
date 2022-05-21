@@ -79,7 +79,7 @@ impl InputMap {
         RawButton::G(device_id,button_type) => button_input.pressed(GamepadButton(device_id, button_type)),
       };
 
-      return InputActionsPressed {
+      InputActionsPressed {
         a: a_pressed,
         b: b_pressed,
         c: c_pressed,

@@ -55,9 +55,9 @@ impl Default for Backdash {
 impl Backdash {
   pub fn get_duration(&self) -> u8 {
     match self {
-      Backdash::Standard {busy, speed: _, motion_duration: _} => return *busy,
-      Backdash::Teleport {busy, distance: _, motion_duration: _} => return *busy,
-      Backdash::Leap {busy, motion_duration: _} => return *busy
+      Backdash::Standard {busy, speed: _, motion_duration: _} => *busy,
+      Backdash::Teleport {busy, distance: _, motion_duration: _} => *busy,
+      Backdash::Leap {busy, motion_duration: _} => *busy
     }
   }
 }

@@ -1,8 +1,8 @@
 pub fn countdown(val: u8) -> u8 {
     if val > 0 {
-        return val - 1;
+        val - 1
     } else {
-        return 0;
+        0
     }
 }
 
@@ -15,31 +15,19 @@ trait MotionGroups {
 
 impl MotionGroups for u8 {
     fn x_positive(&self) -> bool {
-        match self {
-            6 | 3 | 9 => true,
-            _ => false,
-        }
+        matches!(self, 6 | 3 | 9)
     }
 
     fn y_positive(&self) -> bool {
-        match self {
-            7 | 8 | 9 => true,
-            _ => false,
-        }
+        matches!(self, 7 | 8 | 9)
     }
 
     fn x_negative(&self) -> bool {
-        match self {
-            4 | 1 | 7 => true,
-            _ => false,
-        }
+        matches!(self, 4 | 1 | 7)
     }
 
     fn y_negative(&self) -> bool {
-        match self {
-            1 | 2 | 3 => true,
-            _ => false,
-        }
+        matches!(self, 1 | 2 | 3)
     }
 }
 

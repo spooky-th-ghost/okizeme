@@ -19,6 +19,6 @@ impl Position {
   }
 
   pub fn get_position(&self) -> Vec3 {
-    return self.position.clone();
+    self.position
   }
 }

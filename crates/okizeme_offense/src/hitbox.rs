@@ -67,7 +67,7 @@ impl Hitbox {
 
   /// Should the hitbox be removed
   pub fn finished(&self) -> bool {
-    return self.duration == 0;
+    self.duration == 0
   }
 
   /// Base damage for the hitbox
@@ -86,7 +86,7 @@ impl Hitbox {
   }
 
   pub fn generate_collision(&self, hurtbox: &Hurtbox) -> Collision {
-    return Collision::new(self.clone(), self.is_blocked(hurtbox));
+    Collision::new(*self, self.is_blocked(hurtbox))
   }
 
   /// Returns if a Hitbox is blocked by a Hurtbox it overlaps
@@ -94,30 +94,10 @@ impl Hitbox {
     use AttackProperty::*;
     use BlockState::*;
     match hurtbox.block_state {
-      Stand {barrier:_, instant:_} => {
-        match self.property {
-          Low => return false,
-          _ => return true
-        }
-      },
-      Crouch {barrier:_, instant:_} => {
-        match self.property {
-          High => return false,
-          _ => return true
-        }
-      },
-      Air {barrier, instant:_} => {
-        if self.air_blockable {
-          return true
-        } else {
-          if barrier {
-            return true
-          } else {
-            return false
-          }
-        }
-      },
-      None => return false,
+      Stand {barrier:_, instant:_} => !matches!(self.property, Low),
+      Crouch {barrier:_, instant:_} => !matches!(self.property, High),
+      Air {barrier, instant:_} =>  self.air_blockable || barrier,
+      None => false,
     }
   }
 }

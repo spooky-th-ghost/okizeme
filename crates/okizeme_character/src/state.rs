@@ -127,7 +127,7 @@ impl CharacterState {
       None
     };
     *self = new_state;
-    return transition;
+    transition
   }
 
   /// Returns a new state based on input from the following states:
@@ -147,11 +147,11 @@ impl CharacterState {
     }
 
     match buffer.current_motion {
-      4 => return BackWalking,
-      6 => return Walking,
-      1 | 2 | 3 => return Crouching,
-      7 | 8 | 9 => return Self::buffer_jump(buffer.current_motion, &movement.clone(), false),
-      _ => return Idle
+      4 => BackWalking,
+      6 => Walking,
+      1 | 2 | 3 => Crouching,
+      7 | 8 | 9 => Self::buffer_jump(buffer.current_motion, &movement.clone(), false),
+      _ => Idle
     }
   }
 
@@ -175,11 +175,11 @@ impl CharacterState {
   pub fn from_dashing(&self, buffer: &Buffer, movement: &Movement) -> Self {
     use CharacterState::*;
     match buffer.current_motion {
-      4 => return BackWalking,
-      6 => return Dashing,
-      1 | 2 | 3 => return Crouching,
-      7 | 8 | 9 => return Self::buffer_dash_jump(buffer.current_motion, movement, false),
-      _ => return Idle
+      4 => BackWalking,
+      6 => Dashing,
+      1 | 2 | 3 => Crouching,
+      7 | 8 | 9 => Self::buffer_dash_jump(buffer.current_motion, movement, false),
+      _ => Idle
     }
   }
 
@@ -189,17 +189,17 @@ impl CharacterState {
     match self {
       AirDashing {duration, velocity:_} => {
         if *duration == 0 {
-          return self.from_neutral_airborne(buffer, movement, velocity, Vec3::ONE);
+          return self.from_neutral_airborne(buffer, movement, velocity, Vec3::ONE)
         }
-        return self.clone();
+        self.clone()
       },
       AirBackDashing {duration, velocity:_} => {
         if *duration == 0 {
-          return self.from_neutral_airborne(buffer, movement, velocity, Vec3::ONE);
+          return self.from_neutral_airborne(buffer, movement, velocity, Vec3::ONE)
         }
-        return self.clone();
+        self.clone()
       },
-      _ => return self.clone(),
+      _ => self.clone(),
     }
   }
 
@@ -215,10 +215,10 @@ impl CharacterState {
     }
     match self {
       Rising | Falling | AirDashing {duration:_,velocity:_} |  AirBackDashing {duration:_,velocity:_} => {
-        return self.from_airborne_input(buffer, movement, velocity);
+        self.from_airborne_input(buffer, movement, velocity)
       },
-      _ => return self.clone(),
-    };
+      _ => self.clone(),
+    }
   }
 
   /// Returns a new state based on input and the backdash timer from backdash
@@ -229,9 +229,9 @@ impl CharacterState {
         if *duration == 0 {
           return self.from_neutral_states(buffer, movement, velocity);
         }
-        return self.clone();
+        self.clone()
       },
-      _ => return self.clone(),
+      _ => self.clone(),
     }
   }
 
@@ -243,9 +243,9 @@ impl CharacterState {
         if *duration == 0 || *cancellable {
           return self.from_neutral_states(buffer, movement, velocity);
         }
-        return self.clone();
+        self.clone()
       },
-      _ => return self.clone(),
+      _ => self.clone(),
     }
   }
 
@@ -269,7 +269,7 @@ impl CharacterState {
       }
     }
 
-    return match self {
+    match self {
       AirDashing {duration:_,velocity:_} => {
         if self.is_finished_airdashing() {
           Falling
@@ -297,7 +297,7 @@ impl CharacterState {
 
   /// Returns an attacking state, with the passed attack
   fn buffer_attack(&self, attack: Attack) -> Self {
-    return CharacterState::Attacking {duration: attack.duration, attack: attack.clone(), cancellable: false}
+    CharacterState::Attacking {duration: attack.duration, attack, cancellable: false}
   }
 
   /// Returns a backdashing state, based on movement
@@ -311,9 +311,9 @@ impl CharacterState {
           motion_duration
         );
         velocity.set_interpolated_force(i_force);
-        return CharacterState::BackDashing {duration: busy} //TODO add a busy here
+        CharacterState::BackDashing {duration: busy} //TODO add a busy here
       },
-      _ => return Self::Idle
+      _ => Self::Idle
     }
   }
 
@@ -342,7 +342,7 @@ impl CharacterState {
     };
     
     let velocity = Vec2::new(x_velocity, y_velocity);
-    return Self::Jumpsquat {duration: 3, velocity}
+    Self::Jumpsquat {duration: 3, velocity}
   }
 
   /// Returns a Jumpsquat state from a neutral state, with a buffered jump based on character movement and input buffer
@@ -360,7 +360,7 @@ impl CharacterState {
     };
     
     let velocity = Vec2::new(x_velocity, y_velocity);
-    return Self::Jumpsquat {duration: 3, velocity}
+    Self::Jumpsquat {duration: 3, velocity}
   }
 
   /// If the new state does not match the old state, generate an animation transition
@@ -401,50 +401,40 @@ impl CharacterState {
           events.push(e.clone());
         }
       }
-      if events.len() != 0 {
-        return Some(events);
+      if !events.is_empty() {
+        Some(events)
       } else {
-        return None;
+        None
       }
     } else {
-      return None;
+      None
     }
   }
 
   /// Returns whether or not the character can turn around, based on current state
   pub fn get_can_turn(&self) -> bool {
     use CharacterState::*;
-    match self {
-      Idle
-      | Walking
-      | BackWalking
-      | Crouching
-      | Rising
-      | Falling => return true,
-      _ => return false
-    }
+    matches!(self, Idle | Walking | BackWalking | Crouching | Rising | Falling)
   }
 
   /// Returns whether or not the character is in the air, based on current state
   pub fn get_airborne(&self) -> bool {
     use CharacterState::*;
-    match self {
+    matches!(self,
       AirJumpsquat {duration:_, velocity:_}
       | Rising
       | Falling
       | AirDashing {duration:_, velocity:_}
-      | AirBackDashing {duration:_, velocity:_} => return true,
-      _ => return false
-    }
+      | AirBackDashing {duration:_, velocity:_})
   }
 
   /// Updates the current state if finishing an airdash
   pub fn is_finished_airdashing(&self) -> bool {
     use CharacterState::*;
     match self {
-      AirDashing {duration,velocity:_} => return *duration == 0,
-      AirBackDashing {duration,velocity:_} => return *duration == 0,
-      _ => return false,
+      AirDashing {duration,velocity:_} => *duration == 0,
+      AirBackDashing {duration,velocity:_} => *duration == 0,
+      _ => false,
     }
   }
 
