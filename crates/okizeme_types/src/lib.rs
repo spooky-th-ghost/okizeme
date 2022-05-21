@@ -44,6 +44,12 @@ pub struct Hitstop {
     stun_value: Option<u8>
 }
 
+impl Hitstop {
+  pub fn new(duration: u8, stun_value: Option<u8>) -> Self {
+    Hitstop {duration, stun_value}
+  }
+}
+
 //Component used to pause input reading and state updates while in block or hit stun
 #[derive(Component)]
 pub struct Stun {
@@ -66,12 +72,6 @@ pub struct Busy{
 impl Busy {
   pub fn new(duration: u8) -> Self {
     Busy {duration}
-  }
-}
-
-impl Hitstop {
-  pub fn new(duration: u8, stun_value: Option<u8>) -> Self {
-    Hitstop {duration, stun_value}
   }
 }
 
@@ -104,7 +104,7 @@ pub fn manage_stun(
 }
 
 
-pub fn manage_budy(
+pub fn manage_busy(
   mut coms: Commands,
   mut query: Query<(Entity,&mut Busy)>,
 ) {
@@ -114,8 +114,6 @@ pub fn manage_budy(
     }
   }
 }
-
-
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub enum GameState {
