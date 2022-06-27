@@ -4,22 +4,22 @@ use crate::{
   Hitbox
 };
 
-pub struct Collision {
+pub struct Hit {
   pub hitbox: Hitbox,
   pub blocked: bool,
 }
 
-impl Collision {
+impl Hit {
   pub fn new(hitbox: Hitbox, blocked: bool) -> Self {
-    Collision {
+    Hit {
       hitbox,
       blocked
     }
   }
 }
 
-pub struct CollisionEvent{
-  pub collision: Collision,
+pub struct HitEvent{
+  pub hitbox: Hitbox,
   pub offense_id: PlayerId,
   pub defense_id: PlayerId,
 }

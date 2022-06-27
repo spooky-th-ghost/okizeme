@@ -1,0 +1,18 @@
+[package]
+name = "okizeme_systems"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+bevy = "0.7"
+
+okizeme_animation = {path = "../okizeme_animation", version="0.1.0"}
+okizeme_player = {path = "../okizeme_player", version="0.1.0"}
+okizeme_defense = {path = "../okizeme_defense", version="0.1.0"}
+okizeme_types = {path = "../okizeme_types", version="0.1.0"}
+okizeme_utils = {path = "../okizeme_utils", version="0.1.0"}
+okizeme_offense = {path = "../okizeme_offense", version="0.1.0"}
+okizeme_character = {path = "../okizeme_character", version="0.1.0"}
+okizeme_physics = {path = "../okizeme_physics", version="0.1.0"}

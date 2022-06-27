@@ -417,6 +417,22 @@ impl CharacterState {
     matches!(self, Idle | Walking | BackWalking | Crouching | Rising | Falling)
   }
 
+  /// Returns whether or not the character can block, based on their current state
+  pub fn get_can_block(&self) -> bool {
+    use CharacterState::*;
+    match self {
+        Idle
+        | Walking
+        | BackWalking
+        | Crouching
+        | Falling
+        | Dashing
+        => true,
+        _ => false
+
+    }
+  }
+
   /// Returns whether or not the character is in the air, based on current state
   pub fn get_airborne(&self) -> bool {
     use CharacterState::*;
