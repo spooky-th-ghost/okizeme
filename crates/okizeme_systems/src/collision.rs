@@ -1,14 +1,21 @@
 
 use bevy::{prelude::*, sprite::collide_aabb::collide};
-use okizeme_defense::Hurtbox;
-use okizeme_types::PlayerId;
-use okizeme_physics::Velocity;
-use okizeme_character::CharacterState;
+use okizeme_defense::{
+    Hurtbox, 
+    BlockState
+};
+use okizeme_types::{
+    PlayerId,
+    Hitstop,
+    Stun
+};
 use okizeme_offense::{
   Hitbox,
   CancelEvent,
   CancelTrigger, 
-  HitEvent
+  CollisionEvent,
+  HitEvent, 
+  CollisionType
 };
 
 pub fn cancel_hitboxes(
@@ -39,7 +46,7 @@ pub fn cancel_hitboxes(
 pub fn detect_collisions(
   mut hitbox_query: Query<(&PlayerId, &mut Hitbox, &Sprite, &Transform)>,
   hurtbox_query: Query<(&PlayerId, &Sprite, &Transform), With<Hurtbox>>,
-  mut hit_writer: EventWriter<HitEvent>
+  mut collision_writer: EventWriter<CollisionEvent>
 ) {
   for (hit_id, mut hitbox, hit_sprite, hit_transform) in hitbox_query.iter_mut() {
     for (hurt_id, hurt_sprite, hurt_transform) in hurtbox_query.iter() {
@@ -63,7 +70,7 @@ pub fn detect_collisions(
           hit_size, 
           hurt_pos, hurt_size
         ) {
-          hit_writer.send(HitEvent {
+          collision_writer.send(CollisionEvent {
             hitbox: hitbox.clone(),
             offense_id: *hit_id,
             defense_id: *hurt_id
@@ -76,9 +83,47 @@ pub fn detect_collisions(
 }
 
 pub fn handle_collisions(
-    mut commands: Commands,
-    mut defender_query: Query<(&PlayerId, &CharacterState, &Velocity)>
+    player_query: Query<(&PlayerId, &BlockState)>,
+    mut collision_reader: EventReader<CollisionEvent>,
+    mut hit_writer: EventWriter<HitEvent>
 ) {
+    for event in collision_reader.iter() {
+        for (player_id, block_state) in player_query.iter() {
+            if *player_id == event.defense_id {
+                let hit = event.hitbox.generate_collision(block_state);
+                hit_writer.send(HitEvent {
+                   hit,
+                   defense_id: event.defense_id,
+                   offense_id: event.offense_id
+                })
+            }
+        }
+    }
+}
+
+pub fn handle_hits(
+    mut commands: Commands,
+    player_query: Query<(Entity, &PlayerId)>,
+    mut hit_reader: EventReader<HitEvent>
+) {
+    for event in hit_reader.iter() {
+        let stun_value = event.hit.hitbox.get_stun_value();
+        for (entity, player_id) in player_query.iter() {
+            commands.entity(entity).insert(Hitstop::new(stun_value.hitstop));
+            if *player_id == event.defense_id {
+                let stun_duration = match event.hit.collision_type {
+                   CollisionType::StandHit {mixed:_} => stun_value.standing_hitstun,
+                   CollisionType::CrouchHit { mixed:_} => stun_value.crouching_hitstun,
+                   CollisionType::AirHit { mixed:_} => stun_value.aerial_hitstun,
+                   CollisionType::StandBlock {modifier}
+                   | CollisionType::CrouchBlock {modifier}
+                   | CollisionType::AirBlock {modifier} => modifier.get_stun_difference(stun_value.blockstun),
+                };
+                commands.entity(entity).insert(Stun::new(stun_duration));
+            }
+        }
+    }
+}
   // TODO: Handle collisions here
   // Essentially, need to grab the following things:
   //  Commands:
@@ -94,4 +139,3 @@ pub fn handle_collisions(
   // Events:
   // - Hit (Reader: Find any collisions generated this frame)
   // - Transition (Writer: Transition the collision reciever to a blocking or hit state)
-}

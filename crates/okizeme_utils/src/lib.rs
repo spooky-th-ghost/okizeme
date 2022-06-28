@@ -6,7 +6,7 @@ pub fn countdown(val: u8) -> u8 {
     }
 }
 
-trait MotionGroups {
+pub trait MotionGroups {
     fn y_negative(&self) -> bool;
     fn y_positive(&self) -> bool;
     fn x_positive(&self) -> bool;

@@ -1,24 +1,30 @@
 use okizeme_types::PlayerId;
-
+use okizeme_defense::BlockModifier;
 use crate::{
   Hitbox
 };
 
 pub struct Hit {
   pub hitbox: Hitbox,
-  pub blocked: bool,
+  pub collision_type: CollisionType,
 }
 
-impl Hit {
-  pub fn new(hitbox: Hitbox, blocked: bool) -> Self {
-    Hit {
-      hitbox,
-      blocked
-    }
-  }
+pub enum CollisionType {
+    StandHit {mixed: bool},
+    StandBlock {modifier: BlockModifier},
+    CrouchHit {mixed: bool},
+    CrouchBlock {modifier: BlockModifier},
+    AirHit {mixed: bool},
+    AirBlock {modifier: BlockModifier}
 }
 
-pub struct HitEvent{
+pub struct HitEvent {
+    pub hit: Hit,
+    pub defense_id: PlayerId,
+    pub offense_id: PlayerId
+}
+
+pub struct CollisionEvent{
   pub hitbox: Hitbox,
   pub offense_id: PlayerId,
   pub defense_id: PlayerId,

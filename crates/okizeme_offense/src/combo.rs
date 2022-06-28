@@ -1,6 +1,6 @@
 use crate::{
     Hitbox,
-    StunValues,
+    StunValue,
     ComboedState
 };
 /// Resource used to track player combos, as well as calculate damage and hitstun for those combos
@@ -28,11 +28,11 @@ impl Combo {
 
     /// Add a hit to a combo and return the damage and hitstun values to apply
     pub fn add_to_combo(&mut self, hitbox: Hitbox, missed_tech: bool, comboed_state: ComboedState) -> (u8,u8) {
-        let stun_values = StunValues::from_attack_level(hitbox.level());
+        let stun_value = StunValue::from_attack_level(hitbox.level());
         self.add_hit(missed_tech);
         let adjusted_damage = self.scaled_damage(hitbox.damage());
         self.total_damage += adjusted_damage;
-        let hit_stun = self.calculate_hitstun(comboed_state, stun_values);
+        let hit_stun = self.calculate_hitstun(comboed_state, stun_value);
         (adjusted_damage, hit_stun)
     }
 
@@ -56,12 +56,12 @@ impl Combo {
         self.hit_count += 1;
     }
 
-    fn calculate_hitstun(&self,comboed_state: ComboedState, stun_values: StunValues) -> u8 {
+    fn calculate_hitstun(&self,comboed_state: ComboedState, stun_value: StunValue) -> u8 {
         use ComboedState::*;
         match comboed_state {
-            Standing => stun_values.standing_hitstun - self.hitstun_modifier,
-            Crouching => stun_values.crouching_hitstun - self.hitstun_modifier,
-            Juggle => stun_values.aerial_hitstun - self.hitstun_modifier
+            Standing => stun_value.standing_hitstun - self.hitstun_modifier,
+            Crouching => stun_value.crouching_hitstun - self.hitstun_modifier,
+            Juggle => stun_value.aerial_hitstun - self.hitstun_modifier
         }
     }
 

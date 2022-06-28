@@ -40,14 +40,13 @@ macro_rules! SelfRemoving {
 /// and physics calculations
 #[derive(Component)]
 pub struct Hitstop {
-    duration: u8,
-    stun_value: Option<u8>
+    duration: u8
 }
 
 impl Hitstop {
-  pub fn new(duration: u8, stun_value: Option<u8>) -> Self {
-    Hitstop {duration, stun_value}
-  }
+    pub fn new(duration: u8) -> Self {
+        Hitstop {duration}
+    }
 }
 
 //Component used to pause input reading and state updates while in block or hit stun
@@ -56,10 +55,10 @@ pub struct Stun {
     duration: u8
 }
 
-impl Stun {
-  pub fn new(duration: u8) -> Self {
-    Stun {duration}
-  }
+impl Stun{
+    pub fn new(duration: u8) -> Self {
+        Stun {duration}
+    }
 }
 
 /// Primarily attached to enties when they should be skipped for animation 
@@ -83,18 +82,14 @@ pub fn manage_hitstop(
 ) {
   for  (entity, mut hitstop) in query.iter_mut() {
     if hitstop.is_finished() {
-      if let Some(stun_frames) = hitstop.stun_value {
-        coms.entity(entity).remove::<Hitstop>().insert(Stun::new(stun_frames));
-      } else {
         coms.entity(entity).remove::<Hitstop>();
-      }
     }
   }
 }
 
 pub fn manage_stun(
   mut coms: Commands,
-  mut query: Query<(Entity,&mut Stun)>,
+  mut query: Query<(Entity,&mut Stun), Without<Hitstop>>,
 ) {
   for  (entity, mut stun) in query.iter_mut() {
     if stun.is_finished() {
