@@ -17,3 +17,4 @@ okizeme_offense = {path = "../okizeme_offense", version="0.1.0"}
 okizeme_defense = {path = "../okizeme_defense", version="0.1.0"}
 okizeme_utils = {path = "../okizeme_utils", version="0.1.0"}
 okizeme_types = {path = "../okizeme_types", version="0.1.0"}
+okizeme_systems = {path ="../okizeme_systems", version="0.1.0"}

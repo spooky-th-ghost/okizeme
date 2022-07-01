@@ -90,7 +90,9 @@ pub fn handle_collisions(
     for event in collision_reader.iter() {
         let hitstop: u8 = event.hitbox.get_stun_value().hitstop;
         for (entity, player_id, block_state) in player_query.iter() {
-            commands.entity(entity).insert(Hitstop::new(hitstop));
+            if !event.hitbox.projectile() {
+                commands.entity(entity).insert(Hitstop(hitstop));
+            }
             if *player_id == event.defense_id {
                 let hit = event.hitbox.generate_collision(block_state);
                 let stun_value = event.hitbox.get_stun_value(); 
@@ -102,7 +104,10 @@ pub fn handle_collisions(
                    | CollisionType::CrouchBlock {modifier}
                    | CollisionType::AirBlock {modifier} => modifier.get_stun_difference(stun_value.blockstun),
                 };
-                commands.entity(entity).insert(Stun::new(stun_duration));
+                commands.entity(entity).insert(Stun(stun_duration));
+                if event.hitbox.projectile() {
+                    commands.entity(entity).insert(Hitstop(hitstop));
+                }
             }
         }
     }

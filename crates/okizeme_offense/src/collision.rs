@@ -1,8 +1,6 @@
 use okizeme_types::PlayerId;
 use okizeme_defense::BlockModifier;
-use crate::{
-  Hitbox
-};
+use crate::Hitbox;
 
 pub struct Hit {
   pub hitbox: Hitbox,
@@ -19,9 +17,10 @@ pub enum CollisionType {
 }
 
 pub struct ImpactEvent {
-    pub hit: Hit,
     pub defense_id: PlayerId,
-    pub offense_id: PlayerId
+    pub offense_id: PlayerId,
+    pub mixed: bool,
+    pub hitbox: Hitbox
 }
 
 pub struct CollisionEvent{

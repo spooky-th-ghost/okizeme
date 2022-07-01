@@ -26,11 +26,11 @@ macro_rules! SelfRemoving {
   (for $($t:ty),+) => {
       $(impl SelfRemoving for $t {
         fn duration(&self) -> u8 {
-          self.duration
+          self.0
         }
       
         fn countdown(&mut self) {
-          self.duration = countdown(self.duration);
+          self.0 = countdown(self.0);
         }
       })*
   }
@@ -39,40 +39,17 @@ macro_rules! SelfRemoving {
 /// Primarily attached to enties when they should be skipped for animation 
 /// and physics calculations
 #[derive(Component)]
-pub struct Hitstop {
-    duration: u8
-}
-
-impl Hitstop {
-    pub fn new(duration: u8) -> Self {
-        Hitstop {duration}
-    }
-}
+pub struct Hitstop(pub u8);
 
 //Component used to pause input reading and state updates while in block or hit stun
 #[derive(Component)]
-pub struct Stun {
-    duration: u8
-}
-
-impl Stun{
-    pub fn new(duration: u8) -> Self {
-        Stun {duration}
-    }
-}
+pub struct Stun(pub u8);
 
 /// Primarily attached to enties when they should be skipped for animation 
 /// and physics calculations
 #[derive(Component)]
-pub struct Busy{
-  duration: u8
-}
+pub struct Busy(pub u8);
 
-impl Busy {
-  pub fn new(duration: u8) -> Self {
-    Busy {duration}
-  }
-}
 
 SelfRemoving!(for Hitstop, Stun, Busy);
 
@@ -98,10 +75,9 @@ pub fn manage_stun(
   }
 }
 
-
 pub fn manage_busy(
   mut coms: Commands,
-  mut query: Query<(Entity,&mut Busy)>,
+  mut query: Query<(Entity,&mut Busy), Without<Hitstop>>,
 ) {
   for  (entity, mut busy) in query.iter_mut() {
     if busy.is_finished() {

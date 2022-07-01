@@ -1,12 +1,8 @@
 use bevy::prelude::*;
 use serde::{Deserialize, Serialize};
 use bevy_inspector_egui::Inspectable;
-use okizeme_utils::{
-  countdown
-};
-use okizeme_types::{
-  PlayerId
-};
+use okizeme_utils::countdown;
+use okizeme_types::PlayerId;
 use okizeme_defense::{
   BlockState, 
   BlockModifier
@@ -21,7 +17,11 @@ pub struct Hitbox {
   /// Proration when this hitbox connects first in a combo
   proration: f32,
   /// Force to be applied when a player is hit by this
-  force: Vec2,
+  hit_force: Vec2,
+  /// On block, how should this move the attacker
+  attacker_block_force: Vec2,
+  /// On block, how should this move the blocker
+  defender_block_force: Vec2,
   /// Has the hitbox connected
   hit_state: HitState,
   /// Can the hitbox be blocked in the air

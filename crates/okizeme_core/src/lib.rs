@@ -21,3 +21,6 @@ pub mod offense {
     pub use okizeme_offense::*;
 }
 
+pub mod defense {
+    pub use okizeme_defense::*;
+}
