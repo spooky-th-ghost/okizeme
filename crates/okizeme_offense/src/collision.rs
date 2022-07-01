@@ -18,7 +18,7 @@ pub enum CollisionType {
     AirBlock {modifier: BlockModifier}
 }
 
-pub struct HitEvent {
+pub struct ImpactEvent {
     pub hit: Hit,
     pub defense_id: PlayerId,
     pub offense_id: PlayerId

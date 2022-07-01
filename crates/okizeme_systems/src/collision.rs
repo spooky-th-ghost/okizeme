@@ -14,7 +14,6 @@ use okizeme_offense::{
   CancelEvent,
   CancelTrigger, 
   CollisionEvent,
-  HitEvent, 
   CollisionType
 };
 
@@ -83,35 +82,19 @@ pub fn detect_collisions(
 }
 
 pub fn handle_collisions(
-    player_query: Query<(&PlayerId, &BlockState)>,
+    mut commands: Commands,
+    player_query: Query<(Entity, &PlayerId, &BlockState)>,
     mut collision_reader: EventReader<CollisionEvent>,
-    mut hit_writer: EventWriter<HitEvent>
 ) {
+    //TODO: Figure cancellation
     for event in collision_reader.iter() {
-        for (player_id, block_state) in player_query.iter() {
+        let hitstop: u8 = event.hitbox.get_stun_value().hitstop;
+        for (entity, player_id, block_state) in player_query.iter() {
+            commands.entity(entity).insert(Hitstop::new(hitstop));
             if *player_id == event.defense_id {
                 let hit = event.hitbox.generate_collision(block_state);
-                hit_writer.send(HitEvent {
-                   hit,
-                   defense_id: event.defense_id,
-                   offense_id: event.offense_id
-                })
-            }
-        }
-    }
-}
-
-pub fn handle_hits(
-    mut commands: Commands,
-    player_query: Query<(Entity, &PlayerId)>,
-    mut hit_reader: EventReader<HitEvent>
-) {
-    for event in hit_reader.iter() {
-        let stun_value = event.hit.hitbox.get_stun_value();
-        for (entity, player_id) in player_query.iter() {
-            commands.entity(entity).insert(Hitstop::new(stun_value.hitstop));
-            if *player_id == event.defense_id {
-                let stun_duration = match event.hit.collision_type {
+                let stun_value = event.hitbox.get_stun_value(); 
+                let stun_duration = match hit.collision_type {
                    CollisionType::StandHit {mixed:_} => stun_value.standing_hitstun,
                    CollisionType::CrouchHit { mixed:_} => stun_value.crouching_hitstun,
                    CollisionType::AirHit { mixed:_} => stun_value.aerial_hitstun,

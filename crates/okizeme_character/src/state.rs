@@ -23,8 +23,9 @@ use crate::{
 };
 
 /// Handles the current state of a character
-#[derive(Debug, Clone, Component, Inspectable)]
+#[derive(Default, Debug, Clone, Component, Inspectable)]
 pub enum CharacterState {
+  #[default]
   Idle,
   Walking,
   BackWalking,
@@ -82,12 +83,6 @@ pub enum CharacterState {
 impl PartialEq for CharacterState {
   fn eq(&self, other: &Self) -> bool {
     std::mem::discriminant(self) == std::mem::discriminant(other)
-  }
-}
-
-impl Default for CharacterState {
-  fn default() -> Self {
-    CharacterState::Idle
   }
 }
 
