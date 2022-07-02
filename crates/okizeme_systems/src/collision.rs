@@ -1,7 +1,6 @@
-
 use bevy::{prelude::*, sprite::collide_aabb::collide};
 use okizeme_defense::{
-    Hurtbox, 
+    Hurtbox,
     BlockState
 };
 use okizeme_types::{
@@ -12,7 +11,7 @@ use okizeme_types::{
 use okizeme_offense::{
   Hitbox,
   CancelEvent,
-  CancelTrigger, 
+  CancelTrigger,
   CollisionEvent,
   CollisionType
 };
@@ -66,7 +65,7 @@ pub fn detect_collisions(
 
         if let Some(_collision) = collide(
           hit_pos,
-          hit_size, 
+          hit_size,
           hurt_pos, hurt_size
         ) {
           collision_writer.send(CollisionEvent {
@@ -95,7 +94,7 @@ pub fn handle_collisions(
             }
             if *player_id == event.defense_id {
                 let hit = event.hitbox.generate_collision(block_state);
-                let stun_value = event.hitbox.get_stun_value(); 
+                let stun_value = event.hitbox.get_stun_value();
                 let stun_duration = match hit.collision_type {
                    CollisionType::StandHit {mixed:_} => stun_value.standing_hitstun,
                    CollisionType::CrouchHit { mixed:_} => stun_value.crouching_hitstun,

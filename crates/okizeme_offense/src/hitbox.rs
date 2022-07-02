@@ -4,7 +4,7 @@ use bevy_inspector_egui::Inspectable;
 use okizeme_utils::countdown;
 use okizeme_types::PlayerId;
 use okizeme_defense::{
-  BlockState, 
+  BlockState,
   BlockModifier
 };
 use crate::{Hit, CollisionType};
@@ -13,7 +13,7 @@ use crate::{Hit, CollisionType};
 #[derive(Component,Debug, Clone, Copy, Default,Inspectable)]
 pub struct Hitbox {
   /// Base damage of the hitbox
-  damage: u8,
+  damage: u16,
   /// Proration when this hitbox connects first in a combo
   proration: f32,
   /// Force to be applied when a player is hit by this
@@ -69,7 +69,7 @@ impl Hitbox {
   }
 
   /// Base damage for the hitbox
-  pub fn damage(&self) -> u8 {
+  pub fn damage(&self) -> u16 {
     self.damage
   }
 

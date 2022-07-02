@@ -9,25 +9,25 @@ pub struct Combo {
     valid: bool,
     hitstun_modifier: u8,
     damage_scaling: f32,
-    total_damage: u8,
+    total_damage: u16,
     breakpoints: Vec<u8>
 }
 
 impl Combo {
     /// Create a new combo from a connected hitbox
     pub fn new(hitbox: Hitbox) -> Self {
-        Combo {  
-            hit_count: 1, 
-            valid: true, 
-            hitstun_modifier: 0, 
-            damage_scaling: hitbox.proration(), 
-            total_damage: hitbox.damage(), 
-            breakpoints: Vec::new()  
+        Combo {
+            hit_count: 1,
+            valid: true,
+            hitstun_modifier: 0,
+            damage_scaling: hitbox.proration(),
+            total_damage: hitbox.damage(),
+            breakpoints: Vec::new()
         }
     }
 
     /// Add a hit to a combo and return the damage and hitstun values to apply
-    pub fn add_to_combo(&mut self, hitbox: Hitbox, missed_tech: bool, comboed_state: ComboedState) -> (u8,u8) {
+    pub fn add_to_combo(&mut self, hitbox: Hitbox, missed_tech: bool, comboed_state: ComboedState) -> (u16,u8) {
         let stun_value = StunValue::from_attack_level(hitbox.level());
         self.add_hit(missed_tech);
         let adjusted_damage = self.scaled_damage(hitbox.damage());
@@ -65,7 +65,7 @@ impl Combo {
         }
     }
 
-    fn scaled_damage(&self, base_damage: u8) -> u8 {
-        (base_damage as f32 * self.damage_scaling) as u8
+    fn scaled_damage(&self, base_damage: u16) -> u16 {
+        (base_damage as f32 * self.damage_scaling) as u16
     }
 }
