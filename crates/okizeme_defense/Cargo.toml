@@ -8,3 +8,4 @@ description = "a crate handling defense, hurtboxes, and damage in okizeme"
 
 [dependencies]
 bevy = "0.7"
+okizeme_types = {path = "../okizeme_types", version ="0.1.0"}

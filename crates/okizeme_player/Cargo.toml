@@ -8,5 +8,6 @@ description = "a crate handling player resources and input devices in okizeme"
 
 [dependencies]
 bevy = "0.7"
+okizeme_defense = {path = "../okizeme_defense", version="0.1.0"}
 okizeme_input = {path = "../okizeme_input", version="0.1.0"}
 okizeme_types = {path = "../okizeme_types", version="0.1.0"}
