@@ -6,22 +6,23 @@ use crate::{
   CommandType,
   ButtonPress,
   MOTIONS,
-  InputEvent
+  InputEvent,
+  InputSource
 };
 
 /// Input buffer used to hold button presses, directional input, and special motions
 #[derive(Debug)]
 pub struct Buffer {
-  pub motions: Vec<u8>,
-  pub player_id: PlayerId,
-  pub command_priority: u8,
-  pub command_duration: u8,
-  pub command_type: Option<CommandType>,
-  pub current_motion: u8,
-  pub current_press: ButtonPress,
-  pub previous_motion: u8,
-  pub command_lockout: u8,
-  pub buffer_size: usize,
+  motions: Vec<u8>,
+  player_id: PlayerId,
+  command_priority: u8,
+  command_duration: u8,
+  command_type: Option<CommandType>,
+  current_motion: u8,
+  current_press: ButtonPress,
+  previous_motion: u8,
+  command_lockout: u8,
+  buffer_size: usize,
 }
 
 impl Buffer {
@@ -101,5 +102,18 @@ impl Buffer {
       }
     }
   }
+}
 
+impl InputSource for Buffer {
+    fn get_current_motion(&self) -> u8 {
+        self.current_motion
+    }
+
+    fn get_command_type(&self) -> Option<CommandType> {
+        self.command_type
+    }
+
+    fn get_current_press(&self) -> ButtonPress {
+        self.current_press
+    }
 }
