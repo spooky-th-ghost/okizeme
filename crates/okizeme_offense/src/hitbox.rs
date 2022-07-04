@@ -247,6 +247,7 @@ pub enum CancelTrigger{
   Block
 }
 
+#[derive(Copy, Clone)]
 pub enum ComboedState{
   Standing,
   Crouching,

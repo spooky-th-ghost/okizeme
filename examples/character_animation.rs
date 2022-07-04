@@ -119,7 +119,7 @@ fn keyboard_animation_control(
         }
 
         if keyboard_input.just_pressed(KeyCode::Space) {
-            coms.entity(entity).insert(Hitstop::new(15, None));
+            coms.entity(entity).insert(Hitstop(15));
         }
     }
 }

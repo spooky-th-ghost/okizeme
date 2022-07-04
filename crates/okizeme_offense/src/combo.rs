@@ -1,3 +1,5 @@
+use okizeme_types::PlayerId;
+
 use crate::{
     Hitbox,
     StunValue,
@@ -5,6 +7,7 @@ use crate::{
 };
 /// Resource used to track player combos, as well as calculate damage and hitstun for those combos
 pub struct Combo {
+    pub player_id: PlayerId,
     hit_count: u8,
     valid: bool,
     hitstun_modifier: u8,
@@ -15,25 +18,38 @@ pub struct Combo {
 
 impl Combo {
     /// Create a new combo from a connected hitbox
-    pub fn new(hitbox: Hitbox) -> Self {
+    pub fn new(player_id: &PlayerId) -> Self {
         Combo {
-            hit_count: 1,
+            player_id: player_id.clone(),
+            hit_count: 0,
             valid: true,
             hitstun_modifier: 0,
-            damage_scaling: hitbox.proration(),
-            total_damage: hitbox.damage(),
+            damage_scaling: 0.0,
+            total_damage: 0, 
             breakpoints: Vec::new()
         }
     }
 
     /// Add a hit to a combo and return the damage and hitstun values to apply
-    pub fn add_to_combo(&mut self, hitbox: Hitbox, missed_tech: bool, comboed_state: ComboedState) -> (u16,u8) {
+    pub fn add_to_combo(&mut self, hitbox: &Hitbox, missed_tech: bool, comboed_state: ComboedState) -> (u16,u8) {
         let stun_value = StunValue::from_attack_level(hitbox.level());
         self.add_hit(missed_tech);
         let adjusted_damage = self.scaled_damage(hitbox.damage());
         self.total_damage += adjusted_damage;
         let hit_stun = self.calculate_hitstun(comboed_state, stun_value);
         (adjusted_damage, hit_stun)
+    }
+
+    pub fn add_initial_hit_to_combo(&mut self, hitbox: &Hitbox, comboed_state: ComboedState) -> (u16, u8) {
+        let stun_value = StunValue::from_attack_level(hitbox.level());
+        self.total_damage = hitbox.damage();
+        use ComboedState::*;
+        let hit_stun = match comboed_state {
+            Standing => stun_value.standing_hitstun,
+            Crouching => stun_value.crouching_hitstun,
+            Juggle => stun_value.aerial_hitstun
+        };
+        (hitbox.damage(), hit_stun)
     }
 
     fn add_hit(&mut self, missed_tech: bool) {
