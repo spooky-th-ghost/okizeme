@@ -1,0 +1,18 @@
+name: Cargo
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - run: sudo apt install libasound2-dev libudev-dev pkg-config
+    - name: Run tests
+      run: cargo test --workspaces
