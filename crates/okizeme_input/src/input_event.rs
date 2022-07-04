@@ -16,17 +16,17 @@ pub struct InputEvent{
 }
 
 impl InputEvent{
-  fn new(
-    motion: u8, 
-    player_id: PlayerId, 
-    button_press: ButtonPress
-  ) -> Self {
-    InputEvent {
-      motion,
-      player_id,
-      button_press,
-      special_motion_duration: 0,
-      special_motion: None,
+    pub fn new(
+        motion: u8, 
+        player_id: PlayerId, 
+        button_press: ButtonPress
+    ) -> Self {
+        InputEvent {
+            motion,
+            player_id,
+            button_press,
+            special_motion_duration: 0,
+            special_motion: None,
+        }
     }
-  }
 }

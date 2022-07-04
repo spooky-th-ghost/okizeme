@@ -102,7 +102,7 @@ impl CharacterState {
   }
   
   /// updates a character state, advancing it's timers and changing it based on input and character movement
-  pub fn update(&mut self, buffer: &mut Buffer, movement: &mut Movement, velocity: &mut Velocity, position: Vec3) -> Option<AnimationTransition> {
+  pub fn update(&mut self, buffer: &Buffer, movement: &mut Movement, velocity: &mut Velocity, position: Vec3) -> Option<AnimationTransition> {
     use CharacterState::*;
     self.tick();
     

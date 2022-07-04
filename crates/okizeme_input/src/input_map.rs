@@ -1,4 +1,3 @@
-
 use bevy::prelude::*;
 use okizeme_types::PlayerId;
 pub struct InputMap {
