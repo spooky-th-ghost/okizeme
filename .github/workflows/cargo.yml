@@ -6,13 +6,16 @@ on:
   pull_request:
     branches: [ main ]
 
-jobs:
-  build:
-
+ jobs:
+  build_and_test:
+    name: Run tests
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v2
-    - run: sudo apt install libasound2-dev libudev-dev pkg-config
-    - name: Run tests
-      run: cargo test --workspace
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --workspace
