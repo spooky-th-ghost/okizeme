@@ -6,12 +6,14 @@ use crate::{
   CommandType,
   ButtonPress,
   MOTIONS,
-  InputEvent
+  InputEvent,
+  InputMethod
 };
 
 /// Input buffer used to hold button presses, directional input, and special motions
 #[derive(Debug, Clone)]
 pub struct Buffer {
+  player_id: PlayerId,
   motions: Vec<u8>,
   command_priority: u8,
   command_duration: u8,
@@ -24,8 +26,9 @@ pub struct Buffer {
 }
 
 impl Buffer {
-  pub fn new() -> Self {
+  pub fn new(player_id: PlayerId) -> Self {
     Buffer {
+      player_id,
       motions: Vec::new(),
       command_priority: 0,
       command_duration: 0,
@@ -77,7 +80,7 @@ impl Buffer {
     self.command_lockout = 3;
     self.command_duration = 0;
   }
-  
+
   fn extract_special_motions(&mut self) {
     if self.command_lockout == 0 {
       let motion_string = self.motion_to_string();
@@ -97,16 +100,31 @@ impl Buffer {
       }
     }
   }
-
-    pub fn get_current_motion(&self) -> u8 {
+}
+impl InputMethod for Buffer {
+    fn get_current_motion(&self) -> u8 {
         self.current_motion
     }
 
-    pub fn get_command_type(&self) -> Option<CommandType> {
+    fn get_command_type(&self) -> Option<CommandType> {
         self.command_type
     }
 
-    pub fn get_current_press(&self) -> ButtonPress {
+    fn get_current_press(&self) -> ButtonPress {
         self.current_press
     }
+
+    fn get_player_id(&self) -> &PlayerId {
+        &self.player_id
+    }
+
+    fn update(&mut self, event: &InputEvent) {
+        self.tick();
+        self.motions.push(event.motion);
+        self.previous_motion = self.current_motion;
+        self.current_motion = event.motion;
+        self.current_press = event.button_press; 
+        self.extract_special_motions();
+    }
 }
+
