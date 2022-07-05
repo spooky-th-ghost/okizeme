@@ -100,7 +100,7 @@ impl CharacterState {
   }
   
   /// updates a character state, advancing it's timers and changing it based on input and character movement
-  pub fn update(&mut self, buffer: &impl InputSource, movement: &mut Movement, velocity: &mut Velocity, position: Vec3) -> Option<AnimationTransition> {
+  pub fn update(&mut self, buffer: &InputSource, movement: &mut Movement, velocity: &mut Velocity, position: Vec3) -> Option<AnimationTransition> {
     use CharacterState::*;
     self.tick();
     
@@ -128,7 +128,7 @@ impl CharacterState {
   ///  - Walking
   ///  - Backwalking
   ///  - Crouching
-  pub fn from_neutral_states(&self, buffer: &impl InputSource, movement: &mut Movement, velocity: &mut Velocity)  -> Self {
+  pub fn from_neutral_states(&self, buffer: &InputSource, movement: &mut Movement, velocity: &mut Velocity)  -> Self {
     use CharacterState::*;
 
     if let Some(ct) = buffer.get_command_type() {
@@ -165,7 +165,7 @@ impl CharacterState {
   }
 
   /// Returns a new state based on input from dashing
-  pub fn from_dashing(&self, buffer: &impl InputSource, movement: &Movement) -> Self {
+  pub fn from_dashing(&self, buffer: &InputSource, movement: &Movement) -> Self {
     use CharacterState::*;
     match buffer.get_current_motion() {
       4 => BackWalking,
@@ -177,7 +177,7 @@ impl CharacterState {
   }
 
   /// Returns a new state based on input from air dashing
-  pub fn from_air_dashing(&self, buffer: &impl InputSource, movement: &mut Movement, velocity: &mut Velocity) -> Self {
+  pub fn from_air_dashing(&self, buffer: &InputSource, movement: &mut Movement, velocity: &mut Velocity) -> Self {
     use CharacterState::*;
     match self {
       AirDashing {duration, velocity:_} => {
@@ -201,7 +201,7 @@ impl CharacterState {
   ///  - Falling
   ///  - Airdashing
   ///  - Airbackdashing
-  pub fn from_neutral_airborne(&self, buffer: &impl InputSource, movement: &mut Movement, velocity: &mut Velocity, position: Vec3) -> Self {
+  pub fn from_neutral_airborne(&self, buffer: &InputSource, movement: &mut Movement, velocity: &mut Velocity, position: Vec3) -> Self {
     use CharacterState::*;
     if position.y <= 0.0 {
       return Idle;
@@ -215,7 +215,7 @@ impl CharacterState {
   }
 
   /// Returns a new state based on input and the backdash timer from backdash
-  pub fn from_backdashing(&self, buffer: &impl InputSource, movement: &mut Movement, velocity: &mut Velocity) -> Self {
+  pub fn from_backdashing(&self, buffer: &InputSource, movement: &mut Movement, velocity: &mut Velocity) -> Self {
     use CharacterState::*;
     match self {
       BackDashing {duration} => {
@@ -229,7 +229,7 @@ impl CharacterState {
   }
 
   /// Returns a new state based on input and the attack timer from attack
-  pub fn from_attacking(&self, buffer: &impl InputSource, movement: &mut Movement, velocity: &mut Velocity) -> Self {
+  pub fn from_attacking(&self, buffer: &InputSource, movement: &mut Movement, velocity: &mut Velocity) -> Self {
     use CharacterState::*;
     match self {
       Attacking {duration, attack:_, cancellable} => {
@@ -243,7 +243,7 @@ impl CharacterState {
   }
 
   /// Returns a new state from input while aireborne
-  pub fn from_airborne_input(&self, buffer: &impl InputSource, movement: &mut Movement, velocity: &mut Velocity) -> Self {
+  pub fn from_airborne_input(&self, buffer: &InputSource, movement: &mut Movement, velocity: &mut Velocity) -> Self {
     use CharacterState::*;
 
     if movement.can_airdash() {

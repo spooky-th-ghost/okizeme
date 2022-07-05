@@ -2,14 +2,14 @@ use bevy::prelude::*;
 use okizeme_defense::CharacterHealth;
 use okizeme_offense::{Combo, ComboedState, Hitbox};
 use okizeme_input::{
-    Buffer,
     InputMap,
-    RawButton
+    RawButton,
+    InputSource
 };
 use okizeme_types::PlayerId;
 use crate::Position;
 
-pub struct PlayerBuffers(Vec<Buffer>);
+pub struct PlayerInputSources(Vec<InputSource>);
 pub struct PlayerDevices(Vec<InputMap>);
 pub struct PlayerPositions(Vec<Position>);
 pub struct PlayerHealthBars(Vec<CharacterHealth>);
@@ -54,12 +54,12 @@ impl Default for PlayerDevices {
     }
 }
 
-impl Default for PlayerBuffers {
+impl Default for PlayerInputSources {
     fn default() -> Self {
-        PlayerBuffers(
+        PlayerInputSources(
             vec![
-                Buffer::new(PlayerId::P1),
-                Buffer::new(PlayerId::P2),
+                InputSource::buffer(PlayerId::P1),
+                InputSource::buffer(PlayerId::P2),
             ]
         )
     }
@@ -99,64 +99,6 @@ fn get_player_index(player_id: &PlayerId) -> usize {
     }
 }
 
-// pub struct PlayerData {
-//   pub local_devices: Vec<InputMap>,
-//   pub buffers: Vec<Buffer>,
-//   pub positions: Vec<Position>,
-//   pub health_bars: Vec<CharacterHealth>
-// }
-
-// impl Default for PlayerData {
-//   fn default() -> Self {
-//     PlayerData {
-//       local_devices: vec![
-//         InputMap {
-//             player_id: PlayerId::P1,
-//             a: RawButton::G(Gamepad(0),GamepadButtonType::West),
-//             b: RawButton::G(Gamepad(0),GamepadButtonType::North),
-//             c: RawButton::G(Gamepad(0),GamepadButtonType::RightTrigger),
-//             d: RawButton::G(Gamepad(0),GamepadButtonType::South),
-//             e: RawButton::G(Gamepad(0),GamepadButtonType::East),
-//             f: RawButton::G(Gamepad(0),GamepadButtonType::RightTrigger2),
-//             macro_1: RawButton::G(Gamepad(0),GamepadButtonType::LeftTrigger),
-//             macro_2: RawButton::G(Gamepad(0),GamepadButtonType::LeftTrigger2),
-//             x_positive: RawButton::G(Gamepad(0),GamepadButtonType::DPadRight),
-//             x_negative: RawButton::G(Gamepad(0),GamepadButtonType::DPadLeft),
-//             y_positive: RawButton::G(Gamepad(0),GamepadButtonType::DPadUp),
-//             y_negative: RawButton::G(Gamepad(0),GamepadButtonType::DPadDown),
-//         },
-//           InputMap {
-//             player_id: PlayerId::P2,
-//             a: RawButton::K(KeyCode::Y),
-//             b: RawButton::K(KeyCode::U),
-//             c: RawButton::K(KeyCode::I),
-//             d: RawButton::K(KeyCode::G),
-//             e: RawButton::K(KeyCode::H),
-//             f: RawButton::K(KeyCode::J),
-//             macro_1: RawButton::K(KeyCode::O),
-//             macro_2: RawButton::K(KeyCode::K),
-//             x_positive: RawButton::K(KeyCode::E),
-//             x_negative: RawButton::K(KeyCode::Q),
-//             y_positive: RawButton::K(KeyCode::Space),
-//             y_negative: RawButton::K(KeyCode::W),
-//         },
-//       ],
-//       buffers: vec![
-//         Buffer::new(PlayerId::P1),
-//         Buffer::new(PlayerId::P2),
-//       ],
-//       positions: vec![
-//         Position::new(PlayerId::P1,Vec3::new(-50.0, 0.0, 0.0)),
-//         Position::new(PlayerId::P2,Vec3::new(50.0, 0.0, 0.0)),
-//       ],
-//       health_bars: vec![
-//         CharacterHealth::new(PlayerId::P1),
-//         CharacterHealth::new(PlayerId::P2)
-//       ]
-//     }
-//   }
-// }
-
 impl PlayerPositions {
   pub fn get_facing_vector(&self, player_id: &PlayerId) -> f32 {
     let p1_x_pos = self.0[0].get_position().x;
@@ -194,11 +136,11 @@ impl PlayerPositions {
   }
 }
 
-impl PlayerBuffers {
-    pub fn get_buffer_mut(&mut self, player_id: &PlayerId) -> &mut Buffer {
+impl PlayerInputSources {
+    pub fn get_source_mut(&mut self, player_id: &PlayerId) -> &mut InputSource {
         &mut self.0[get_player_index(player_id)]
     }
-    pub fn get_buffer(&self, player_id: &PlayerId) -> &Buffer {
+    pub fn get_source(&self, player_id: &PlayerId) -> &InputSource {
         &self.0[get_player_index(player_id)]
     }
 }
