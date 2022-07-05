@@ -3,7 +3,8 @@ use okizeme_input::{
     InputMap,
     InputEvent,
     InputActionsPressed,
-    ButtonPress
+    ButtonPress,
+    InputMethod
 };
 use okizeme_player::{
     PlayerInputSources, 

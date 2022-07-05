@@ -8,7 +8,8 @@ use okizeme_offense::{
 };
 use okizeme_input::{
   CommandType,
-  InputSource
+  InputSource,
+  InputMethod
 };
 use okizeme_physics::{
   Velocity,
