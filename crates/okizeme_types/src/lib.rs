@@ -1,6 +1,9 @@
 use bevy::prelude::*;
 use okizeme_utils::countdown;
 
+mod config;
+
+pub use config::*;
 /// Used to distinguish which player various game objects belong to
 #[derive(Debug, Clone, Copy, PartialEq, Component)]
 pub enum PlayerId {
