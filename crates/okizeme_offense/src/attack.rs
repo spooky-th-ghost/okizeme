@@ -1,7 +1,5 @@
 use bevy_inspector_egui::Inspectable;
-use crate::{
-  Hitbox
-};
+use crate::Hitbox;
 
 #[derive(Debug, Clone, Inspectable)]
 pub struct Attack {
@@ -10,12 +8,22 @@ pub struct Attack {
   pub attack_events: Vec<AttackEvent>
 }
 
-impl Default for Attack {
-  fn default() -> Self {
-      Attack { name: "none".to_string(), duration: 0, attack_events: Vec::new() }
-  }
+
+pub struct Attacking {
+    counter_hit: bool,
+    cancellable: bool,
+    duration: u8
 }
 
+impl Default for Attack {
+  fn default() -> Self {
+      Attack { 
+          name: "none".to_string(),
+          duration: 0,
+          attack_events: Vec::new() 
+      }
+  }
+}
 
 #[derive(Debug, Default, Clone, Inspectable)]
 pub struct AttackEvent {

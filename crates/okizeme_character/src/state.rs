@@ -2,10 +2,6 @@ use bevy::prelude::*;
 use bevy_inspector_egui::Inspectable;
 use okizeme_animation::AnimationTransition;
 use okizeme_utils::*;
-use okizeme_offense::{
-  Attack,
-  AttackEvent
-};
 use okizeme_input::{
   CommandType,
   InputSource,
@@ -28,22 +24,10 @@ pub enum CharacterState {
   Idle,
   Walking,
   BackWalking,
-  Attacking {
-    ///The number of frames until the action completes naturally
-    duration: u8,
-        ///The current attack being executed 
-    attack: Attack,
-    ///Can the current attack me cancelled prematurely 
-    cancellable: bool
-  },
-  AttackingAirborne {
-    ///The number of frames until the action completes naturally
-    duration: u8, 
-    ///The current attack being executed 
-    attack: Attack,
-    ///Can the current attack me cancelled prematurely 
-    cancellable: bool
-  },
+  Attacking,
+  AttackingAirborne,
+  Recovering,
+  RecoveringAirborne,
   Crouching,
   Jumpsquat {
     ///The number of frames until the action completes naturally
@@ -90,7 +74,6 @@ impl CharacterState {
   fn tick(&mut self) {
     use CharacterState::*;
     match self {
-      Attacking {duration, attack: _, cancellable:_} => { *duration = countdown(*duration);},
       Jumpsquat {duration, velocity:_ } => { *duration = countdown(*duration);},
       AirJumpsquat {duration, velocity: _ } => { *duration = countdown(*duration);},
       BackDashing {duration} => { *duration = countdown(*duration);},
@@ -111,7 +94,6 @@ impl CharacterState {
       Jumpsquat { duration:_,velocity:_ } => self.from_jump_squat(velocity),
       Rising | Falling => self.from_neutral_airborne(buffer, movement, velocity, position),
       BackDashing { duration:_ } => self.from_backdashing(buffer, movement, velocity),
-      Attacking {duration:_, attack:_, cancellable:_} => self.from_attacking(buffer, movement, velocity),
       AirDashing {duration:_,velocity:_} | AirBackDashing {duration:_,velocity:_} => self.from_air_dashing(buffer, movement, velocity),
       _ => self.clone()
     };
@@ -229,20 +211,6 @@ impl CharacterState {
     }
   }
 
-  /// Returns a new state based on input and the attack timer from attack
-  pub fn from_attacking(&self, buffer: &InputSource, movement: &mut Movement, velocity: &mut Velocity) -> Self {
-    use CharacterState::*;
-    match self {
-      Attacking {duration, attack:_, cancellable} => {
-        if *duration == 0 || *cancellable {
-          return self.from_neutral_states(buffer, movement, velocity);
-        }
-        self.clone()
-      },
-      _ => self.clone(),
-    }
-  }
-
   /// Returns a new state from input while aireborne
   pub fn from_airborne_input(&self, buffer: &InputSource, movement: &mut Movement, velocity: &mut Velocity) -> Self {
     use CharacterState::*;
@@ -287,11 +255,6 @@ impl CharacterState {
       }
       _ => self.clone()
     }
-  }
-
-  /// Returns an attacking state, with the passed attack
-  fn buffer_attack(&self, attack: Attack) -> Self {
-    CharacterState::Attacking {duration: attack.duration, attack, cancellable: false}
   }
 
   /// Returns a backdashing state, based on movement
@@ -380,28 +343,7 @@ impl CharacterState {
       (_, AirDashing {duration:_, velocity:_}) => Some(ToAirdash),
       (_, AirBackDashing {duration:_, velocity:_}) => Some(ToAirBackdash),
       (_, Crouching) => Some(ToCrouch),
-      (_, Attacking {duration:_, attack, cancellable:_}) => Some(ToAttack {name: attack.name.clone()}),
       (_,_) => None
-    }
-  }
-
-  /// Generate necessary hitboxes this frame if needed
-  pub fn get_hitbox_events_this_frame(&self) -> Option<Vec<AttackEvent>> {
-    use CharacterState::*;
-    if let Attacking{duration, attack, cancellable: _} = self.clone() {
-      let mut events = Vec::new();
-      for e in attack.attack_events.iter() {
-        if (attack.duration as i8 - e.frame as i8) == duration as i8 {
-          events.push(e.clone());
-        }
-      }
-      if !events.is_empty() {
-        Some(events)
-      } else {
-        None
-      }
-    } else {
-      None
     }
   }
 
