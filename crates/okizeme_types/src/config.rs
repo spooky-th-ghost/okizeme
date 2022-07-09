@@ -17,6 +17,17 @@ pub struct OkizemeConfig {
     pub show_damage: ElementVisibility
 }
 
+impl OkizemeConfig {
+    pub fn get_hitbox_visibility(&self, player_id: &PlayerId) -> bool {
+        use ElementVisibility::*;
+        match self.show_hitboxes {
+            Player(pid) => pid == *player_id,
+            Both => true,
+            Off => false
+        }
+    }
+}
+
 impl Default for OkizemeConfig {
     fn default() -> Self {
 
