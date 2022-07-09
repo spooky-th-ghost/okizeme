@@ -6,22 +6,25 @@ use okizeme_defense::{
 use okizeme_types::{
     PlayerId,
     Hitstop,
-    Stun
+    Stun,
+    Busy
 };
 use okizeme_offense::{
   Hitbox,
   CancelEvent,
   CancelTrigger,
   CollisionEvent,
-  CollisionType
+  CollisionType,
+  ImpactEvent,
+  AttackController
 };
 
 pub fn cancel_hitboxes(
   mut coms: Commands,
   query: Query<(Entity, &PlayerId, &Hitbox)>,
-  mut reader: EventReader<CancelEvent>
+  mut cancel_reader: EventReader<CancelEvent>
 ) {
-  for event in reader.iter() {
+  for event in cancel_reader.iter() {
     for (entity, player_id, hitbox) in query.iter() {
       if *player_id == event.player_id {
         let mut remove_hitbox = || {coms.entity(entity).despawn();};
@@ -39,6 +42,26 @@ pub fn cancel_hitboxes(
       }
     }
   }
+}
+
+pub fn cleanup_components_on_hit(
+    mut commands: Commands,
+    query: Query<(Entity, &PlayerId, AnyOf<(&Busy, &AttackController)>)>,
+    mut impact_reader: EventReader<ImpactEvent>
+) {
+    for event in impact_reader.iter() {
+        for (entity, player_id, (busy, attack_controller)) in query.iter() {
+            if &event.defense_id == player_id {
+                if let Some(_) = busy {
+                    commands.entity(entity).remove::<Busy>();
+                }
+
+                if let Some(_) = attack_controller {
+                    commands.entity(entity).remove::<AttackController>();
+                }
+            }
+        }
+    }
 }
 
 pub fn detect_collisions(
