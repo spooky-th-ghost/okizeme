@@ -95,3 +95,9 @@ pub enum GameState {
   InGame,
   PauseMenu,
 }
+
+#[derive(Debug, Clone, Copy)]
+pub struct BusyEvent {
+    pub player_id: PlayerId,
+    pub busy_frames: u8
+}

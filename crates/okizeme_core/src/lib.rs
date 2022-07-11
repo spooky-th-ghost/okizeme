@@ -24,3 +24,11 @@ pub mod offense {
 pub mod defense {
     pub use okizeme_defense::*;
 }
+
+pub mod systems {
+    pub use okizeme_systems::*;
+}
+
+pub mod physics {
+    pub use okizeme_physics::*;
+}

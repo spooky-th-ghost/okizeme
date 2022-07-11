@@ -87,7 +87,7 @@ impl CharacterState {
   pub fn update(&mut self, buffer: &InputSource, movement: &mut Movement, velocity: &mut Velocity, position: Vec3) -> Option<AnimationTransition> {
     use CharacterState::*;
     self.tick();
-    
+
     let new_state = match self {
       Idle | Walking | BackWalking | Crouching => self.from_neutral_states(buffer, movement, velocity),
       Dashing => self.from_dashing(buffer, movement),
@@ -119,7 +119,7 @@ impl CharacterState {
         CommandType::Dash => return Dashing,
         CommandType::BackDash => return self.buffer_backdash(movement, velocity),
       _ => ()
-      }               
+      }
     }
 
     match buffer.get_current_motion() {

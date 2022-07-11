@@ -12,7 +12,7 @@ use okizeme_player::{
     PlayerPositions
 };
 
-pub fn write_fighter_inputs(
+pub fn write_inputs(
   player_devices: Res<PlayerDevices>,
   player_positions: Res<PlayerPositions>,
   keyboard_input: Res<Input<KeyCode>>, 
@@ -118,7 +118,7 @@ pub fn write_fighter_inputs(
   }
 }
 
-pub fn read_fighter_inputs(
+pub fn read_inputs(
   mut input_reader: EventReader<InputEvent>, 
   mut player_buffers: ResMut<PlayerInputSources>,
 ) {

@@ -11,6 +11,7 @@ pub struct Movement {
   pub airdashes_remaining: u8,
   pub air_dash_speed: f32,
   pub air_back_dash_speed: f32,
+  pub air_dash_lockout: u8,
   pub jump_lockout: u8,
   pub walk_speed: f32,
   pub back_walk_speed: f32,
