@@ -29,6 +29,11 @@ pub use okizeme_core::{
         read_inputs,
         manage_action_state,
         add_busy,
+        manage_character_velocity,
+        apply_character_velocity,
+        handle_attacks,
+        detect_collisions,
+        handle_collisions
     }
 };
 
@@ -59,6 +64,11 @@ impl Plugin for OkizemePlugin {
         .with_system(write_inputs)
         .with_system(read_inputs.after(write_inputs))
         .with_system(manage_action_state.after(read_inputs))
+        .with_system(manage_character_velocity.after(manage_action_state))
+        .with_system(apply_character_velocity.after(manage_character_velocity))
+        .with_system(handle_attacks.after(apply_character_velocity))
+        .with_system(detect_collisions.after(handle_attacks))
+        .with_system(handle_collisions.after(detect_collisions))
 
         );
         // .with_system(manage_character_velocity.after(manage_action_state));

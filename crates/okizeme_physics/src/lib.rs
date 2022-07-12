@@ -1,25 +1,8 @@
 use bevy::prelude::*;
-use lerp::Lerp;
 
 mod systems;
 
 pub use systems::*;
-
-pub trait CustomLerp {
-  fn custom_lerp(&self, target: Self, t: f32) -> Self;
-}
-
-impl CustomLerp for Vec2 {
-  fn custom_lerp(&self, target: Vec2, t: f32) -> Vec2 {
-    if self.distance(target) > 0.02 {
-      let _x = self.x.lerp(target.x,t);
-      let _y = self.y.lerp(target.y,t);
-      Vec2::new(_x,_y)
-    } else {
-      target
-    }
-  }
-}
 
 /// Component used to move transforms
 #[derive(Component)]
@@ -42,6 +25,17 @@ impl Velocity {
     pub fn is_falling(&self) -> bool {
       self.force.y < 0.0
     }
+
+    pub fn get_target_velo(&mut self) -> Vec2 {
+        if let Some(i_force) = self.interpolated_force.as_mut() {
+            i_force.update();
+            let i_force_velo = i_force.current_velocity;
+            if i_force.is_finished() {self.interpolated_force = None;}
+            i_force_velo + self.force
+        } else {
+            self.force
+        }
+    }
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -63,11 +57,10 @@ impl InterpolatedForce {
     }
   }
 
-  pub fn update(&mut self) -> Vec2 {
+  pub fn update(&mut self) {
     self.tick();
     let t = self.frames_elapsed as f32 / self.duration as f32;
-    self.current_velocity = self.current_velocity.custom_lerp(self.ending_velocity,t);
-    self.current_velocity
+    self.current_velocity = self.current_velocity.lerp(self.ending_velocity,t);
   }
 
   pub fn tick(&mut self) {
