@@ -6,7 +6,7 @@ use okizeme_input::{
     ButtonPress,
     InputMethod
 };
-use okizeme_player::{
+use okizeme_resources::{
     PlayerInputSources, 
     PlayerDevices,
     PlayerPositions

@@ -9,7 +9,7 @@ edition = "2021"
 bevy = "0.7"
 
 okizeme_animation = {path = "../okizeme_animation", version="0.1.0"}
-okizeme_player = {path = "../okizeme_player", version="0.1.0"}
+okizeme_resources = {path = "../okizeme_resources", version="0.1.0"}
 okizeme_defense = {path = "../okizeme_defense", version="0.1.0"}
 okizeme_types = {path = "../okizeme_types", version="0.1.0"}
 okizeme_utils = {path = "../okizeme_utils", version="0.1.0"}

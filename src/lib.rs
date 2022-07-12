@@ -16,7 +16,7 @@ pub use okizeme_core::{
         manage_busy,
         manage_hitstop
     },
-    player::{
+    resources::{
         PlayerInputSources,
         PlayerDevices,
         PlayerPositions,

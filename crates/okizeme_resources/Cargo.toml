@@ -1,10 +1,9 @@
 [package]
-name = "okizeme_player"
+name = "okizeme_resources"
 version = "0.1.0"
 edition = "2021"
-license = "MIT OR Apache-2.0"
-repository = "https://github.com/spooky-th-ghost/okizeme/tree/main/crates/okizeme_player"
-description = "a crate handling player resources and input devices in okizeme"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 bevy = "0.7"

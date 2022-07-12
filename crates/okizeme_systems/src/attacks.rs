@@ -9,7 +9,7 @@ use okizeme_offense::{
     SpawnHitbox
 };
 
-use okizeme_player::PlayerPositions;
+use okizeme_resources::PlayerPositions;
 
 pub fn handle_attacks (
     mut commands: Commands,

@@ -5,8 +5,8 @@ pub mod input {
     pub use okizeme_input::*;
 }
 
-pub mod player {
-    pub use okizeme_player::*;
+pub mod resources {
+    pub use okizeme_resources::*;
 }
 
 pub mod types {

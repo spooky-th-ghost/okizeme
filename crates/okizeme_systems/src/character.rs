@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use okizeme_animation::*;
 use okizeme_physics::*;
-use okizeme_player::{
+use okizeme_resources::{
     PlayerPositions,
     PlayerInputSources
 };

@@ -4,10 +4,8 @@ use okizeme_character::{
     Movement
 };
 
-use okizeme_physics::{
-    Velocity
-};
-use okizeme_player::PlayerPositions;
+use okizeme_physics::Velocity;
+use okizeme_resources::PlayerPositions;
 use okizeme_types::{
     Hitstop,
     PlayerId
@@ -36,9 +34,9 @@ pub fn manage_character_velocity (
 }
 
 pub fn apply_character_velocity(
-    mut player_query: Query<(&PlayerId, &mut Velocity, &mut Transform), Without<Hitstop>>
+    mut player_query: Query<(&mut Velocity, &mut Transform), Without<Hitstop>>
 ) {
-    for (player_id, mut velocity, mut transform) in player_query.iter_mut() {
+    for (mut velocity, mut transform) in player_query.iter_mut() {
         let tv = velocity.get_target_velo();
         transform.translation += tv.extend(0.);
     }
