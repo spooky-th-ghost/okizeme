@@ -1,6 +1,9 @@
 pub mod animation {
     pub use okizeme_animation::*;
 }
+pub mod character {
+    pub use okizeme_character::*;
+}
 pub mod input {
     pub use okizeme_input::*;
 }

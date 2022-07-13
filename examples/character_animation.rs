@@ -4,8 +4,11 @@ use bevy::{
 };
 use bevy_inspector_egui::WorldInspectorPlugin;
 use okizeme::{
-    animation::oki_animation_player,
-    types::{Hitstop, manage_hitstop},
+    types::Hitstop,
+    systems::{
+        manage_hitstop,
+        oki_animation_player
+    }
 };
 fn main() {
     App::new()
