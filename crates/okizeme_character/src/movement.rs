@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_inspector_egui::Inspectable;
 use okizeme_utils::*;
 
-#[derive(Component, Clone, Debug, Default, Inspectable)]
+#[derive(Component, Clone, Debug, Inspectable)]
 pub struct Movement {
   pub jumpsquat: u8,
   pub air_jumps: u8,
@@ -23,6 +23,32 @@ pub struct Movement {
   pub backdash: Backdash,
   pub facing_vector: f32,
   pub can_turn: bool,
+}
+
+impl Default for Movement {
+    fn default() -> Self {
+        Movement {
+            jumpsquat: 3,
+            air_jumps: 1,
+            air_jumps_remaining: 1,
+            airdashes: 1,
+            airdashes_remaining: 1,
+            air_dash_speed: 8.,
+            air_back_dash_speed: 6.,
+            air_dash_lockout: 10,
+            jump_lockout: 8,
+            walk_speed: 4.,
+            back_walk_speed: 2.5,
+            dash_speed: 8.,
+            gravity: 1.,
+            jump_height: 10.,
+            max_airdash_time: 25,
+            max_air_backdash_time: 20,
+            backdash: Backdash::Standard { busy: 20, speed: 25., motion_duration: 20 },
+            facing_vector: 1.,
+            can_turn: true
+        }
+    }
 }
 
 impl Movement {

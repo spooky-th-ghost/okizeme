@@ -11,7 +11,7 @@ impl Default for PlayerDevices {
         PlayerDevices(
             vec![
                 InputMap {
-                    player_id: PlayerId::P1,
+                    player_id: PlayerId::P2,
                     a: RawButton::G(Gamepad(0),GamepadButtonType::West),
                     b: RawButton::G(Gamepad(0),GamepadButtonType::North),
                     c: RawButton::G(Gamepad(0),GamepadButtonType::RightTrigger),
@@ -26,7 +26,7 @@ impl Default for PlayerDevices {
                     y_negative: RawButton::G(Gamepad(0),GamepadButtonType::DPadDown),
                 },
                   InputMap {
-                    player_id: PlayerId::P2,
+                    player_id: PlayerId::P1,
                     a: RawButton::K(KeyCode::Y),
                     b: RawButton::K(KeyCode::U),
                     c: RawButton::K(KeyCode::I),

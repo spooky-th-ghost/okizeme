@@ -19,6 +19,7 @@ impl Plugin for OkizemePlugin {
       use resources::*;
       use systems::*;
       use types::*;
+      use physics::*;
 
     // Events
     app
@@ -27,7 +28,8 @@ impl Plugin for OkizemePlugin {
         .add_event::<BusyEvent>()
         .add_event::<CollisionEvent>()
         .add_event::<ImpactEvent>()
-        .add_event::<CancelEvent>();
+        .add_event::<CancelEvent>()
+        .add_event::<LandingEvent>();
 
     // Resources
     app
@@ -39,15 +41,20 @@ impl Plugin for OkizemePlugin {
         .insert_resource(PlayerCombos::default());
 
     app.add_stage("main",SystemStage::single_threaded()
-        .with_run_criteria(FixedTimestep::steps_per_second(60.0))
+        .with_run_criteria(FixedTimestep::steps_per_second(60.))
         .with_system(write_inputs)
         .with_system(read_inputs.after(write_inputs))
         .with_system(manage_action_state.after(read_inputs))
+        .with_system(add_busy.after(manage_action_state))
         .with_system(manage_character_velocity.after(manage_action_state))
         .with_system(apply_character_velocity.after(manage_character_velocity))
+        .with_system(manage_landing.after(apply_character_velocity))
         .with_system(handle_attacks.after(apply_character_velocity))
         .with_system(detect_collisions.after(handle_attacks))
         .with_system(handle_collisions.after(detect_collisions))
+        .with_system(manage_busy.after(detect_collisions))
+        .with_system(manage_hitstop.after(detect_collisions))
+        .with_system(manage_stun.after(detect_collisions))
     );
   }
 }

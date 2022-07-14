@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy_inspector_egui::Inspectable;
 use okizeme_input::{
     InputSource,
     CommandType,
@@ -16,7 +17,7 @@ use crate::{
 };
 
 /// Handles the current state of the player
-#[derive(Default, Debug, Clone, Copy, Component)]
+#[derive(Default, Debug, Clone, Copy, Component, Inspectable)]
 pub enum ActionState {
     #[default]
     Idle,
@@ -54,12 +55,13 @@ impl ActionState {
         use ActionState::*;
 
         let (new_state, busy): (ActionState, u8) = match *self {
-            Idle | Walking | BackWalking | BackDashing => self.from_neutral_states(input, movement, velocity),
+            Idle | Walking | BackWalking | BackDashing | Crouching => self.from_neutral_states(input, movement, velocity),
             Dashing => self.from_dashing(input, movement),
             Rising 
             | Falling 
             | AirDashing { duration:_, velocity:_ }
             | AirBackDashing { duration:_, velocity:_ } => self.from_neutral_airborne(input, movement, velocity, position),
+            Jumpsquat {velocity: _} => self.from_jump_squat(movement, velocity), 
             _ => (*self, 0)
         };
 
@@ -193,6 +195,10 @@ impl ActionState {
             AirBackDashing {duration, velocity:_} => *duration == 0,
             _ => false,
         }
+    }
+
+    pub fn land(&mut self) {
+        *self = ActionState::Idle;
     }
 
     /// If the new state does not match the old state, generate an animation transition

@@ -7,3 +7,4 @@ edition = "2021"
 
 [dependencies]
 bevy = "0.7"
+okizeme_types = {path = "../okizeme_types", version ="0.1.0"}

@@ -8,4 +8,5 @@ description = "a crate containing various high level types in okizeme"
 
 [dependencies]
 bevy = "0.7"
+bevy-inspector-egui = "0.10"
 okizeme_utils = {path = "../okizeme_utils", version = "0.1.0"}

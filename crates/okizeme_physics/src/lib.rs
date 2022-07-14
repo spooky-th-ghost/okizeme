@@ -1,9 +1,10 @@
 use bevy::prelude::*;
+use okizeme_types::PlayerId;
 
-mod systems;
 
-pub use systems::*;
-
+pub struct LandingEvent {
+    pub player_id: PlayerId
+}
 /// Component used to move transforms
 #[derive(Component)]
 pub struct Velocity {
@@ -14,6 +15,14 @@ pub struct Velocity {
 }
 
 impl Velocity {
+    pub fn new(force: Vec2, gravity: f32, collides_with_ground: bool, interpolated_force: Option<InterpolatedForce>) -> Self {
+        Velocity {
+            force,
+            gravity,
+            collides_with_ground,
+            interpolated_force
+        }
+    }
     pub fn interpolated_force(&self) -> Option<InterpolatedForce> {
         self.interpolated_force
     }
@@ -35,6 +44,11 @@ impl Velocity {
         } else {
             self.force
         }
+    }
+
+    pub fn land(&mut self) {
+        self.force.y = 0.;
+        self.interpolated_force = None;
     }
 }
 

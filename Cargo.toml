@@ -37,3 +37,7 @@ path = "examples/character_animation.rs"
 [[example]]
 name = "collisions"
 path = "examples/collisions.rs"
+
+[[example]]
+name = "basic_movement"
+path = "examples/basic_movement.rs"

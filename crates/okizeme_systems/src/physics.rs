@@ -4,7 +4,7 @@ use okizeme_character::{
     Movement
 };
 
-use okizeme_physics::Velocity;
+use okizeme_physics::{Velocity, LandingEvent};
 use okizeme_resources::PlayerPositions;
 use okizeme_types::{
     Hitstop,
@@ -34,10 +34,31 @@ pub fn manage_character_velocity (
 }
 
 pub fn apply_character_velocity(
-    mut player_query: Query<(&mut Velocity, &mut Transform), Without<Hitstop>>
+    mut player_query: Query<(&PlayerId, &mut Velocity, &mut Transform), Without<Hitstop>>,
+    mut landing_writer: EventWriter<LandingEvent>
 ) {
-    for (mut velocity, mut transform) in player_query.iter_mut() {
+    for (player_id, mut velocity, mut transform) in player_query.iter_mut() {
         let tv = velocity.get_target_velo();
         transform.translation += tv.extend(0.);
+        if transform.translation.y < 0. {
+            landing_writer.send(LandingEvent {player_id: *player_id});
+        }
     }
 }
+
+pub fn manage_landing(
+    mut player_query: Query<(&PlayerId, &mut ActionState, &mut Movement, &mut Velocity, &mut Transform)>,
+    mut landing_reader: EventReader<LandingEvent>
+) {
+    for event in landing_reader.iter() {
+        for (player_id, mut action_state, mut movement, mut velocity, mut transform) in player_query.iter_mut() {
+            if event.player_id == *player_id {
+                transform.translation.y = 0.;
+                action_state.land();
+                movement.land();
+                velocity.land();
+            }
+        }
+    }
+}
+
