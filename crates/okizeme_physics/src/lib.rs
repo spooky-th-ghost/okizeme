@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy_inspector_egui::Inspectable;
 use okizeme_types::PlayerId;
 
 
@@ -6,7 +7,7 @@ pub struct LandingEvent {
     pub player_id: PlayerId
 }
 /// Component used to move transforms
-#[derive(Component)]
+#[derive(Component, Inspectable)]
 pub struct Velocity {
   pub force: Vec2,
   pub gravity: f32,
@@ -52,7 +53,7 @@ impl Velocity {
     }
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Inspectable)]
 pub struct InterpolatedForce {
   current_velocity: Vec2,
   ending_velocity: Vec2,

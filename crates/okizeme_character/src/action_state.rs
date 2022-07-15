@@ -102,13 +102,11 @@ impl ActionState {
     ///  - Airbackdashing
     pub fn from_neutral_airborne(&self, buffer: &InputSource, movement: &mut Movement, velocity: &mut Velocity, position: Vec3) -> (Self, u8) {
         use ActionState::*;
-            if position.y <= 0.0 {
-            return (Idle, 0);
-        }
+
         match self {
-            Rising 
-            | Falling 
-            | AirDashing { duration: _, velocity:_} 
+            Rising
+            | Falling
+            | AirDashing { duration: _, velocity:_}
             | AirBackDashing { duration: _, velocity:_} => {
                 self.from_airborne_input(buffer, movement, velocity)
             },
@@ -168,12 +166,20 @@ impl ActionState {
         }
 
         match self {
-            AirDashing { duration:_, velocity:_} 
-            | AirBackDashing {duration:_, velocity:_ }=> {
+            AirDashing { duration, velocity} => {
+                if self.is_finished_airdashing() {
+                    (Falling,0)
+                } else {
+                    let new_duration = okizeme_utils::countdown(*duration);
+                    (AirDashing { duration: new_duration, velocity: *velocity }, 0)
+                }
+            },
+            AirBackDashing {duration, velocity } => {
                 if self.is_finished_airdashing() {
                     (Falling, 0)
                 } else {
-                    (*self, 0)
+                    let new_duration = okizeme_utils::countdown(*duration);
+                    (AirBackDashing { duration: new_duration, velocity: *velocity }, 0)
                 }
             },
             Rising => {

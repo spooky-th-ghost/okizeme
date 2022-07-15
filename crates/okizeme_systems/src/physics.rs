@@ -26,7 +26,7 @@ pub fn manage_character_velocity (
             BackDashing => Vec2::ZERO,
             AirDashing { duration:_, velocity: dash_velo }
             | AirBackDashing { duration:_, velocity: dash_velo } => dash_velo,
-            _ => velocity.force.lerp(Vec2::ZERO, 0.5)
+            _ => velocity.force.lerp(Vec2::ZERO, 0.25)
         };
 
         velocity.force = force;

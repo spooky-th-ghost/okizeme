@@ -28,7 +28,8 @@ pub fn main() {
         .register_inspectable::<ActionState>()
         .register_inspectable::<Busy>()
         .register_inspectable::<Hitstop>()
-        .register_inspectable::<Stun>();
+        .register_inspectable::<Stun>()
+        .register_inspectable::<Velocity>();
 
     app
         .add_startup_system(setup)
@@ -41,17 +42,18 @@ pub fn setup (
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
+    let cam_height = 60.;
     commands.spawn_bundle(PerspectiveCameraBundle {
         transform: 
-            Transform::from_xyz(0., 0., 150.)
-            .looking_at(Vec3::ZERO, Vec3::Y),
+            Transform::from_xyz(0., cam_height, 250.)
+            .looking_at(Vec3::Y * cam_height, Vec3::Y),
             ..default()
     });
     commands.spawn_bundle(
         PbrBundle {
             mesh: meshes.add(Mesh::from(shape::Cube{size: 10.})),
             material: materials.add(Color::ORANGE_RED.into()),
-            transform: Transform::from_translation(Vec3::new(-40., 0., 0.)),
+            transform: Transform::from_translation(Vec3::new(-60., 0., 0.)),
             ..default()
         })
     .insert(PlayerId::P1)
@@ -60,16 +62,12 @@ pub fn setup (
     .insert(Movement::default());
 
     commands.spawn_bundle(
-        SpriteBundle {
-            sprite: Sprite {
-                color: Color::BLUE,
-                custom_size: Some(Vec2::new(40., 80.)),
-                ..default()
-            },
-            transform: Transform::from_translation(Vec3::new(40., 0., 0.)),
+        PbrBundle {
+            mesh: meshes.add(Mesh::from(shape::Cube{size: 10.})),
+            material: materials.add(Color::SEA_GREEN.into()),
+            transform: Transform::from_translation(Vec3::new(60., 0., 0.)),
             ..default()
-        }
-    )
+        })
     .insert(PlayerId::P2)
     .insert(ActionState::Idle)
     .insert(Velocity::new(Vec2::ZERO,10., true, None))
