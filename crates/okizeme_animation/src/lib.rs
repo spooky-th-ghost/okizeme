@@ -1,9 +1,6 @@
 use okizeme_types::PlayerId;
 
-pub struct AnimationController3D {
-
-
-}
+pub struct AnimationController3D {}
 
 pub struct AnimationMap3D;
 
