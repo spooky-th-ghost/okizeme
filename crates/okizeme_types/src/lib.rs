@@ -8,22 +8,22 @@ pub use config::*;
 /// Used to distinguish which player various game objects belong to
 #[derive(Debug, Clone, Copy, PartialEq, Component)]
 pub enum PlayerId {
-  P1,
-  P2
+    P1,
+    P2,
 }
 
 pub trait SelfRemoving {
-  fn countdown(&mut self);
-  fn duration(&self) -> u8;
+    fn countdown(&mut self);
+    fn duration(&self) -> u8;
 
-  fn is_finished(&mut self) -> bool {
-    if self.duration() == 0 {
-      true
-    } else {
-      self.countdown();
-      false
+    fn is_finished(&mut self) -> bool {
+        if self.duration() == 0 {
+            true
+        } else {
+            self.countdown();
+            false
+        }
     }
-  }
 }
 
 macro_rules! SelfRemoving {
@@ -32,7 +32,7 @@ macro_rules! SelfRemoving {
         fn duration(&self) -> u8 {
           self.0
         }
-      
+
         fn countdown(&mut self) {
           self.0 = countdown(self.0);
         }
@@ -40,7 +40,7 @@ macro_rules! SelfRemoving {
   }
 }
 
-/// Primarily attached to enties when they should be skipped for animation 
+/// Primarily attached to enties when they should be skipped for animation
 /// and physics calculations
 #[derive(Component, Inspectable)]
 pub struct Hitstop(pub u8);
@@ -49,23 +49,22 @@ pub struct Hitstop(pub u8);
 #[derive(Component, Inspectable)]
 pub struct Stun(pub u8);
 
-/// Primarily attached to enties when they should be skipped for animation 
+/// Primarily attached to enties when they should be skipped for animation
 /// and physics calculations
 #[derive(Component, Inspectable)]
 pub struct Busy(pub u8);
-
 
 SelfRemoving!(for Hitstop, Stun, Busy);
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub enum GameState {
-  MainMenu,
-  InGame,
-  PauseMenu,
+    MainMenu,
+    InGame,
+    PauseMenu,
 }
 
 #[derive(Debug, Clone, Copy)]
 pub struct BusyEvent {
     pub player_id: PlayerId,
-    pub busy_frames: u8
+    pub busy_frames: u8,
 }

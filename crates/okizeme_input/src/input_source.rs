@@ -1,9 +1,5 @@
 use crate::InputEvent;
-pub use crate::{
-    CommandType,
-    ButtonMask,
-    Buffer
-};
+pub use crate::{Buffer, ButtonMask, CommandType};
 
 pub use okizeme_types::PlayerId;
 
@@ -18,7 +14,7 @@ pub trait InputMethod {
 }
 
 pub enum InputSource {
-    Buffer(Buffer)
+    Buffer(Buffer),
 }
 
 impl InputSource {

@@ -1,9 +1,5 @@
+use okizeme_offense::{Combo, ComboedState, Hitbox};
 use okizeme_types::PlayerId;
-use okizeme_offense::{
-    Combo,
-    ComboedState,
-    Hitbox
-};
 
 pub struct PlayerCombos(Vec<Combo>);
 
@@ -14,8 +10,15 @@ impl Default for PlayerCombos {
 }
 
 impl PlayerCombos {
-    pub fn add_to_combo(&mut self, hitbox: &Hitbox, player_id: &PlayerId, comboed_state: ComboedState, missed_tech: bool) -> (u16, u8) {
-        let existing_combo: Option<&mut Combo> = self.0.iter_mut().find(|c| c.player_id == *player_id);
+    pub fn add_to_combo(
+        &mut self,
+        hitbox: &Hitbox,
+        player_id: &PlayerId,
+        comboed_state: ComboedState,
+        missed_tech: bool,
+    ) -> (u16, u8) {
+        let existing_combo: Option<&mut Combo> =
+            self.0.iter_mut().find(|c| c.player_id == *player_id);
         if let Some(combo) = existing_combo {
             combo.add_to_combo(hitbox, missed_tech, comboed_state)
         } else {
