@@ -1,7 +1,11 @@
 #[cfg(test)]
 mod test{
   use bevy::prelude::*;
-  use okizeme_types::*;
+  use okizeme::{
+    types::Busy,
+    systems::manage_busy
+  };
+
   #[test]
   fn is_busy_decremented() {
       // Setup world

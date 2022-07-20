@@ -2,8 +2,8 @@ use bevy::prelude::*;
 use okizeme_input::{
     InputMap,
     InputEvent,
-    InputActionsPressed,
-    ButtonPress,
+    RawInputFrame,
+    ButtonMask,
     InputMethod
 };
 use okizeme_resources::{
@@ -23,20 +23,14 @@ pub fn write_inputs(
     let mut h_axis: f32 = 0.0;
     let mut v_axis: f32 = 0.0;
     let InputMap { player_id, ..} = mapper;
-    
-    let InputActionsPressed {
-      right, 
-      left, 
-      up, 
-      down,
-      a, 
-      b, 
-      c, 
-      d,
-      e,
-      f,
-      macro_1,
-      macro_2} = mapper.get_pressed_buttons(&keyboard_input, &button_input);
+
+    let RawInputFrame {
+        buttons,
+        right, 
+        left, 
+        up, 
+        down
+    } = mapper.get_raw_input_frame(&keyboard_input, &button_input);
 
 
     if left {
@@ -97,22 +91,11 @@ pub fn write_inputs(
       }
     }
 
-
-    let mut pressed_byte: u8 = 0b0000_0000;
-    if a {pressed_byte |= 0b0000_0001}
-    if b {pressed_byte |= 0b0000_0010}
-    if c {pressed_byte |= 0b0000_0100}
-    if d {pressed_byte |= 0b0000_1000}
-    if e {pressed_byte |= 0b0001_0000}
-    if f {pressed_byte |= 0b0010_0000}
-    if macro_1 {pressed_byte |= 0b0100_0000}
-    if macro_2 {pressed_byte |= 0b1000_0000}
-    let button_press = ButtonPress::new(pressed_byte);
     input_writer.send(
         InputEvent::new(
             motion,
             *player_id,
-            button_press
+            buttons
         )
     );
   }

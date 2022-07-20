@@ -292,7 +292,7 @@ impl ActionState {
         if forward {
             (AirDashing {duration: movement.max_airdash_time, velocity: Vec2::X * movement.air_dash_speed * movement.facing_vector}, movement.air_dash_lockout)
         } else {
-            (AirBackDashing {duration: movement.max_air_backdash_time, velocity: Vec2::X * movement.air_dash_speed * -movement.facing_vector }, movement.air_dash_lockout)
+            (AirBackDashing {duration: movement.max_air_backdash_time, velocity: Vec2::X * movement.air_dash_speed * -movement.facing_vector }, movement.air_back_dash_lockout)
         }
     }
 
@@ -314,4 +314,9 @@ impl ActionState {
             _ => (Self::Idle, 0)
     }
   }
+}
+
+#[cfg(test)]
+mod tests {
+    
 }

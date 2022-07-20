@@ -1,7 +1,7 @@
 use crate::InputEvent;
 pub use crate::{
     CommandType,
-    ButtonPress,
+    ButtonMask,
     Buffer
 };
 
@@ -10,7 +10,9 @@ pub use okizeme_types::PlayerId;
 pub trait InputMethod {
     fn get_current_motion(&self) -> u8;
     fn get_command_type(&self) -> Option<CommandType>;
-    fn get_current_press(&self) -> ButtonPress;
+    fn get_current_hold(&self) -> ButtonMask;
+    fn get_current_press(&self) -> ButtonMask;
+    fn get_current_release(&self) -> ButtonMask;
     fn get_player_id(&self) -> &PlayerId;
     fn update(&mut self, event: &InputEvent);
 }
@@ -38,7 +40,19 @@ impl InputMethod for InputSource {
         }
     }
 
-    fn get_current_press(&self) -> ButtonPress {
+    fn get_current_release(&self) -> ButtonMask {
+        match self {
+            InputSource::Buffer(buffer) => buffer.get_current_release(),
+        }
+    }
+
+    fn get_current_hold(&self) -> ButtonMask {
+        match self {
+            InputSource::Buffer(buffer) => buffer.get_current_hold(),
+        }
+    }
+
+    fn get_current_press(&self) -> ButtonMask {
         match self {
             InputSource::Buffer(buffer) => buffer.get_current_press(),
         }

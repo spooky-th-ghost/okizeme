@@ -4,7 +4,8 @@ use okizeme_utils::countdown;
 
 use crate::{
   CommandType,
-  ButtonPress,
+  Buttons,
+  ButtonMask,
   MOTIONS,
   InputEvent,
   InputMethod
@@ -19,7 +20,7 @@ pub struct Buffer {
   command_duration: u8,
   command_type: Option<CommandType>,
   current_motion: u8,
-  current_press: ButtonPress,
+  current_buttons: Buttons,
   previous_motion: u8,
   command_lockout: u8,
   buffer_size: usize,
@@ -34,7 +35,7 @@ impl Buffer {
       command_duration: 0,
       command_type: None,
       current_motion: 5,
-      current_press: ButtonPress::new(0),
+      current_buttons: Buttons::default(),
       previous_motion: 5,
       command_lockout: 0,
       buffer_size: 20,
@@ -45,13 +46,9 @@ impl Buffer {
     self.tick();
     self.motions.push(event.motion);
     self.previous_motion = self.current_motion;
+    self.current_buttons = event.buttons;
     self.current_motion = event.motion;
-    self.current_press = event.button_press; 
     self.extract_special_motions();
-  }
-
-  pub fn current_input(&self) -> String {
-    return format!("{:?}{}", self.current_motion, &self.current_press.to_string()[..]);
   }
 
   fn tick(&mut self) {
@@ -101,6 +98,7 @@ impl Buffer {
     }
   }
 }
+
 impl InputMethod for Buffer {
     fn get_current_motion(&self) -> u8 {
         self.current_motion
@@ -110,9 +108,18 @@ impl InputMethod for Buffer {
         self.command_type
     }
 
-    fn get_current_press(&self) -> ButtonPress {
-        self.current_press
+    fn get_current_release(&self) -> ButtonMask {
+        self.current_buttons.released
     }
+
+    fn get_current_hold(&self) -> ButtonMask {
+        self.current_buttons.held
+    }
+
+    fn get_current_press(&self) -> ButtonMask {
+        self.current_buttons.pressed
+    }
+
 
     fn get_player_id(&self) -> &PlayerId {
         &self.player_id
@@ -123,8 +130,15 @@ impl InputMethod for Buffer {
         self.motions.push(event.motion);
         self.previous_motion = self.current_motion;
         self.current_motion = event.motion;
-        self.current_press = event.button_press; 
+        self.current_buttons = event.buttons; 
         self.extract_special_motions();
     }
 }
 
+pub struct InputFrame {
+    pub motion: u8,
+    pub button_press: u8,
+    pub motion_just: bool,
+    pub button_just: bool,
+    pub command: Option<CommandType>
+}
