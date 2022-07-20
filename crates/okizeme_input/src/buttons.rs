@@ -57,3 +57,27 @@ pub struct Buttons {
     pub held: ButtonMask,
     pub released: ButtonMask
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn detect_single_button() {
+        let single_button_mask = ButtonMask(0b0000_1000);
+        assert!(single_button_mask.contains('d'));
+    }
+
+    #[test]
+    fn detect_multiple_buttons() {
+        let multi_button_mask = ButtonMask(0b1010_0110);
+        assert!(
+            multi_button_mask.contains('h')
+            && multi_button_mask.contains('f')
+            && multi_button_mask.contains('b')
+            && multi_button_mask.contains('c')
+        )
+    }
+
+
+}
