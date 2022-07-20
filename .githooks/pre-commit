@@ -4,7 +4,7 @@ HAS_ISSUES=0
 FIRST_FILE=1
 
 for file in $(git diff --name-only --staged); do
-    FMT_RESULT="$(rustfmt --skip-children --force --write-mode diff $file 2>/dev/null || true)"
+    FMT_RESULT="$(cargo format --skip-children --force --write-mode diff $file 2>/dev/null || true)"
     if [ "$FMT_RESULT" != "" ]; then
         if [ $FIRST_FILE -eq 0 ]; then
             echo -n ", "
