@@ -78,6 +78,4 @@ mod test {
             && multi_button_mask.contains('c')
         )
     }
-
-
 }
