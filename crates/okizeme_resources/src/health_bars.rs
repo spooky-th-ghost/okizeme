@@ -1,11 +1,15 @@
-use okizeme_types::PlayerId;
 use okizeme_defense::CharacterHealth;
+use okizeme_types::PlayerId;
 
 pub struct PlayerHealthBars(Vec<CharacterHealth>);
 
 impl PlayerHealthBars {
     pub fn get_health(&self, player_id: &PlayerId) -> u16 {
-        self.0.iter().find(|x| x.player_id == *player_id).unwrap().current_value
+        self.0
+            .iter()
+            .find(|x| x.player_id == *player_id)
+            .unwrap()
+            .current_value
     }
 
     pub fn get_health_percentage(&self, player_id: &PlayerId) -> f32 {
@@ -14,17 +18,19 @@ impl PlayerHealthBars {
     }
 
     pub fn deal_damage(&mut self, player_id: &PlayerId, damage: u16) {
-        self.0.iter_mut().find(|x| x.player_id == *player_id).unwrap().deal_damage(damage);
+        self.0
+            .iter_mut()
+            .find(|x| x.player_id == *player_id)
+            .unwrap()
+            .deal_damage(damage);
     }
 }
 
 impl Default for PlayerHealthBars {
     fn default() -> Self {
-        PlayerHealthBars(
-            vec![
-                CharacterHealth::new(PlayerId::P1),
-                CharacterHealth::new(PlayerId::P2)
-            ]
-        )
+        PlayerHealthBars(vec![
+            CharacterHealth::new(PlayerId::P1),
+            CharacterHealth::new(PlayerId::P2),
+        ])
     }
 }

@@ -1,16 +1,12 @@
 use bevy::prelude::*;
-use okizeme_types::{
-    PlayerId,
-    OkizemeConfig,
-    ElementVisibility
-};
+use okizeme_types::{ElementVisibility, OkizemeConfig, PlayerId};
 
 use okizeme_defense::Hurtbox;
 use okizeme_offense::Hitbox;
 
 pub fn update_hitbox_visibility(
     config: Res<OkizemeConfig>,
-    mut query: Query<(&mut Visibility, &PlayerId), With<Hitbox>>
+    mut query: Query<(&mut Visibility, &PlayerId), With<Hitbox>>,
 ) {
     if config.is_changed() {
         for (mut visibility, player_id) in query.iter_mut() {
@@ -22,15 +18,13 @@ pub fn update_hitbox_visibility(
                     } else {
                         visibility.is_visible = false;
                     }
-                },
+                }
 
                 Both => {
                     visibility.is_visible = true;
-                },
-
-                Off => {
-                    visibility.is_visible = false
                 }
+
+                Off => visibility.is_visible = false,
             }
         }
     }
@@ -38,7 +32,7 @@ pub fn update_hitbox_visibility(
 
 pub fn update_hurtbox_visibility(
     config: Res<OkizemeConfig>,
-    mut query: Query<(&mut Visibility, &PlayerId), With<Hurtbox>>
+    mut query: Query<(&mut Visibility, &PlayerId), With<Hurtbox>>,
 ) {
     if config.is_changed() {
         for (mut visibility, player_id) in query.iter_mut() {
@@ -50,15 +44,13 @@ pub fn update_hurtbox_visibility(
                     } else {
                         visibility.is_visible = false;
                     }
-                },
+                }
 
                 Both => {
                     visibility.is_visible = true;
-                },
-
-                Off => {
-                    visibility.is_visible = false
                 }
+
+                Off => visibility.is_visible = false,
             }
         }
     }

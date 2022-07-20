@@ -4,7 +4,7 @@ use crate::PlayerId;
 pub enum ElementVisibility {
     Player(PlayerId),
     Both,
-    Off
+    Off,
 }
 
 pub struct OkizemeConfig {
@@ -14,7 +14,7 @@ pub struct OkizemeConfig {
     pub show_meter: ElementVisibility,
     pub show_health: ElementVisibility,
     pub show_move_data: ElementVisibility,
-    pub show_damage: ElementVisibility
+    pub show_damage: ElementVisibility,
 }
 
 impl OkizemeConfig {
@@ -23,14 +23,13 @@ impl OkizemeConfig {
         match self.show_hitboxes {
             Player(pid) => pid == *player_id,
             Both => true,
-            Off => false
+            Off => false,
         }
     }
 }
 
 impl Default for OkizemeConfig {
     fn default() -> Self {
-
         let training_element_visibility = if cfg!(feature = "debug") {
             ElementVisibility::Both
         } else {
@@ -44,8 +43,7 @@ impl Default for OkizemeConfig {
             show_move_data: training_element_visibility,
             show_meter: ElementVisibility::Both,
             show_health: ElementVisibility::Both,
-            show_damage: ElementVisibility::Both
+            show_damage: ElementVisibility::Both,
         }
     }
 }
-

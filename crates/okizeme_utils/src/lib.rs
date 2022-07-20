@@ -30,4 +30,3 @@ impl MotionGroups for u8 {
         matches!(self, 1 | 2 | 3)
     }
 }
-

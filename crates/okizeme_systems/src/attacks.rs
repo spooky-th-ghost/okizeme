@@ -1,21 +1,14 @@
 use bevy::prelude::*;
-use okizeme_types::{
-    PlayerId,
-    Hitstop,
-    OkizemeConfig
-};
-use okizeme_offense::{
-    AttackController,
-    SpawnHitbox
-};
+use okizeme_offense::{AttackController, SpawnHitbox};
+use okizeme_types::{Hitstop, OkizemeConfig, PlayerId};
 
 use okizeme_resources::PlayerPositions;
 
-pub fn handle_attacks (
+pub fn handle_attacks(
     mut commands: Commands,
     mut query: Query<(Entity, &PlayerId, &mut AttackController, &Transform), Without<Hitstop>>,
     config: Res<OkizemeConfig>,
-    positions: Res<PlayerPositions>
+    positions: Res<PlayerPositions>,
 ) {
     for (entity, player_id, mut attack_controller, transform) in query.iter_mut() {
         // Get all (if any) attack events that should execute this frame
@@ -24,22 +17,18 @@ pub fn handle_attacks (
             let is_visible = config.get_hitbox_visibility(player_id);
             let facing_vector = positions.get_facing_vector(player_id);
             for attack_event in attack_events.iter() {
-                commands
-                    .spawn_hitbox(
-                        player_id, 
-                        attack_event, 
-                        transform, 
-                        facing_vector, 
-                        is_visible)
+                commands.spawn_hitbox(
+                    player_id,
+                    attack_event,
+                    transform,
+                    facing_vector,
+                    is_visible,
+                )
             }
-
         }
 
         if attack_controller.is_expired() {
             commands.entity(entity).remove::<AttackController>();
         }
-
     }
 }
-
-

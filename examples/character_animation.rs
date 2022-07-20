@@ -1,14 +1,8 @@
-use bevy::{
-    prelude::*,
-    core::FixedTimestep
-};
+use bevy::{core::FixedTimestep, prelude::*};
 use bevy_inspector_egui::WorldInspectorPlugin;
 use okizeme::{
+    systems::{manage_hitstop, oki_animation_player},
     types::Hitstop,
-    systems::{
-        manage_hitstop,
-        oki_animation_player
-    }
 };
 fn main() {
     App::new()
@@ -20,10 +14,12 @@ fn main() {
         })
         .add_startup_system(setup)
         .add_system(setup_scene_once_loaded)
-        .add_stage("oki",SystemStage::single_threaded()
-            .with_run_criteria(FixedTimestep::steps_per_second(60.))
-            .with_system(oki_animation_player)
-            .with_system(manage_hitstop)
+        .add_stage(
+            "oki",
+            SystemStage::single_threaded()
+                .with_run_criteria(FixedTimestep::steps_per_second(60.))
+                .with_system(oki_animation_player)
+                .with_system(manage_hitstop),
         )
         .add_system(keyboard_animation_control)
         .run();
@@ -83,7 +79,6 @@ fn setup(
         .insert(Name::new("Player"))
         .with_children(|parent| {
             parent.spawn_scene(asset_server.load("models/Oki_frames.glb#Scene0"));
-           
         });
 
     println!("Animation controls:");
@@ -105,20 +100,20 @@ fn setup_scene_once_loaded(
     }
 }
 
-
 fn keyboard_animation_control(
     mut coms: Commands,
     keyboard_input: Res<Input<KeyCode>>,
-    mut query: Query<(Entity,&mut AnimationPlayer)>,
+    mut query: Query<(Entity, &mut AnimationPlayer)>,
     animations: Res<Animations>,
     mut current_animation: Local<usize>,
 ) {
-    if let Ok((entity,mut player)) = query.get_single_mut() {
+    if let Ok((entity, mut player)) = query.get_single_mut() {
         if keyboard_input.just_pressed(KeyCode::Return) {
             *current_animation = (*current_animation + 1) % animations.0.len();
             player
                 .play(animations.0[*current_animation].clone_weak())
-                .repeat().pause();
+                .repeat()
+                .pause();
         }
 
         if keyboard_input.just_pressed(KeyCode::Space) {

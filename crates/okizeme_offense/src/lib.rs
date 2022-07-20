@@ -1,9 +1,9 @@
-mod hitbox;
+mod attack;
 mod collision;
 mod combo;
-mod attack;
+mod hitbox;
 
-pub use hitbox::*;
+pub use attack::*;
 pub use collision::*;
 pub use combo::*;
-pub use attack::*;
+pub use hitbox::*;
