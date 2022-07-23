@@ -7,7 +7,7 @@ use okizeme_types::{Busy, BusyEvent, Hitstop, PlayerId, Stun};
 
 /// Manage and update ActionState for all characters based on input
 pub fn manage_action_state(
-    player_buffers: Res<PlayerInputSources>,
+    player_inputs: Res<PlayerInputSources>,
     mut query: Query<
         (&PlayerId, &mut ActionState, &mut Movement, &mut Velocity),
         (Without<Hitstop>, Without<Busy>, Without<Stun>),
@@ -16,8 +16,8 @@ pub fn manage_action_state(
     mut busy_writer: EventWriter<BusyEvent>,
 ) {
     for (player_id, mut state, mut movement, mut velocity) in query.iter_mut() {
-        let buffer = player_buffers.get_source(player_id);
-        let (possible_transition, busy) = state.update(buffer, &mut movement, &mut velocity);
+        let input_source = player_inputs.get_source(player_id);
+        let (possible_transition, busy) = state.update(input_source, &mut movement, &mut velocity);
         if let Some(transition) = possible_transition {
             transition_writer.send(AnimationTransitionEvent {
                 player_id: *player_id,
