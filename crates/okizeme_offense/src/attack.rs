@@ -37,11 +37,7 @@ impl AttackController {
                 events_to_return.push(*attack_event);
             }
         }
-        if events_to_return.len() != 0 {
-            Some(events_to_return)
-        } else {
-            None
-        }
+        (events_to_return.len() != 0).then_some(events_to_return)
     }
 
     fn leave_counterhit(&mut self) {
