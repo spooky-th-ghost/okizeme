@@ -13,7 +13,6 @@ pub fn handle_attacks(
     for (entity, player_id, mut attack_controller, transform) in query.iter_mut() {
         // Get all (if any) attack events that should execute this frame
         if let Some(attack_events) = attack_controller.update() {
-            //TODO: Spawn hitboxes from attack events here
             let is_visible = config.get_hitbox_visibility(player_id);
             let facing_vector = positions.get_facing_vector(player_id);
             for attack_event in attack_events.iter() {
