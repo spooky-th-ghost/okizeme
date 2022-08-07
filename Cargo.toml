@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/spooky-th-ghost/okizeme"
-description = "a micro engine for creationg fighting games in bevy"
+description = "a micro engine for creating fighting games in bevy"
 
 [workspace]
 members = ["crates/*"]
