@@ -25,198 +25,226 @@ impl InputMap {
     ) -> RawInputFrame {
         let right = match self.x_positive {
             RawButton::K(keycode) => keyboard_input.pressed(keycode),
-            RawButton::G(device_id, button_type) => {
-                button_input.pressed(GamepadButton(device_id, button_type))
-            }
+            RawButton::G(device_id, button_type) => button_input.pressed(GamepadButton {
+                gamepad: device_id,
+                button_type,
+            }),
         };
 
         let left = match self.x_negative {
             RawButton::K(keycode) => keyboard_input.pressed(keycode),
-            RawButton::G(device_id, button_type) => {
-                button_input.pressed(GamepadButton(device_id, button_type))
-            }
+            RawButton::G(device_id, button_type) => button_input.pressed(GamepadButton {
+                gamepad: device_id,
+                button_type,
+            }),
         };
 
         let down = match self.y_negative {
             RawButton::K(keycode) => keyboard_input.pressed(keycode),
-            RawButton::G(device_id, button_type) => {
-                button_input.pressed(GamepadButton(device_id, button_type))
-            }
+            RawButton::G(device_id, button_type) => button_input.pressed(GamepadButton {
+                gamepad: device_id,
+                button_type,
+            }),
         };
 
         let up = match self.y_positive {
             RawButton::K(keycode) => keyboard_input.pressed(keycode),
-            RawButton::G(device_id, button_type) => {
-                button_input.pressed(GamepadButton(device_id, button_type))
-            }
+            RawButton::G(device_id, button_type) => button_input.pressed(GamepadButton {
+                gamepad: device_id,
+                button_type,
+            }),
         };
 
         let a_pressed = match self.a {
             RawButton::K(keycode) => keyboard_input.just_pressed(keycode),
-            RawButton::G(device_id, button_type) => {
-                button_input.just_pressed(GamepadButton(device_id, button_type))
-            }
+            RawButton::G(device_id, button_type) => button_input.just_pressed(GamepadButton {
+                gamepad: device_id,
+                button_type,
+            }),
         };
 
         let b_pressed = match self.b {
             RawButton::K(keycode) => keyboard_input.just_pressed(keycode),
-            RawButton::G(device_id, button_type) => {
-                button_input.just_pressed(GamepadButton(device_id, button_type))
-            }
+            RawButton::G(device_id, button_type) => button_input.just_pressed(GamepadButton {
+                gamepad: device_id,
+                button_type,
+            }),
         };
 
         let c_pressed = match self.c {
             RawButton::K(keycode) => keyboard_input.just_pressed(keycode),
-            RawButton::G(device_id, button_type) => {
-                button_input.just_pressed(GamepadButton(device_id, button_type))
-            }
+            RawButton::G(device_id, button_type) => button_input.just_pressed(GamepadButton {
+                gamepad: device_id,
+                button_type,
+            }),
         };
 
         let d_pressed = match self.d {
             RawButton::K(keycode) => keyboard_input.just_pressed(keycode),
-            RawButton::G(device_id, button_type) => {
-                button_input.just_pressed(GamepadButton(device_id, button_type))
-            }
+            RawButton::G(device_id, button_type) => button_input.just_pressed(GamepadButton {
+                gamepad: device_id,
+                button_type,
+            }),
         };
 
         let e_pressed = match self.e {
             RawButton::K(keycode) => keyboard_input.just_pressed(keycode),
-            RawButton::G(device_id, button_type) => {
-                button_input.just_pressed(GamepadButton(device_id, button_type))
-            }
+            RawButton::G(device_id, button_type) => button_input.just_pressed(GamepadButton {
+                gamepad: device_id,
+                button_type,
+            }),
         };
 
         let f_pressed = match self.f {
             RawButton::K(keycode) => keyboard_input.just_pressed(keycode),
-            RawButton::G(device_id, button_type) => {
-                button_input.just_pressed(GamepadButton(device_id, button_type))
-            }
+            RawButton::G(device_id, button_type) => button_input.just_pressed(GamepadButton {
+                gamepad: device_id,
+                button_type,
+            }),
         };
 
         let g_pressed = match self.g {
             RawButton::K(keycode) => keyboard_input.just_pressed(keycode),
-            RawButton::G(device_id, button_type) => {
-                button_input.just_pressed(GamepadButton(device_id, button_type))
-            }
+            RawButton::G(device_id, button_type) => button_input.just_pressed(GamepadButton {
+                gamepad: device_id,
+                button_type,
+            }),
         };
 
         let h_pressed = match self.h {
             RawButton::K(keycode) => keyboard_input.pressed(keycode),
-            RawButton::G(device_id, button_type) => {
-                button_input.pressed(GamepadButton(device_id, button_type))
-            }
+            RawButton::G(device_id, button_type) => button_input.pressed(GamepadButton {
+                gamepad: device_id,
+                button_type,
+            }),
         };
 
         let a_held = match self.a {
             RawButton::K(keycode) => keyboard_input.pressed(keycode),
-            RawButton::G(device_id, button_type) => {
-                button_input.pressed(GamepadButton(device_id, button_type))
-            }
+            RawButton::G(device_id, button_type) => button_input.pressed(GamepadButton {
+                gamepad: device_id,
+                button_type,
+            }),
         };
 
         let b_held = match self.b {
             RawButton::K(keycode) => keyboard_input.pressed(keycode),
-            RawButton::G(device_id, button_type) => {
-                button_input.pressed(GamepadButton(device_id, button_type))
-            }
+            RawButton::G(device_id, button_type) => button_input.pressed(GamepadButton {
+                gamepad: device_id,
+                button_type,
+            }),
         };
 
         let c_held = match self.c {
             RawButton::K(keycode) => keyboard_input.pressed(keycode),
-            RawButton::G(device_id, button_type) => {
-                button_input.pressed(GamepadButton(device_id, button_type))
-            }
+            RawButton::G(device_id, button_type) => button_input.pressed(GamepadButton {
+                gamepad: device_id,
+                button_type,
+            }),
         };
 
         let d_held = match self.d {
             RawButton::K(keycode) => keyboard_input.pressed(keycode),
-            RawButton::G(device_id, button_type) => {
-                button_input.pressed(GamepadButton(device_id, button_type))
-            }
+            RawButton::G(device_id, button_type) => button_input.pressed(GamepadButton {
+                gamepad: device_id,
+                button_type,
+            }),
         };
 
         let e_held = match self.e {
             RawButton::K(keycode) => keyboard_input.pressed(keycode),
-            RawButton::G(device_id, button_type) => {
-                button_input.pressed(GamepadButton(device_id, button_type))
-            }
+            RawButton::G(device_id, button_type) => button_input.pressed(GamepadButton {
+                gamepad: device_id,
+                button_type,
+            }),
         };
 
         let f_held = match self.f {
             RawButton::K(keycode) => keyboard_input.pressed(keycode),
-            RawButton::G(device_id, button_type) => {
-                button_input.pressed(GamepadButton(device_id, button_type))
-            }
+            RawButton::G(device_id, button_type) => button_input.pressed(GamepadButton {
+                gamepad: device_id,
+                button_type,
+            }),
         };
 
         let g_held = match self.g {
             RawButton::K(keycode) => keyboard_input.pressed(keycode),
-            RawButton::G(device_id, button_type) => {
-                button_input.pressed(GamepadButton(device_id, button_type))
-            }
+            RawButton::G(device_id, button_type) => button_input.pressed(GamepadButton {
+                gamepad: device_id,
+                button_type,
+            }),
         };
 
         let h_held = match self.h {
             RawButton::K(keycode) => keyboard_input.pressed(keycode),
-            RawButton::G(device_id, button_type) => {
-                button_input.pressed(GamepadButton(device_id, button_type))
-            }
+            RawButton::G(device_id, button_type) => button_input.pressed(GamepadButton {
+                gamepad: device_id,
+                button_type,
+            }),
         };
 
         let a_released = match self.a {
             RawButton::K(keycode) => keyboard_input.just_released(keycode),
-            RawButton::G(device_id, button_type) => {
-                button_input.just_released(GamepadButton(device_id, button_type))
-            }
+            RawButton::G(device_id, button_type) => button_input.just_released(GamepadButton {
+                gamepad: device_id,
+                button_type,
+            }),
         };
 
         let b_released = match self.b {
             RawButton::K(keycode) => keyboard_input.just_released(keycode),
-            RawButton::G(device_id, button_type) => {
-                button_input.just_released(GamepadButton(device_id, button_type))
-            }
+            RawButton::G(device_id, button_type) => button_input.just_released(GamepadButton {
+                gamepad: device_id,
+                button_type,
+            }),
         };
 
         let c_released = match self.c {
             RawButton::K(keycode) => keyboard_input.just_released(keycode),
-            RawButton::G(device_id, button_type) => {
-                button_input.just_released(GamepadButton(device_id, button_type))
-            }
+            RawButton::G(device_id, button_type) => button_input.just_released(GamepadButton {
+                gamepad: device_id,
+                button_type,
+            }),
         };
 
         let d_released = match self.d {
             RawButton::K(keycode) => keyboard_input.just_released(keycode),
-            RawButton::G(device_id, button_type) => {
-                button_input.just_released(GamepadButton(device_id, button_type))
-            }
+            RawButton::G(device_id, button_type) => button_input.just_released(GamepadButton {
+                gamepad: device_id,
+                button_type,
+            }),
         };
 
         let e_released = match self.e {
             RawButton::K(keycode) => keyboard_input.just_released(keycode),
-            RawButton::G(device_id, button_type) => {
-                button_input.just_released(GamepadButton(device_id, button_type))
-            }
+            RawButton::G(device_id, button_type) => button_input.just_released(GamepadButton {
+                gamepad: device_id,
+                button_type,
+            }),
         };
 
         let f_released = match self.f {
             RawButton::K(keycode) => keyboard_input.just_released(keycode),
-            RawButton::G(device_id, button_type) => {
-                button_input.just_released(GamepadButton(device_id, button_type))
-            }
+            RawButton::G(device_id, button_type) => button_input.just_released(GamepadButton {
+                gamepad: device_id,
+                button_type,
+            }),
         };
 
         let g_released = match self.g {
             RawButton::K(keycode) => keyboard_input.just_released(keycode),
-            RawButton::G(device_id, button_type) => {
-                button_input.just_released(GamepadButton(device_id, button_type))
-            }
+            RawButton::G(device_id, button_type) => button_input.just_released(GamepadButton {
+                gamepad: device_id,
+                button_type,
+            }),
         };
 
         let h_released = match self.h {
             RawButton::K(keycode) => keyboard_input.just_released(keycode),
-            RawButton::G(device_id, button_type) => {
-                button_input.just_released(GamepadButton(device_id, button_type))
-            }
+            RawButton::G(device_id, button_type) => button_input.just_released(GamepadButton {
+                gamepad: device_id,
+                button_type,
+            }),
         };
 
         let mut pressed_byte: u8 = 0b0000_0000;

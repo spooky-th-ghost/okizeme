@@ -127,8 +127,7 @@ impl CharacterState {
             } => self.from_air_dashing(buffer, movement, velocity),
             _ => self.clone(),
         };
-        let transition =
-            (self.clone() = !new_state).then_some(self.calculate_transition(&new_state));
+        let transition = self.calculate_transition(&new_state);
         // let transition = if self.clone() != new_state {
         //     self.calculate_transition(&new_state)
         // } else {

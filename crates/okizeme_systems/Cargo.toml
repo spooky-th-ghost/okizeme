@@ -6,7 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-bevy = "0.7"
+bevy = "0.8"
 
 okizeme_animation = {path = "../okizeme_animation", version="0.1.0"}
 okizeme_resources = {path = "../okizeme_resources", version="0.1.0"}

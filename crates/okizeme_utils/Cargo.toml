@@ -7,4 +7,4 @@ repository = "https://github.com/spooky-th-ghost/okizeme/tree/main/crates/okizem
 description = "a crate containing various utility types and functions for okizeme"
 
 [dependencies]
-bevy = "0.7"
+bevy = "0.8"
