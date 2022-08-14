@@ -7,6 +7,6 @@ repository = "https://github.com/spooky-th-ghost/okizeme/tree/main/crates/okizem
 description = "a crate containing various high level types in okizeme"
 
 [dependencies]
-bevy = "0.7"
-bevy-inspector-egui = "0.10"
+bevy = "0.8"
+bevy-inspector-egui = "0.12"
 okizeme_utils = {path = "../okizeme_utils", version = "0.1.0"}

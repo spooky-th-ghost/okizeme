@@ -7,5 +7,5 @@ repository = "https://github.com/spooky-th-ghost/okizeme/tree/main/crates/okizem
 description = "a crate handling defense, hurtboxes, and damage in okizeme"
 
 [dependencies]
-bevy = "0.7"
+bevy = "0.8"
 okizeme_types = {path = "../okizeme_types", version ="0.1.0"}

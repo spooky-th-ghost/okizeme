@@ -1,4 +1,4 @@
-use bevy::{core::FixedTimestep, prelude::*};
+use bevy::{prelude::*, time::FixedTimestep};
 
 pub use okizeme_core::*;
 

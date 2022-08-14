@@ -1,4 +1,4 @@
-use bevy::{core::FixedTimestep, prelude::*};
+use bevy::{time::FixedTimestep, prelude::*};
 use bevy_inspector_egui::WorldInspectorPlugin;
 use okizeme::{
     systems::{manage_hitstop, oki_animation_player},
@@ -44,7 +44,7 @@ fn setup(
     ]));
 
     // Camera
-    commands.spawn_bundle(PerspectiveCameraBundle {
+    commands.spawn_bundle(Camera3dBundle {
         transform: Transform::from_xyz(0., 30.0, 150.0)
             .looking_at(Vec3::new(0.0, 15.0, 0.0), Vec3::Y),
         ..Default::default()
@@ -74,12 +74,14 @@ fn setup(
 
     // Oki
     commands
-        .spawn_bundle(TransformBundle::default())
+        .spawn_bundle(SceneBundle {
+            scene: asset_server.load("models/Oki_frames.glb#Scene0"),
+            ..default()
+        })
         .insert(Player(1))
-        .insert(Name::new("Player"))
-        .with_children(|parent| {
-            parent.spawn_scene(asset_server.load("models/Oki_frames.glb#Scene0"));
-        });
+        .insert(Name::new("Player"));
+        // .with_children(|parent| {
+        //     parent.spawn_scene(asset_server.load("models/Oki_frames.glb#Scene0"));
 
     println!("Animation controls:");
     println!("  - spacebar: Add 60 frames of hitpause");
