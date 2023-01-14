@@ -10,7 +10,7 @@ description = "a micro engine for creationg fighting games in bevy"
 members = ["crates/*"]
 
 [dependencies]
-bevy = "0.8"
+bevy = "0.9.1"
 regex = "1.4.6"
 lazy_static = "1.4.0"
 serde_json = "1.0"
