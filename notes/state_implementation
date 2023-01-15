@@ -1,0 +1,38 @@
+Which States are mutually exclusive:
+
+Idle
+Walk,
+Backwalk,
+Crouch,
+Dash,
+Backdash,
+AirIdle,
+AirBackdash,
+Airdash
+
+== Input Step ==
+1. Inputs are capatured									(read_inputs)
+2. Input Buffers are updated						(write_to_input_buffer)
+
+== Action Step ==
+For each character that's not
+1. if a super is input, start that			(execute_supermoves)
+2. if a special is input do that				(execute_specials)
+3. if a normal is input, do that				(execute_normals)
+4. if a jump is input, do that,					(execute_jumps)
+5. if a dash is input do that,					(execute_dashes)
+6. if basic movement is input do that		(execute_movement)
+
+== Collision Step ==
+1. Generate hitboxes										(maintain_hitboxes)
+2. Generate hurtboxes										(maintain_hurtboxes)
+3. Handle collision											(detect_collisions)
+4. resolve collision results            (resolve_collisions)
+
+== Result Step
+1. Handle health changes								(update_health)
+2. Handle meter changes                 (update_super_meter)
+3. Handle ending the round              (finish_round)
+
+== Cleanup Step
+1. Handle all timers and add/remove components accordingly

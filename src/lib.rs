@@ -4,7 +4,9 @@ extern crate lazy_static;
 
 pub mod animation;
 pub mod character;
+pub mod components;
 pub mod defense;
+pub mod events;
 pub mod input;
 pub mod macros;
 pub mod offense;
@@ -12,18 +14,33 @@ pub mod physics;
 pub mod resources;
 pub mod systems;
 pub mod types;
-mod utils;
+pub mod utils;
 
+#[doc(hidden)]
 pub use animation::*;
+#[doc(hidden)]
 pub use character::*;
+#[doc(hidden)]
+pub use components::*;
+#[doc(hidden)]
 pub use defense::*;
+#[doc(hidden)]
+pub use events::*;
+#[doc(hidden)]
 pub use input::*;
+#[doc(hidden)]
 pub use macros::*;
+#[doc(hidden)]
 pub use offense::*;
+#[doc(hidden)]
 pub use physics::*;
+#[doc(hidden)]
 pub use resources::*;
+#[doc(hidden)]
 pub use systems::*;
+#[doc(hidden)]
 pub use types::*;
+#[doc(hidden)]
 pub use utils::*;
 
 pub mod prelude {
