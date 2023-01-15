@@ -73,3 +73,42 @@ pub fn manage_character_state(
         //}
     }
 }
+
+///// New stuff
+
+pub fn execute_jumps(
+    buffers: Res<PlayerInputSources>,
+    // get the air jumps resources
+    query: Query<
+        (Entity, &PlayerId, Option<&Grounded>),
+        (Without<Busy>, Without<Stun>, Without<Jumpsquat>),
+    >,
+) {
+    for (entity, player_id, grounded) in &query {
+        let buffer = buffers.get_source(player_id);
+        // if buffer.current_action(Jump)
+        // do jump here, probably just add jumpsquat
+        // if grounded add grounded jumpsquat, else add aerial jumpsquat
+        // if aerial, spend an airjump from the resource
+    }
+}
+
+pub fn execute_airdashes(
+    buffers: Res<PlayerInputSources>,
+    query: Query<
+        (Entity, &PlayerId),
+        (
+            Without<Busy>,
+            Without<Stun>,
+            Without<Jumpsquat>,
+            Without<Grounded>,
+        ),
+    >,
+) {
+    for (entity, player_id) in &query {
+        let buffer = buffers.get_source(player_id);
+        // if buffer.current_action(Airdash or Airbackdash)
+        // buffer an airdash and add busy
+        // spend the resource
+    }
+}

@@ -47,10 +47,30 @@ pub mod prelude {
     pub use crate::OkizemePlugin;
 }
 
+#[derive(SystemLabel)]
+pub enum OkizemeSystemLabels {
+    InputPhase,
+    ActionPhase,
+    CollisionPhase,
+    ResultPhase,
+    CleanupPhase,
+}
+
+#[derive(Debug, PartialEq, Eq, Clone, Copy, Hash)]
+pub enum OkizemeStates {
+    Gameplay,
+    ResultsScreen,
+    TrainingMenu,
+    CharacterSelect,
+    MainMenu,
+}
+
 pub struct OkizemePlugin;
 
 impl Plugin for OkizemePlugin {
     fn build(&self, app: &mut App) {
+        use OkizemeSystemLabels::*;
+
         // Events
         app.add_event::<InputEvent>()
             .add_event::<AnimationTransitionEvent>()
@@ -71,7 +91,39 @@ impl Plugin for OkizemePlugin {
         app.add_stage(
             "main",
             SystemStage::single_threaded()
+                // Ensure that everything runs at 60 frames per second
                 .with_run_criteria(FixedTimestep::steps_per_second(60.))
+                // Input Phase
+                .with_system_set(
+                    SystemSet::on_update(OkizemeStates::Gameplay)
+                        .label(InputPhase)
+                        .with_system(write_inputs)
+                        .with_system(read_inputs.after(write_inputs)),
+                )
+                // Action Phase
+                .with_system_set(
+                    SystemSet::on_update(OkizemeStates::Gameplay)
+                        .label(ActionPhase)
+                        .after(InputPhase),
+                )
+                // Collision Phase
+                .with_system_set(
+                    SystemSet::on_update(OkizemeStates::Gameplay)
+                        .label(CollisionPhase)
+                        .after(ActionPhase),
+                )
+                // Results Phase
+                .with_system_set(
+                    SystemSet::on_update(OkizemeStates::Gameplay)
+                        .label(ResultPhase)
+                        .after(CollisionPhase),
+                )
+                // Cleanup Phase
+                .with_system_set(
+                    SystemSet::on_update(OkizemeStates::Gameplay)
+                        .label(CleanupPhase)
+                        .after(ResultPhase),
+                )
                 .with_system(write_inputs)
                 .with_system(read_inputs.after(write_inputs))
                 .with_system(manage_action_state.after(read_inputs))

@@ -1,5 +1,40 @@
 use bevy::prelude::*;
 
+#[derive(Component, PartialEq, Default, Debug, Reflect)]
+pub enum MoveState {
+    #[default]
+    Idle,
+    Walk,
+    Backwalk,
+    Airborne,
+    Crouching,
+    Dash,
+    DashBack,
+    Airdash,
+    AirdashBack,
+    HitStand,
+    HitAir,
+    Knockdown,
+}
+
+#[derive(Component, Default, Debug, Reflect)]
+pub struct Velocity {
+    pub direction: Vec2,
+    pub speed: f32,
+    pub weight: f32,
+    pub ground_collision: bool,
+}
+
+#[derive(Component, Default, Debug, Reflect)]
+pub struct Forces(pub Vec<Force>);
+
+#[derive(Default, Debug, Reflect, FromReflect)]
+pub struct Force {
+    pub duration: u8,
+    pub direction: Vec2,
+    pub speed: f32,
+}
+
 #[derive(Component, Default, Reflect)]
 pub struct Blocking {
     pub duration: u8,
@@ -21,9 +56,5 @@ pub struct Jumpsquat {
     pub jump_velocity: Vec2,
 }
 
-#[derive(Component, Default, Reflect)]
-pub struct Force {
-    pub duration: u8,
-    pub force: Vec2,
-    pub gravity_frame: u8,
-}
+#[derive(Component, Reflect)]
+pub struct Grounded;
