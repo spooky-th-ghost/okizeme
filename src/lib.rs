@@ -1,6 +1,30 @@
 use bevy::{prelude::*, time::FixedTimestep};
+#[macro_use]
+extern crate lazy_static;
 
-pub use okizeme_core::*;
+pub mod animation;
+pub mod character;
+pub mod defense;
+pub mod input;
+pub mod macros;
+pub mod offense;
+pub mod physics;
+pub mod resources;
+pub mod systems;
+pub mod types;
+mod utils;
+
+pub use animation::*;
+pub use character::*;
+pub use defense::*;
+pub use input::*;
+pub use macros::*;
+pub use offense::*;
+pub use physics::*;
+pub use resources::*;
+pub use systems::*;
+pub use types::*;
+pub use utils::*;
 
 pub mod prelude {
     pub use crate::OkizemePlugin;
@@ -10,14 +34,6 @@ pub struct OkizemePlugin;
 
 impl Plugin for OkizemePlugin {
     fn build(&self, app: &mut App) {
-        use animation::*;
-        use input::*;
-        use offense::*;
-        use physics::*;
-        use resources::*;
-        use systems::*;
-        use types::*;
-
         // Events
         app.add_event::<InputEvent>()
             .add_event::<AnimationTransitionEvent>()

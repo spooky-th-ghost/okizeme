@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use bevy_inspector_egui::{RegisterInspectable, WorldInspectorPlugin};
+use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use okizeme::{
     character::{ActionState, Movement},
     physics::Velocity,
@@ -12,12 +12,12 @@ pub fn main() {
 
     app.add_plugins(DefaultPlugins)
         .add_plugin(OkizemePlugin)
-        .add_plugin(WorldInspectorPlugin::new())
-        .register_inspectable::<ActionState>()
-        .register_inspectable::<Busy>()
-        .register_inspectable::<Hitstop>()
-        .register_inspectable::<Stun>()
-        .register_inspectable::<Velocity>();
+        .add_plugin(WorldInspectorPlugin)
+        .register_type::<ActionState>()
+        .register_type::<Busy>()
+        .register_type::<Hitstop>()
+        .register_type::<Stun>()
+        .register_type::<Velocity>();
 
     app.add_startup_system(setup).run();
 }
@@ -28,7 +28,7 @@ pub fn setup(
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     let cam_height = 60.;
-    commands.spawn_bundle(PerspectiveCameraBundle {
+    commands.spawn(Camera3dBundle {
         transform: Transform::from_xyz(0., cam_height, 250.)
             .looking_at(Vec3::Y * cam_height, Vec3::Y),
         ..default()
