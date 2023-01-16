@@ -5,6 +5,7 @@ use okizeme::{
     physics::Velocity,
     prelude::*,
     types::{Busy, Hitstop, PlayerId, Stun},
+    InputListenerBundle,
 };
 
 pub fn main() {
@@ -33,6 +34,9 @@ pub fn setup(
             .looking_at(Vec3::Y * cam_height, Vec3::Y),
         ..default()
     });
+
+    commands.spawn(InputListenerBundle::input_map(PlayerId::P1));
+    commands.spawn(InputListenerBundle::input_map(PlayerId::P2));
     commands
         .spawn_bundle(PbrBundle {
             mesh: meshes.add(Mesh::from(shape::Cube { size: 10. })),
