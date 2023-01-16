@@ -37,6 +37,7 @@ pub fn setup(
 
     commands.spawn(InputListenerBundle::input_map(PlayerId::P1));
     commands.spawn(InputListenerBundle::input_map(PlayerId::P2));
+
     commands
         .spawn_bundle(PbrBundle {
             mesh: meshes.add(Mesh::from(shape::Cube { size: 10. })),
