@@ -76,7 +76,7 @@ pub fn manage_character_state(
 
 ///// New stuff
 
-pub fn execute_jumps(
+pub fn buffer_jumps(
     buffers: Res<PlayerInputSources>,
     // get the air jumps resources
     query: Query<
@@ -93,7 +93,7 @@ pub fn execute_jumps(
     }
 }
 
-pub fn execute_airdashes(
+pub fn buffer_airdashes(
     buffers: Res<PlayerInputSources>,
     query: Query<
         (Entity, &PlayerId),

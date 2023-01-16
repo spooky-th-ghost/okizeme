@@ -58,3 +58,8 @@ pub struct Jumpsquat {
 
 #[derive(Component, Reflect)]
 pub struct Grounded;
+
+#[derive(Component)]
+pub struct Counterhit {
+    duration: u8,
+}
