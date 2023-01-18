@@ -1,5 +1,5 @@
-use bevy::{time::FixedTimestep, prelude::*};
-use bevy_inspector_egui::WorldInspectorPlugin;
+use bevy::{prelude::*, time::FixedTimestep};
+use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use okizeme::{
     systems::{manage_hitstop, oki_animation_player},
     types::Hitstop,
@@ -7,7 +7,7 @@ use okizeme::{
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
-        .add_plugin(WorldInspectorPlugin::new())
+        .add_plugin(WorldInspectorPlugin)
         .insert_resource(AmbientLight {
             color: Color::WHITE,
             brightness: 1.0,
@@ -25,6 +25,7 @@ fn main() {
         .run();
 }
 
+#[derive(Resource)]
 struct Animations(Vec<Handle<AnimationClip>>);
 
 #[derive(Component)]
@@ -44,21 +45,21 @@ fn setup(
     ]));
 
     // Camera
-    commands.spawn_bundle(Camera3dBundle {
+    commands.spawn(Camera3dBundle {
         transform: Transform::from_xyz(0., 30.0, 150.0)
             .looking_at(Vec3::new(0.0, 15.0, 0.0), Vec3::Y),
         ..Default::default()
     });
 
     // Plane
-    commands.spawn_bundle(PbrBundle {
+    commands.spawn(PbrBundle {
         mesh: meshes.add(Mesh::from(shape::Plane { size: 500000.0 })),
         material: materials.add(Color::rgb(0.3, 0.5, 0.3).into()),
         ..default()
     });
 
     // Light
-    commands.spawn_bundle(DirectionalLightBundle {
+    commands.spawn(DirectionalLightBundle {
         transform: Transform::from_rotation(Quat::from_euler(
             EulerRot::ZYX,
             0.0,
@@ -74,14 +75,14 @@ fn setup(
 
     // Oki
     commands
-        .spawn_bundle(SceneBundle {
+        .spawn(SceneBundle {
             scene: asset_server.load("models/Oki_frames.glb#Scene0"),
             ..default()
         })
         .insert(Player(1))
         .insert(Name::new("Player"));
-        // .with_children(|parent| {
-        //     parent.spawn_scene(asset_server.load("models/Oki_frames.glb#Scene0"));
+    // .with_children(|parent| {
+    //     parent.spawn_scene(asset_server.load("models/Oki_frames.glb#Scene0"));
 
     println!("Animation controls:");
     println!("  - spacebar: Add 60 frames of hitpause");

@@ -10,6 +10,7 @@ pub trait InputMethod {
     fn update(&mut self, event: &InputEvent);
 }
 
+#[derive(Clone, Debug, Reflect, FromReflect)]
 pub enum InputSource {
     Buffer(Buffer),
 }

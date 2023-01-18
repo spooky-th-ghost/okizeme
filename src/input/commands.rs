@@ -1,3 +1,4 @@
+use bevy::reflect::{FromReflect, Reflect};
 use regex::Regex;
 
 /// Notation, Priority, and Regex for special motions
@@ -22,7 +23,7 @@ impl CommandMotion {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Reflect, FromReflect)]
 pub enum CommandType {
     Qcf,
     Qcb,

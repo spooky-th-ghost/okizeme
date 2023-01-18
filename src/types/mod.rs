@@ -5,7 +5,7 @@ mod config;
 
 pub use config::*;
 /// Used to distinguish which player various game objects belong to
-#[derive(Debug, Clone, Copy, PartialEq, Component)]
+#[derive(Debug, Clone, Copy, PartialEq, Component, Reflect, FromReflect)]
 pub enum PlayerId {
     P1,
     P2,

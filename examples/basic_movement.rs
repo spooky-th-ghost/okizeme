@@ -5,6 +5,7 @@ use okizeme::{
     physics::Velocity,
     prelude::*,
     types::{Busy, Hitstop, PlayerId, Stun},
+    InputListenerBundle,
 };
 
 pub fn main() {
@@ -33,8 +34,12 @@ pub fn setup(
             .looking_at(Vec3::Y * cam_height, Vec3::Y),
         ..default()
     });
+
+    commands.spawn(InputListenerBundle::input_map(PlayerId::P1));
+    commands.spawn(InputListenerBundle::input_map(PlayerId::P2));
+
     commands
-        .spawn_bundle(PbrBundle {
+        .spawn(PbrBundle {
             mesh: meshes.add(Mesh::from(shape::Cube { size: 10. })),
             material: materials.add(Color::ORANGE_RED.into()),
             transform: Transform::from_translation(Vec3::new(-60., 0., 0.)),
@@ -46,7 +51,7 @@ pub fn setup(
         .insert(Movement::default());
 
     commands
-        .spawn_bundle(PbrBundle {
+        .spawn(PbrBundle {
             mesh: meshes.add(Mesh::from(shape::Cube { size: 10. })),
             material: materials.add(Color::SEA_GREEN.into()),
             transform: Transform::from_translation(Vec3::new(60., 0., 0.)),

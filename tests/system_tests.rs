@@ -13,7 +13,7 @@ mod test {
         update_stage.add_system(manage_busy);
 
         // Setup test entities
-        let busy_id = world.spawn().insert(Busy(1)).id();
+        let busy_id = world.spawn(Busy(1)).id();
 
         // Run systems
         update_stage.run(&mut world);
@@ -32,7 +32,7 @@ mod test {
         update_stage.add_system(manage_busy);
 
         // Setup test entities
-        let busy_id = world.spawn().insert(Busy(1)).id();
+        let busy_id = world.spawn(Busy(1)).id();
 
         // Run systems
         update_stage.run(&mut world);
