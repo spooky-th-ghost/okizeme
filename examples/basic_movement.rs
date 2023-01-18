@@ -39,7 +39,7 @@ pub fn setup(
     commands.spawn(InputListenerBundle::input_map(PlayerId::P2));
 
     commands
-        .spawn_bundle(PbrBundle {
+        .spawn(PbrBundle {
             mesh: meshes.add(Mesh::from(shape::Cube { size: 10. })),
             material: materials.add(Color::ORANGE_RED.into()),
             transform: Transform::from_translation(Vec3::new(-60., 0., 0.)),
@@ -51,7 +51,7 @@ pub fn setup(
         .insert(Movement::default());
 
     commands
-        .spawn_bundle(PbrBundle {
+        .spawn(PbrBundle {
             mesh: meshes.add(Mesh::from(shape::Cube { size: 10. })),
             material: materials.add(Color::SEA_GREEN.into()),
             transform: Transform::from_translation(Vec3::new(60., 0., 0.)),

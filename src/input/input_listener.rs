@@ -7,6 +7,12 @@ pub struct InputListener {
     pub player_id: PlayerId,
 }
 
+impl InputListener {
+    pub fn new(player_id: PlayerId) -> Self {
+        Self { player_id }
+    }
+}
+
 #[derive(Bundle)]
 pub struct InputListenerBundle {
     input_listener: InputListener,
@@ -15,9 +21,8 @@ pub struct InputListenerBundle {
 }
 
 impl InputListenerBundle {
-    pub fn input_map(player_id: PlayerId) -> input_map::InputMap<OkiAction> {
+    pub fn input_map(player_id: PlayerId) -> InputListenerBundle {
         use OkiAction::*;
-        println!("attaching input listener for {:?}", player_id);
         let mut input_map = match player_id {
             PlayerId::P1 => input_map::InputMap::new([
                 (KeyCode::Q, Left),
@@ -50,7 +55,13 @@ impl InputListenerBundle {
             ])
             .build(),
         };
-        input_map
+        InputListenerBundle {
+            input_listener: InputListener::new(player_id),
+            input_manager: InputManagerBundle {
+                input_map,
+                ..Default::default()
+            },
+        }
     }
 }
 
@@ -61,7 +72,6 @@ pub fn write_inputs_to_buffer(
         &leafwing_input_manager::action_state::ActionState<OkiAction>,
     )>,
 ) {
-    println!("Found some input listeners");
     for (listener, action) in &query {
         use OkiAction::*;
 
@@ -248,8 +258,5 @@ pub fn write_inputs_to_buffer(
             }
         }
         input_writer.send(InputEvent::new(motion, listener.player_id, buttons));
-        if listener.player_id == PlayerId::P1 {
-            println!("Writing {:?} for P1", motion);
-        }
     }
 }

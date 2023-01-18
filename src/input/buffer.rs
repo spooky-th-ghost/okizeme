@@ -2,7 +2,7 @@ use crate::*;
 use std::fmt::Write;
 
 /// Input buffer used to hold button presses, directional input, and special motions
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Reflect, FromReflect)]
 pub struct Buffer {
     player_id: PlayerId,
     motions: Vec<u8>,

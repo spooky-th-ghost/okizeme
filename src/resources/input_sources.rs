@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use crate::{InputMethod, InputSource, PlayerId};
 
-#[derive(Resource)]
+#[derive(Resource, Reflect, FromReflect)]
 pub struct PlayerInputSources(Vec<InputSource>);
 
 impl Default for PlayerInputSources {
