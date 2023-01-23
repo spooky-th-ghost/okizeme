@@ -8,6 +8,7 @@ mod input_event;
 mod input_listener;
 mod input_map;
 mod input_source;
+mod parsing;
 
 pub use actions::*;
 pub use buffer::*;
@@ -19,3 +20,4 @@ pub use input_event::*;
 pub use input_listener::*;
 pub use input_map::*;
 pub use input_source::*;
+pub use parsing::*;

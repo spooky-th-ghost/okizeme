@@ -1,6 +1,9 @@
 use std::fmt;
 
-use bevy::reflect::{FromReflect, Reflect};
+use bevy::{
+    prelude::GamepadButtonType,
+    reflect::{FromReflect, Reflect},
+};
 
 #[derive(Debug, Default, Clone, Copy, Reflect, FromReflect)]
 #[repr(transparent)]
@@ -205,6 +208,33 @@ pub struct Buttons {
     pub pressed: ButtonMask,
     pub held: ButtonMask,
     pub released: ButtonMask,
+}
+
+pub struct InputMask(pub u16);
+
+impl InputMask {
+    pub fn get_motion_mask(&self) -> MotionMask {
+        MotionMask::new(self.0 as u8)
+    }
+
+    pub fn get_button_mask(&self) -> ButtonMask {
+        let buttons_u16 = self.0 >> 8;
+        ButtonMask(buttons_u16 as u8)
+    }
+}
+
+impl fmt::Display for InputMask {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let motion_string = self.get_motion_mask().to_string();
+        let button_string = self.get_button_mask().to_string();
+        write!(f, "{}{}", button_string, motion_string)
+    }
+}
+
+#[test]
+fn input_mask_test() {
+    let masky = InputMask(0b0000_0011_0000_0001);
+    assert_eq!(masky.to_string(), "323f23f".to_string())
 }
 
 #[cfg(test)]
