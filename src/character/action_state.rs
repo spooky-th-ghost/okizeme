@@ -1,5 +1,5 @@
 use crate::*;
-use bevy::prelude::*;
+use bevy::{prelude::*, utils::tracing::Id};
 
 /// Handles the current state of the player
 #[derive(Default, Debug, Clone, Copy, Component, Reflect)]
@@ -42,7 +42,7 @@ impl PartialEq for ActionState {
 impl ActionState {
     pub fn update(
         &mut self,
-        input: &InputSource,
+        input: &InputBuffer,
         movement: &mut Movement,
         velocity: &mut Velocity,
     ) -> (Option<AnimationTransition>, u8) {
@@ -74,27 +74,28 @@ impl ActionState {
 
     pub fn from_neutral_states(
         &self,
-        input: &InputSource,
+        input: &InputBuffer,
         movement: &mut Movement,
         velocity: &mut Velocity,
     ) -> (Self, u8) {
         use ActionState::*;
 
-        if let Some(ct) = input.get_command_type() {
-            match ct {
-                CommandType::Dash => return (Dashing, 0),
-                CommandType::BackDash => return self.buffer_backdash(movement, velocity),
-                _ => (),
-            }
-        }
+        // if let Some(ct) = input.get_command_type() {
+        //     match ct {
+        //         CommandType::Dash => return (Dashing, 0),
+        //         CommandType::BackDash => return self.buffer_backdash(movement, velocity),
+        //         _ => (),
+        //     }
+        // }
 
-        match input.get_current_motion() {
-            4 => (BackWalking, 0),
-            6 => (Walking, 0),
-            1 | 2 | 3 => (Crouching, 0),
-            7 | 8 | 9 => Self::buffer_jump(input.get_current_motion(), movement, false),
-            _ => (Idle, 0),
-        }
+        // match input.get_current_motion() {
+        //     4 => (BackWalking, 0),
+        //     6 => (Walking, 0),
+        //     1 | 2 | 3 => (Crouching, 0),
+        //     7 | 8 | 9 => Self::buffer_jump(input.get_current_motion(), movement, false),
+        //     _ => (Idle, 0),
+        // }
+        (Idle, 0)
     }
 
     /// Returns a new state based on input from the following states:
@@ -104,7 +105,7 @@ impl ActionState {
     ///  - Airbackdashing
     pub fn from_neutral_airborne(
         &self,
-        buffer: &InputSource,
+        buffer: &InputBuffer,
         movement: &mut Movement,
         velocity: &mut Velocity,
     ) -> (Self, u8) {
@@ -125,15 +126,16 @@ impl ActionState {
         }
     }
     /// Returns a new state based on input from dashing
-    pub fn from_dashing(&self, input: &InputSource, movement: &Movement) -> (Self, u8) {
+    pub fn from_dashing(&self, input: &InputBuffer, movement: &Movement) -> (Self, u8) {
         use ActionState::*;
-        match input.get_current_motion() {
-            4 => (BackWalking, 0),
-            6 => (Dashing, 0),
-            1 | 2 | 3 => (Crouching, 0),
-            7 | 8 | 9 => Self::buffer_dash_jump(input.get_current_motion(), movement, false),
-            _ => (Idle, 0),
-        }
+        // match input.get_current_motion() {
+        //     4 => (BackWalking, 0),
+        //     6 => (Dashing, 0),
+        //     1 | 2 | 3 => (Crouching, 0),
+        //     7 | 8 | 9 => Self::buffer_dash_jump(input.get_current_motion(), movement, false),
+        //     _ => (Idle, 0),
+        // }
+        (Idle, 0)
     }
 
     pub fn from_jump_squat(&self, movement: &Movement, velocity: &mut Velocity) -> (Self, u8) {
@@ -152,26 +154,26 @@ impl ActionState {
     /// Returns a new state from input while aireborne
     pub fn from_airborne_input(
         &self,
-        buffer: &InputSource,
+        buffer: &InputBuffer,
         movement: &mut Movement,
         velocity: &mut Velocity,
     ) -> (Self, u8) {
         use ActionState::*;
 
         if movement.can_airdash() {
-            if let Some(ct) = buffer.get_command_type() {
-                match ct {
-                    CommandType::Dash => {
-                        movement.spend_airdash();
-                        return self.buffer_airdash(movement, true);
-                    }
-                    CommandType::BackDash => {
-                        movement.spend_airdash();
-                        return self.buffer_airdash(movement, false);
-                    }
-                    _ => (),
-                }
-            }
+            // if let Some(ct) = buffer.get_command_type() {
+            //     match ct {
+            //         CommandType::Dash => {
+            //             movement.spend_airdash();
+            //             return self.buffer_airdash(movement, true);
+            //         }
+            //         CommandType::BackDash => {
+            //             movement.spend_airdash();
+            //             return self.buffer_airdash(movement, false);
+            //         }
+            //         _ => (),
+            //     }
+            // }
         }
 
         match self {

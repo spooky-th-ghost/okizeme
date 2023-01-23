@@ -1,6 +1,87 @@
 use crate::*;
 use bevy::prelude::*;
 
+pub struct Skill {
+    skill_type: SkillType,
+    skill_state: SkillState,
+    skill_motion: SkillMotion,
+    skill_button: SkillButton,
+}
+
+pub enum SkillType {
+    Normal,
+    Special,
+    Super,
+}
+
+pub enum SkillState {
+    Ground,
+    Air,
+}
+
+pub enum MotionType {
+    Normal,
+    Special,
+    Super,
+}
+
+#[allow(non_camel_case_types)]
+pub enum SkillMotion {
+    m_236,
+    m_214,
+    m_623,
+    m_421,
+    m_22,
+    m_5,
+    m_4,
+    m_6,
+    m_2,
+    m_3,
+    m_1,
+}
+
+impl SkillMotion {
+    pub fn is_normal(&self) -> bool {
+        use SkillMotion::*;
+        match self {
+            m_5 | m_4 | m_6 | m_2 | m_1 | m_3 => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_special(&self) -> bool {
+        use SkillMotion::*;
+        match self {
+            m_236 | m_214 | m_623 | m_421 | m_22 => true,
+            _ => false,
+        }
+    }
+}
+
+#[allow(non_camel_case_types)]
+pub enum SkillButton {
+    b_a,
+    b_b,
+    b_c,
+    b_d,
+    b_e,
+    b_f,
+    b_g,
+    b_h,
+}
+
+#[derive(Debug, Eq, PartialEq)]
+pub enum CommandMotion {
+    Dash,
+    Backdash,
+    Qcf,
+    Qcb,
+    Dp,
+    Rdp,
+    TwoTwo,
+    DoubleQcf,
+}
+
 #[derive(Debug, Clone)]
 pub struct Attack {
     pub name: String,

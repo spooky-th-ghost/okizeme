@@ -1,4 +1,4 @@
-use crate::ButtonMask;
+use crate::{ButtonMask, CommandMotion};
 
 pub type ParseResult<'a, Output> = Result<(&'a str, Output), &'a str>;
 
@@ -235,18 +235,6 @@ fn match_button<'a>(button_to_check: char) -> impl Parser<'a, ()> {
         }
         None => Err(input),
     }
-}
-
-#[derive(Debug, Eq, PartialEq)]
-pub enum CommandMotion {
-    Dash,
-    Backdash,
-    Qcf,
-    Qcb,
-    Dp,
-    Rdp,
-    TwoTwo,
-    DoubleQcf,
 }
 
 pub mod motion_parsing {

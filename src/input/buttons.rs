@@ -10,6 +10,34 @@ use bevy::{
 pub struct ButtonMask(pub u8);
 
 impl ButtonMask {
+    pub fn new(value: u8) -> Self {
+        ButtonMask(value)
+    }
+
+    pub fn with_buttons(buttons: &str) -> Self {
+        let mut binary_representation = 0_u8;
+        for button in buttons.chars().into_iter() {
+            let bit_to_set = match button {
+                'a' => 0b0000_0001,
+                'b' => 0b0000_0010,
+                'c' => 0b0000_0100,
+                'd' => 0b0000_1000,
+                'e' => 0b0001_0000,
+                'f' => 0b0010_0000,
+                'g' => 0b0100_0000,
+                'h' => 0b1000_0000,
+                _ => 0,
+            };
+            binary_representation |= bit_to_set;
+        }
+
+        ButtonMask(binary_representation)
+    }
+
+    pub fn raw_value(&self) -> u8 {
+        self.0
+    }
+
     pub fn any(&self) -> bool {
         self.0 != 0
     }
@@ -106,6 +134,26 @@ impl MotionMask {
 
         MotionMask(value)
     }
+
+    pub fn with_direction(motion: &str) -> Self {
+        let mut binary_representation = 0_u8;
+        for dir in motion.chars().into_iter() {
+            let bit_to_set = match dir {
+                'd' => 0b0000_0100,
+                'u' => 0b0000_1000,
+                'l' => 0b0000_0001,
+                'r' => 0b0000_0010,
+                _ => 0,
+            };
+            binary_representation |= bit_to_set;
+        }
+        MotionMask::new(binary_representation)
+    }
+
+    pub fn raw_value(&self) -> u8 {
+        self.0
+    }
+
     pub fn to_unicode(&self) -> char {
         const LEFT: u8 = 0b0000_0001;
         const RIGHT: u8 = 0b0000_0010;
@@ -209,10 +257,17 @@ pub struct Buttons {
     pub held: ButtonMask,
     pub released: ButtonMask,
 }
-
+#[derive(Debug, Default, Clone, Copy, Reflect, FromReflect)]
+#[repr(transparent)]
 pub struct InputMask(pub u16);
 
 impl InputMask {
+    pub fn from_masks(buttons: ButtonMask, motion: MotionMask) -> Self {
+        let mut base_value = (buttons.raw_value() as u16) << 8;
+        base_value |= motion.raw_value() as u16;
+        InputMask(base_value)
+    }
+
     pub fn get_motion_mask(&self) -> MotionMask {
         MotionMask::new(self.0 as u8)
     }
@@ -233,8 +288,11 @@ impl fmt::Display for InputMask {
 
 #[test]
 fn input_mask_test() {
-    let masky = InputMask(0b0000_0011_0000_0001);
-    assert_eq!(masky.to_string(), "323f23f".to_string())
+    let masky = InputMask::from_masks(
+        ButtonMask::with_buttons("abc"),
+        MotionMask::with_direction("dr"),
+    );
+    assert_eq!(masky.to_string(), "abc↘".to_string())
 }
 
 #[cfg(test)]

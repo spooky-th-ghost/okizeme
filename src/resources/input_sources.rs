@@ -1,39 +1,30 @@
+use crate::{InputBuffer, PlayerId};
 use bevy::prelude::*;
 
-use crate::{InputMethod, InputSource, PlayerId};
-
-#[derive(Resource, Reflect, FromReflect)]
-pub struct PlayerInputSources(Vec<InputSource>);
+#[derive(Resource)]
+pub struct PlayerInputSources(Vec<InputBuffer>);
 
 impl Default for PlayerInputSources {
     fn default() -> Self {
         PlayerInputSources(vec![
-            InputSource::new_buffer(PlayerId::P1),
-            InputSource::new_buffer(PlayerId::P2),
+            InputBuffer::with_player(PlayerId::P1),
+            InputBuffer::with_player(PlayerId::P2),
         ])
     }
 }
 
 impl PlayerInputSources {
-    pub fn get_source_mut(&mut self, player_id: &PlayerId) -> &mut InputSource {
+    pub fn get_source_mut(&mut self, player_id: &PlayerId) -> &mut InputBuffer {
         self.0
             .iter_mut()
             .find(|x| x.get_player_id() == player_id)
             .unwrap()
     }
-    pub fn get_source(&self, player_id: &PlayerId) -> &InputSource {
+    pub fn get_source(&self, player_id: &PlayerId) -> &InputBuffer {
         &self
             .0
             .iter()
             .find(|&x| x.get_player_id() == player_id)
             .unwrap()
-    }
-
-    pub fn get_player_current_motion(&self, player_id: &PlayerId) -> u8 {
-        if let Some(source) = self.0.iter().find(|x| x.get_player_id() == player_id) {
-            source.get_current_motion()
-        } else {
-            5
-        }
     }
 }

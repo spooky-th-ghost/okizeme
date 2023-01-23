@@ -146,7 +146,7 @@ impl Plugin for OkizemePlugin {
                 //         .with_system(manage_stun),
                 // ),
                 .with_system(write_inputs_to_buffer)
-                .with_system(read_inputs.after(write_inputs))
+                .with_system(read_inputs.after(write_inputs_to_buffer))
                 .with_system(manage_action_state.after(read_inputs))
                 .with_system(add_busy.after(manage_action_state))
                 .with_system(manage_character_velocity.after(manage_action_state))
