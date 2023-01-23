@@ -1,9 +1,15 @@
 use std::fmt;
 
-use bevy::{
-    prelude::GamepadButtonType,
-    reflect::{FromReflect, Reflect},
-};
+use bevy::reflect::{FromReflect, Reflect};
+
+pub const A: ButtonMask = ButtonMask(0b0000_0001);
+pub const B: ButtonMask = ButtonMask(0b0000_0010);
+pub const C: ButtonMask = ButtonMask(0b0000_0100);
+pub const D: ButtonMask = ButtonMask(0b0000_1000);
+pub const E: ButtonMask = ButtonMask(0b0001_0000);
+pub const F: ButtonMask = ButtonMask(0b0010_0000);
+pub const G: ButtonMask = ButtonMask(0b0100_0000);
+pub const H: ButtonMask = ButtonMask(0b1000_0000);
 
 #[derive(Debug, Default, Clone, Copy, Reflect, FromReflect)]
 #[repr(transparent)]
@@ -64,37 +70,46 @@ impl ButtonMask {
 }
 
 impl fmt::Display for ButtonMask {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let mut button_string = String::new();
-        if self.is_bit_set(0) {
-            button_string.push('a')
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        if self.0 & A.0 == A.0 {
+            write!(f, "a")?
         }
-        if self.is_bit_set(1) {
-            button_string.push('b')
+        if self.0 & B.0 == B.0 {
+            write!(f, "b")?
         }
-        if self.is_bit_set(2) {
-            button_string.push('c')
+        if self.0 & C.0 == C.0 {
+            write!(f, "c")?
         }
-        if self.is_bit_set(3) {
-            button_string.push('d')
+        if self.0 & D.0 == D.0 {
+            write!(f, "d")?
         }
-        if self.is_bit_set(4) {
-            button_string.push('e')
+        if self.0 & E.0 == E.0 {
+            write!(f, "e")?
         }
-        if self.is_bit_set(5) {
-            button_string.push('f')
+        if self.0 & F.0 == F.0 {
+            write!(f, "f")?
         }
-        if self.is_bit_set(6) {
-            button_string.push('g')
+        if self.0 & G.0 == G.0 {
+            write!(f, "g")?
         }
-        if self.is_bit_set(7) {
-            button_string.push('h')
+        if self.0 & H.0 == H.0 {
+            write!(f, "h")?
         }
-        write!(f, "{}", button_string)
+        Ok(())
     }
 }
 
-#[derive(Debug, Default, Clone, Copy, Reflect, FromReflect)]
+pub const LEFT: MotionMask = MotionMask(0b0000_0001);
+pub const RIGHT: MotionMask = MotionMask(0b0000_0010);
+pub const DOWN: MotionMask = MotionMask(0b0000_0100);
+pub const UP: MotionMask = MotionMask(0b0000_1000);
+pub const DOWN_LEFT: MotionMask = MotionMask(0b0000_0101);
+pub const DOWN_RIGHT: MotionMask = MotionMask(0b0000_0110);
+pub const UP_LEFT: MotionMask = MotionMask(0b0000_1001);
+pub const UP_RIGHT: MotionMask = MotionMask(0b0000_1010);
+pub const NEUTRAL: MotionMask = MotionMask(0b0000_0000);
+
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Reflect, FromReflect)]
 #[repr(transparent)]
 pub struct MotionMask(u8);
 
@@ -135,14 +150,30 @@ impl MotionMask {
         MotionMask(value)
     }
 
+    pub fn is_down(self) -> bool {
+        matches!(self, DOWN | DOWN_LEFT | DOWN_RIGHT)
+    }
+
+    pub fn is_right(self) -> bool {
+        matches!(self, RIGHT | DOWN_RIGHT | UP_RIGHT)
+    }
+
+    pub fn is_left(self) -> bool {
+        matches!(self, LEFT | DOWN_LEFT | UP_LEFT)
+    }
+
+    pub fn is_up(self) -> bool {
+        matches!(self, UP | UP_LEFT | UP_RIGHT)
+    }
+
     pub fn with_direction(motion: &str) -> Self {
         let mut binary_representation = 0_u8;
         for dir in motion.chars().into_iter() {
             let bit_to_set = match dir {
-                'd' => 0b0000_0100,
-                'u' => 0b0000_1000,
                 'l' => 0b0000_0001,
                 'r' => 0b0000_0010,
+                'd' => 0b0000_0100,
+                'u' => 0b0000_1000,
                 _ => 0,
             };
             binary_representation |= bit_to_set;
@@ -155,17 +186,7 @@ impl MotionMask {
     }
 
     pub fn to_unicode(&self) -> char {
-        const LEFT: u8 = 0b0000_0001;
-        const RIGHT: u8 = 0b0000_0010;
-        const DOWN: u8 = 0b0000_0100;
-        const UP: u8 = 0b0000_1000;
-        const DOWN_LEFT: u8 = 0b0000_0101;
-        const DOWN_RIGHT: u8 = 0b0000_0110;
-        const UP_LEFT: u8 = 0b0000_1001;
-        const UP_RIGHT: u8 = 0b0000_1010;
-
-        let mask = self.0;
-        match mask {
+        match *self {
             LEFT => char::from_u32(0x2190).unwrap(),
             RIGHT => char::from_u32(0x2192).unwrap(),
             DOWN => char::from_u32(0x2193).unwrap(),
@@ -174,75 +195,39 @@ impl MotionMask {
             DOWN_RIGHT => char::from_u32(0x2198).unwrap(),
             UP_LEFT => char::from_u32(0x2196).unwrap(),
             UP_RIGHT => char::from_u32(0x2197).unwrap(),
-            0 => char::from_u32(0x2605).unwrap(),
+            NEUTRAL => char::from_u32(0x2605).unwrap(),
             _ => ' ',
         }
     }
 
     pub fn to_numpad(&self, facing_right: bool) -> u8 {
-        const LEFT: u8 = 0b0000_0001;
-        const RIGHT: u8 = 0b0000_0010;
-        const DOWN: u8 = 0b0000_0100;
-        const UP: u8 = 0b0000_1000;
-        const DOWN_LEFT: u8 = 0b0000_0101;
-        const DOWN_RIGHT: u8 = 0b0000_0110;
-        const UP_LEFT: u8 = 0b0000_1001;
-        const UP_RIGHT: u8 = 0b0000_1010;
-
-        let mask = self.0;
-        let mut motion: u8 = 5;
         if facing_right {
-            if mask == LEFT {
-                motion = 4;
-            }
-            if mask == RIGHT {
-                motion = 6;
-            }
-            if mask == DOWN {
-                motion = 2;
-            }
-            if mask == UP {
-                motion = 8;
-            }
-            if mask == DOWN_LEFT {
-                motion = 1;
-            }
-            if mask == DOWN_RIGHT {
-                motion = 3;
-            }
-            if mask == UP_LEFT {
-                motion = 7;
-            }
-            if mask == UP_RIGHT {
-                motion = 9;
+            match *self {
+                LEFT => 4,
+                RIGHT => 6,
+                DOWN => 2,
+                UP => 8,
+                DOWN_LEFT => 1,
+                DOWN_RIGHT => 3,
+                UP_LEFT => 7,
+                UP_RIGHT => 9,
+                NEUTRAL => 5,
+                _ => 0,
             }
         } else {
-            if mask == LEFT {
-                motion = 6;
-            }
-            if mask == RIGHT {
-                motion = 4;
-            }
-            if mask == DOWN {
-                motion = 2;
-            }
-            if mask == UP {
-                motion = 8;
-            }
-            if mask == DOWN_LEFT {
-                motion = 3;
-            }
-            if mask == DOWN_RIGHT {
-                motion = 1;
-            }
-            if mask == UP_LEFT {
-                motion = 9;
-            }
-            if mask == UP_RIGHT {
-                motion = 7;
+            match *self {
+                LEFT => 6,
+                RIGHT => 4,
+                DOWN => 2,
+                UP => 8,
+                DOWN_LEFT => 3,
+                DOWN_RIGHT => 1,
+                UP_LEFT => 9,
+                UP_RIGHT => 7,
+                NEUTRAL => 5,
+                _ => 0,
             }
         }
-        motion
     }
 }
 

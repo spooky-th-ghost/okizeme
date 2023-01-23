@@ -1,0 +1,8 @@
+
+Store the motions universally
+
+Buffering:
+-Actions will have a set buffer
+-When leaving busing/stun check for buffered actions, essentially look at the last 5 frames, see if a motion should be exxecuted, if not use prio to find the appropriate normal to do
+
+- Design a fallthrough system, so that if a command normal exists for a direction, do that, but if none exists, fall through to the closest neighbor
