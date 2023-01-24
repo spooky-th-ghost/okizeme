@@ -67,6 +67,34 @@ impl ButtonMask {
     fn is_bit_set(&self, position: u8) -> bool {
         (self.0 & (1 << position)) != 0
     }
+
+    pub fn iter(&self) -> ButtonIter {
+        ButtonIter {
+            index: 0,
+            remaining: self.0,
+        }
+    }
+}
+
+pub struct ButtonIter {
+    index: usize,
+    remaining: u8,
+}
+
+impl Iterator for ButtonIter {
+    type Item = (usize, bool);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index >= 8 {
+            None
+        } else {
+            let index = self.index;
+            let flag = self.remaining & 1 == 1;
+            self.index += 1;
+            self.remaining >>= 1;
+            Some((index, flag))
+        }
+    }
 }
 
 impl fmt::Display for ButtonMask {
@@ -243,46 +271,62 @@ pub struct Buttons {
     pub released: ButtonMask,
 }
 #[derive(Debug, Default, Clone, Copy, Reflect, FromReflect)]
-#[repr(transparent)]
-pub struct InputMask(pub u16);
+pub struct InputMask {
+    pub held_buttons: ButtonMask,
+    pub pressed_buttons: ButtonMask,
+    pub released_buttons: ButtonMask,
+    pub motion: MotionMask,
+}
 
 impl InputMask {
-    pub fn from_masks(buttons: ButtonMask, motion: MotionMask) -> Self {
-        let mut base_value = (buttons.raw_value() as u16) << 8;
-        base_value |= motion.raw_value() as u16;
-        InputMask(base_value)
+    pub fn get_motion(&self) -> MotionMask {
+        self.motion
     }
 
-    pub fn get_motion_mask(&self) -> MotionMask {
-        MotionMask::new(self.0 as u8)
+    pub fn get_held_buttons(&self) -> ButtonMask {
+        self.held_buttons
     }
 
-    pub fn get_button_mask(&self) -> ButtonMask {
-        let buttons_u16 = self.0 >> 8;
-        ButtonMask(buttons_u16 as u8)
+    pub fn get_pressed_buttons(&self) -> ButtonMask {
+        self.pressed_buttons
+    }
+
+    pub fn get_released_buttons(&self) -> ButtonMask {
+        self.released_buttons
     }
 }
 
 impl fmt::Display for InputMask {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let motion_string = self.get_motion_mask().to_string();
-        let button_string = self.get_button_mask().to_string();
-        write!(f, "{}{}", button_string, motion_string)
+        let motion_string = self.get_motion().to_string();
+        let held_button_string = self.get_held_buttons().to_string();
+        let pressed_button_string = self.get_pressed_buttons().to_string();
+        let released_button_string = self.get_released_buttons().to_string();
+        write!(
+            f,
+            "Motion: {}\nHeld Buttons: {}\nPressed Buttons: {}\nReleased Buttons: {}",
+            motion_string, held_button_string, pressed_button_string, released_button_string
+        )
     }
-}
-
-#[test]
-fn input_mask_test() {
-    let masky = InputMask::from_masks(
-        ButtonMask::with_buttons("abc"),
-        MotionMask::with_direction("dr"),
-    );
-    assert_eq!(masky.to_string(), "abc↘".to_string())
 }
 
 #[cfg(test)]
 mod test {
     use super::*;
+
+    #[test]
+    fn input_mask_test() {
+        let mask = InputMask {
+            held_buttons: ButtonMask::with_buttons("abc"),
+            pressed_buttons: ButtonMask::with_buttons("abc"),
+            released_buttons: ButtonMask::with_buttons("abc"),
+            motion: MotionMask::with_direction("dr"),
+        };
+        assert_eq!(
+            mask.to_string(),
+            "Motion: ↘\nHeld Buttons: abc\nPressed Buttons: abc\nReleased Buttons: abc".to_string()
+        )
+    }
 
     #[test]
     fn detect_single_button() {

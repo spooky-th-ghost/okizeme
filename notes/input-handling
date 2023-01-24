@@ -6,3 +6,11 @@ Buffering:
 -When leaving busing/stun check for buffered actions, essentially look at the last 5 frames, see if a motion should be exxecuted, if not use prio to find the appropriate normal to do
 
 - Design a fallthrough system, so that if a command normal exists for a direction, do that, but if none exists, fall through to the closest neighbor
+
+Buffer:
+- Have a method to return 2 iterators (buttons, motions)
+- Motion parser will find the highest priority command (if any, and return it)
+- if a valid button shows up in range of the index for the found command, do that special
+- if no special motion, check for a valid normal
+
+

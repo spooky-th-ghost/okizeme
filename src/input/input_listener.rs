@@ -75,49 +75,116 @@ pub fn write_inputs_to_buffer(
     for (listener, action) in &query {
         use OkiAction::*;
 
-        let a = action.pressed(A);
+        let a_held = action.pressed(A);
+        let b_held = action.pressed(B);
+        let c_held = action.pressed(C);
+        let d_held = action.pressed(D);
+        let e_held = action.pressed(E);
+        let f_held = action.pressed(F);
+        let g_held = action.pressed(G);
+        let h_held = action.pressed(H);
 
-        let b = action.pressed(B);
-
-        let c = action.pressed(C);
-
-        let d = action.pressed(D);
-
-        let e = action.pressed(E);
-
-        let f = action.pressed(F);
-
-        let g = action.pressed(G);
-
-        let h = action.pressed(H);
-
-        let mut button_byte: u8 = 0b0000_0000;
-        if a {
-            button_byte |= 0b0000_0001
+        let mut held_byte: u8 = 0b0000_0000;
+        if a_held {
+            held_byte |= 0b0000_0001
         }
-        if b {
-            button_byte |= 0b0000_0010
+        if b_held {
+            held_byte |= 0b0000_0010
         }
-        if c {
-            button_byte |= 0b0000_0100
+        if c_held {
+            held_byte |= 0b0000_0100
         }
-        if d {
-            button_byte |= 0b0000_1000
+        if d_held {
+            held_byte |= 0b0000_1000
         }
-        if e {
-            button_byte |= 0b0001_0000
+        if e_held {
+            held_byte |= 0b0001_0000
         }
-        if f {
-            button_byte |= 0b0010_0000
+        if f_held {
+            held_byte |= 0b0010_0000
         }
-        if g {
-            button_byte |= 0b0100_0000
+        if g_held {
+            held_byte |= 0b0100_0000
         }
-        if h {
-            button_byte |= 0b1000_0000
+        if h_held {
+            held_byte |= 0b1000_0000
         }
 
-        let button_mask = ButtonMask::new(button_byte);
+        let held_button_mask = ButtonMask::new(held_byte);
+
+        let a_pressed = action.just_pressed(A);
+        let b_pressed = action.just_pressed(B);
+        let c_pressed = action.just_pressed(C);
+        let d_pressed = action.just_pressed(D);
+        let e_pressed = action.just_pressed(E);
+        let f_pressed = action.just_pressed(F);
+        let g_pressed = action.just_pressed(G);
+        let h_pressed = action.just_pressed(H);
+
+        let mut pressed_byte: u8 = 0b0000_0000;
+        if a_pressed {
+            pressed_byte |= 0b0000_0001
+        }
+        if b_pressed {
+            pressed_byte |= 0b0000_0010
+        }
+        if c_pressed {
+            pressed_byte |= 0b0000_0100
+        }
+        if d_pressed {
+            pressed_byte |= 0b0000_1000
+        }
+        if e_pressed {
+            pressed_byte |= 0b0001_0000
+        }
+        if f_pressed {
+            pressed_byte |= 0b0010_0000
+        }
+        if g_pressed {
+            pressed_byte |= 0b0100_0000
+        }
+        if h_pressed {
+            pressed_byte |= 0b1000_0000
+        }
+
+        let pressed_button_mask = ButtonMask::new(pressed_byte);
+
+        let a_released = action.just_released(A);
+        let b_released = action.just_released(B);
+        let c_released = action.just_released(C);
+        let d_released = action.just_released(D);
+        let e_released = action.just_released(E);
+        let f_released = action.just_released(F);
+        let g_released = action.just_released(G);
+        let h_released = action.just_released(H);
+
+        let mut released_byte: u8 = 0b0000_0000;
+        if a_released {
+            released_byte |= 0b0000_0001
+        }
+        if b_released {
+            released_byte |= 0b0000_0010
+        }
+        if c_released {
+            released_byte |= 0b0000_0100
+        }
+        if d_released {
+            released_byte |= 0b0000_1000
+        }
+        if e_released {
+            released_byte |= 0b0001_0000
+        }
+        if f_released {
+            released_byte |= 0b0010_0000
+        }
+        if g_released {
+            released_byte |= 0b0100_0000
+        }
+        if h_released {
+            released_byte |= 0b1000_0000
+        }
+
+        let released_button_mask = ButtonMask::new(released_byte);
 
         // Motion
         let up = action.pressed(Up);
@@ -141,7 +208,12 @@ pub fn write_inputs_to_buffer(
 
         let motion_mask = MotionMask::new(motion_byte);
 
-        let input_mask = InputMask::from_masks(button_mask, motion_mask);
+        let input_mask = InputMask {
+            motion: motion_mask,
+            held_buttons: held_button_mask,
+            pressed_buttons: pressed_button_mask,
+            released_buttons: released_button_mask,
+        };
 
         input_writer.send(InputEvent::new(listener.player_id, input_mask));
     }
