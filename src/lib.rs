@@ -12,6 +12,7 @@ pub mod macros;
 pub mod offense;
 pub mod physics;
 pub mod resources;
+pub mod states;
 pub mod systems;
 pub mod types;
 pub mod utils;
@@ -36,6 +37,8 @@ pub use offense::*;
 pub use physics::*;
 #[doc(hidden)]
 pub use resources::*;
+#[doc(hidden)]
+pub use states::*;
 #[doc(hidden)]
 pub use systems::*;
 #[doc(hidden)]
@@ -84,7 +87,6 @@ impl Plugin for OkizemePlugin {
         // Resources
         app.insert_resource(OkizemeConfig::default())
             .insert_resource(PlayerInputSources::default())
-            .insert_resource(PlayerDevices::default())
             .insert_resource(PlayerPositions::default())
             .insert_resource(PlayerHealthBars::default())
             .insert_resource(PlayerCombos::default());

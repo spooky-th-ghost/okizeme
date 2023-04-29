@@ -13,4 +13,20 @@ Buffer:
 - if a valid button shows up in range of the index for the found command, do that special
 - if no special motion, check for a valid normal
 
+- for buttons, look for a button that was just pressed within 5 frames, and is currently held to execute it
+
+Mask to indicate which special inputs a player has
+
+QCF = 0000_0001
+QCB = 0000_0010
+DP = 0000_0100
+RDP = 0000_1000
+22 = 0001_0000
+dash = 0010_0000
+backdash = 0100_0000
+D_QCF = 1000_0000
+
+struct CharacterActionMask {
+	
+}
 

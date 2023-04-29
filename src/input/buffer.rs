@@ -4,7 +4,6 @@ pub struct InputBuffer {
     pub player_id: PlayerId,
     pub inputs: Vec<InputMask>,
 }
-
 impl InputBuffer {
     pub fn with_player(player_id: PlayerId) -> Self {
         InputBuffer {
@@ -26,5 +25,12 @@ impl InputBuffer {
     pub fn update(&mut self, input_event: &InputEvent) {
         self.tick();
         self.inputs.push(input_event.input_mask.clone());
+    }
+
+    pub fn motions_to_numpad(&self, facing_right: bool) -> String {
+        self.inputs
+            .iter()
+            .map(|i| i.motion.to_numpad(facing_right) as char)
+            .collect()
     }
 }

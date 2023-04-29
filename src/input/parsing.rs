@@ -330,11 +330,39 @@ pub mod motion_parsing {
         )
         .map(|(_next_input, _result)| CommandMotion::TwoTwo)
     }
+
+    pub fn find_command_motion<'a>() -> impl Parser<'a, CommandMotion> {
+        either(
+            double_qcf(),
+            either(
+                dp(),
+                either(
+                    rdp(),
+                    either(
+                        qcf(),
+                        either(qcb(), either(two_two(), either(dash(), backdash()))),
+                    ),
+                ),
+            ),
+        )
+        .map(|result| result)
+    }
 }
+
 #[cfg(test)]
 mod test {
     use super::*;
     use motion_parsing::*;
+
+    #[test]
+    fn all_inputs_test() {
+        let find_it = find_command_motion();
+
+        assert_eq!(
+            find_it.parse("554422233654"),
+            Ok(("54", CommandMotion::Qcf))
+        )
+    }
 
     #[test]
     fn double_qcf_test() {
