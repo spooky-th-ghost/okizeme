@@ -1,9 +1,5 @@
-use bevy::ecs::query::ReadOnlyWorldQuery;
-use bevy::ecs::world;
+use bevy::prelude::*;
 use bevy::utils::HashMap;
-use bevy::{ecs::query::WorldQuery, prelude::*};
-
-use crate::{PlayerId, Velocity};
 
 #[derive(Resource)]
 pub struct CharacterActions {
@@ -14,51 +10,60 @@ pub struct CharacterActions {
     attacks: HashMap<String, Box<dyn AttackTrait>>,
 }
 
-fn blah(world: &mut World) {
-    let mut attacks: HashMap<String, Box<dyn AttackTrait>> = HashMap::new();
-    attacks.insert("5K".to_string(), Box::new(Shoto5K));
-    attacks.insert("6S".to_string(), Box::new(Sol6S));
-    let actions = CharacterActions {
-        forward_ground_dash: GroundDashV2::Run { speed: Speed(0.5) },
-        backward_ground_dash: GroundDashV2::Run { speed: Speed(1.0) },
-        forward_air_dash: AirdashV2::Straight { speed: Speed(1.0) },
-        backward_air_dash: AirdashV2::Straight { speed: Speed(2.0) },
-        attacks,
-    };
-
-    let fiveK = Box::new(Shoto5K);
-    fiveK.execute(Entity::from_raw(41), world);
-    fiveK.execute(Entity::from_raw(41), world);
-}
-
-#[derive(Component)]
-pub struct AttackHandler {
-    attack: Box<dyn AttackTrait>,
-}
-
-pub struct Shoto5K;
-
-impl AttackTrait for Shoto5K {
-    fn execute(&self, entity: Entity, mut world: &mut World) {
-        let mut player_query = world.query::<(&PlayerId, &mut Velocity)>();
-        if let Ok((player_id, mut velocity)) = player_query.get_mut(&mut world, entity) {}
+impl CharacterActions {
+    pub fn get_action_from_input(&self) -> CharacterActionType {
+        CharacterActionType::AirDash(AirdashV2::Straight { speed: Speed(0.5) })
     }
-}
-
-pub struct Sol6S;
-
-impl AttackTrait for Sol6S {
-    fn execute(&self, entity: Entity, world: &mut World) {}
 }
 
 pub trait AttackTrait: Send + Sync + 'static {
     fn execute(&self, entity: Entity, world: &mut World);
 }
 
-pub enum CharacterAction {
+pub struct SingleHitbox {
+    hitbox: HitboxEvent,
+    hurtbox_events: Vec<HurtboxEvent>,
+    recovery: Recovery,
+    counter_hit_duration: Duration,
+}
+
+impl AttackTrait for SingleHitbox {
+    fn execute(&self, entity: Entity, world: &mut World) {
+        world.entity_mut(entity);
+    }
+}
+
+/// Build some structs that impl Attack Trait as a starter
+/// write structs for Airdash and Dash and see if it can be done without world access or handle all
+/// of it within a specific execute_actions system
+
+pub struct HitboxEvent {
+    position: Vec2,
+    startup: u8,
+    active: u8,
+    duration: Duration,
+}
+
+pub struct HurtboxEvent {
+    frame: u8,
+    head: Option<HurtboxProperties>,
+    torso: Option<HurtboxProperties>,
+    forward_arm: Option<HurtboxProperties>,
+    back_arm: Option<HurtboxProperties>,
+    forward_leg: Option<HurtboxProperties>,
+    back_leg: Option<HurtboxProperties>,
+}
+
+pub struct HurtboxProperties {
+    position: Vec2,
+    size: Vec2,
+    invulnerability: bool,
+}
+
+pub enum CharacterActionType {
     Dash(GroundDashV2),
     AirDash(AirdashV2),
-    Attack(AttackV2),
+    Attack(Box<dyn AttackTrait>),
 }
 
 #[derive(Component)]
@@ -67,10 +72,10 @@ pub enum CharacterStateV2 {
     Walking,
     Backwalking,
     AttackingGrounded {
-        attack: AttackV2,
+        attack: Box<dyn AttackTrait>,
     },
     AttackingAirborne {
-        attack: AttackV2,
+        attack: Box<dyn AttackTrait>,
     },
     Freefall {
         recovery: Recovery,
