@@ -4,13 +4,13 @@ extern crate lazy_static;
 
 pub mod animation;
 pub mod character;
+pub mod collision;
 pub mod components;
 pub mod defense;
-pub mod events;
 pub mod input;
 pub mod macros;
 pub mod new_types;
-pub mod offense;
+//pub mod offense;
 pub mod physics;
 pub mod resources;
 pub mod states;
@@ -23,18 +23,17 @@ pub use animation::*;
 #[doc(hidden)]
 pub use character::*;
 #[doc(hidden)]
+pub use collision::*;
+#[doc(hidden)]
 pub use components::*;
 #[doc(hidden)]
 pub use defense::*;
-#[doc(hidden)]
-pub use events::*;
 #[doc(hidden)]
 pub use input::*;
 #[doc(hidden)]
 pub use macros::*;
 pub use new_types::*;
-#[doc(hidden)]
-pub use offense::*;
+//pub use offense::*;
 #[doc(hidden)]
 pub use physics::*;
 #[doc(hidden)]
@@ -83,7 +82,6 @@ impl Plugin for OkizemePlugin {
             .add_event::<BusyEvent>()
             .add_event::<CollisionEvent>()
             .add_event::<ImpactEvent>()
-            .add_event::<CancelEvent>()
             .add_event::<LandingEvent>();
 
         // Resources

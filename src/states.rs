@@ -1,3 +1,4 @@
+use crate::{Hitbox, HitboxBundle, PlayerId};
 use bevy::prelude::*;
 use bevy::utils::HashMap;
 
@@ -17,33 +18,62 @@ impl CharacterActions {
 }
 
 pub trait Attack: Send + Sync + 'static {
-    fn execute(&self, frame: u8, entity: Entity, world: &mut World);
+    fn execute(&self, frame: u8, player_id: PlayerId, entity: Entity, world: &mut World);
+    fn startup(&self) -> u8;
+    fn active(&self) -> Vec<u8>;
+    fn recovery(&self) -> u8;
+}
+
+fn execute_actions(world: &mut World) {
+    let mut player_query = world.query::<(Entity, &PlayerId, &CharacterStateV2)>();
+    for (entity, player_id, character_state) in player_query.iter(world) {
+        if let Some((frame, attack)) = character_state.is_attacking() {
+            attack.execute(frame.get(), *player_id, entity, world);
+        }
+    }
 }
 
 #[derive(Component)]
 pub struct Attacking;
 
 pub struct SingleHitbox {
-    hitbox: HitboxEvent,
+    hitbox_event: HitboxEvent,
     hurtbox_events: Vec<HurtboxEvent>,
-    recovery: Recovery,
-    counter_hit_duration: Duration,
+    total_duration: Frame,
+    counter_hit_duration: Frame,
 }
 
 impl Attack for SingleHitbox {
-    fn execute(&self, frame: u8, entity: Entity, world: &mut World) {
+    fn execute(&self, frame: u8, player_id: PlayerId, entity: Entity, world: &mut World) {
         let mut player = world.entity_mut(entity);
 
         if !player.contains::<Attacking>() {
             player.insert(Attacking);
         }
 
-        if frame == self.hitbox.frame {
+        if frame == self.hitbox_event.frame {
             player.with_children(|parent| {
-                // Create a hitbox bundle to easy instantiate hitboxes
-                //parent.spawn(HitboxBundle::new())
+                parent.spawn(HitboxBundle::new(
+                    player_id,
+                    self.hitbox_event.hitbox,
+                    self.hitbox_event.position,
+                    self.hitbox_event.size,
+                ));
             });
         }
+    }
+
+    fn startup(&self) -> u8 {
+        self.hitbox_event.frame
+    }
+
+    fn active(&self) -> Vec<u8> {
+        vec![self.hitbox_event.hitbox.duration.0]
+    }
+
+    fn recovery(&self) -> u8 {
+        let active_sum: u8 = self.active().iter().sum();
+        self.total_duration.get() - self.startup() - active_sum
     }
 }
 
@@ -60,8 +90,8 @@ pub struct SingleProjectile {
 pub struct HitboxEvent {
     frame: u8,
     position: Vec2,
-    active: u8,
-    duration: Duration,
+    size: Vec2,
+    hitbox: Hitbox,
 }
 
 pub struct HurtboxEvent {
@@ -90,17 +120,19 @@ pub enum CharacterStateV2 {
     Walking,
     Backwalking,
     AttackingGrounded {
+        frame: Frame,
         attack: Box<dyn Attack>,
     },
     AttackingAirborne {
+        frame: Frame,
         attack: Box<dyn Attack>,
     },
     Freefall {
-        recovery: Recovery,
+        recovery: Frame,
     },
     Crouching,
     Jumpsquat {
-        duration: Duration,
+        duration: Frame,
         jump_velocity: Vec2,
     },
     Rising,
@@ -131,7 +163,10 @@ impl CharacterStateV2 {
             | Backwalking
             | Crouching
             | Blocking
-            | AttackingGrounded { attack: _ }
+            | AttackingGrounded {
+                frame: _,
+                attack: _,
+            }
             | Dashing { dash_type: _ }
             | BackDashing { dash_type: _ } => StateType::Grounded,
             _ => StateType::Airborne,
@@ -169,6 +204,38 @@ impl CharacterStateV2 {
         // that is the correct action to take that frame
         //
     }
+
+    pub fn is_attacking(&self) -> Option<(&Frame, &Box<dyn Attack>)> {
+        match self {
+            CharacterStateV2::AttackingGrounded { frame, attack } => {
+                //attack.execute(frame.get(), *player_id, entity, world);
+                Some((frame, attack))
+            }
+            CharacterStateV2::AttackingAirborne { frame, attack } => {
+                //attack.execute(frame.get(), *player_id, entity, world);
+                Some((frame, attack))
+            }
+            _ => None,
+        }
+    }
+
+    pub fn tick(&mut self) {
+        match self {
+            CharacterStateV2::AttackingGrounded { frame, attack: _ } => {
+                frame.increment();
+            }
+            CharacterStateV2::AttackingAirborne { frame, attack: _ } => {
+                frame.increment();
+            }
+            CharacterStateV2::Jumpsquat {
+                duration,
+                jump_velocity: _,
+            } => {
+                duration.increment();
+            }
+            _ => (),
+        }
+    }
 }
 
 pub enum StateType {
@@ -200,11 +267,6 @@ pub enum StateTransition {
 // cannot be thrown
 
 // When an attack has a counter hit property
-#[derive(Clone, Copy)]
-pub struct AttackV2 {
-    counterhit: SimpleRange,
-}
-
 pub struct HurtboxV2 {
     lifetime: SimpleRange,
     position: Vec2,
@@ -216,12 +278,12 @@ pub enum GroundDashV2 {
     },
     StepDash {
         speed: Speed,
-        duration: Duration,
+        duration: Frame,
         airborne: SimpleRange,
     },
     Teleport {
         distance: Distance,
-        duration: Duration,
+        duration: Frame,
         invulnerability: SimpleRange,
     },
 }
@@ -251,7 +313,36 @@ impl SimpleRange {
     }
 }
 
-pub struct Duration(u8);
-pub struct Recovery(u8);
+#[derive(Default)]
+pub struct Frame(u8);
+impl Frame {
+    pub fn get(&self) -> u8 {
+        self.0
+    }
+    pub fn set(&mut self, value: u8) {
+        self.0 = value;
+    }
+    pub fn increment(&mut self) {
+        self.0 += 1;
+    }
+}
+#[derive(Default)]
 pub struct Speed(f32);
+impl Speed {
+    pub fn get(&self) -> f32 {
+        self.0
+    }
+    pub fn set(&mut self, value: f32) {
+        self.0 = value;
+    }
+}
+#[derive(Default)]
 pub struct Distance(f32);
+impl Distance {
+    pub fn get(&self) -> f32 {
+        self.0
+    }
+    pub fn set(&mut self, value: f32) {
+        self.0 = value;
+    }
+}

@@ -32,6 +32,6 @@ impl HitboxBundle {
 
 #[derive(Component, Default)]
 pub struct Hitbox {
-    duration: Duration,
-    base_damage: u8,
+    pub duration: Duration,
+    pub base_damage: u8,
 }
