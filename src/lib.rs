@@ -9,6 +9,7 @@ pub mod defense;
 pub mod events;
 pub mod input;
 pub mod macros;
+pub mod new_types;
 pub mod offense;
 pub mod physics;
 pub mod resources;
@@ -31,6 +32,7 @@ pub use events::*;
 pub use input::*;
 #[doc(hidden)]
 pub use macros::*;
+pub use new_types::*;
 #[doc(hidden)]
 pub use offense::*;
 #[doc(hidden)]

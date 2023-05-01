@@ -7,7 +7,7 @@ pub struct CharacterActions {
     backward_ground_dash: GroundDashV2,
     forward_air_dash: AirdashV2,
     backward_air_dash: AirdashV2,
-    attacks: HashMap<String, Box<dyn AttackTrait>>,
+    attacks: HashMap<String, Box<dyn Attack>>,
 }
 
 impl CharacterActions {
@@ -16,9 +16,12 @@ impl CharacterActions {
     }
 }
 
-pub trait AttackTrait: Send + Sync + 'static {
-    fn execute(&self, entity: Entity, world: &mut World);
+pub trait Attack: Send + Sync + 'static {
+    fn execute(&self, frame: u8, entity: Entity, world: &mut World);
 }
+
+#[derive(Component)]
+pub struct Attacking;
 
 pub struct SingleHitbox {
     hitbox: HitboxEvent,
@@ -27,10 +30,27 @@ pub struct SingleHitbox {
     counter_hit_duration: Duration,
 }
 
-impl AttackTrait for SingleHitbox {
-    fn execute(&self, entity: Entity, world: &mut World) {
-        world.entity_mut(entity);
+impl Attack for SingleHitbox {
+    fn execute(&self, frame: u8, entity: Entity, world: &mut World) {
+        let mut player = world.entity_mut(entity);
+
+        if !player.contains::<Attacking>() {
+            player.insert(Attacking);
+        }
+
+        if frame == self.hitbox.frame {
+            player.with_children(|parent| {
+                // Create a hitbox bundle to easy instantiate hitboxes
+                //parent.spawn(HitboxBundle::new())
+            });
+        }
     }
+}
+
+pub struct SingleProjectile {
+    startup: u8,
+    position: Vec2,
+    velocity: Vec2,
 }
 
 /// Build some structs that impl Attack Trait as a starter
@@ -38,8 +58,8 @@ impl AttackTrait for SingleHitbox {
 /// of it within a specific execute_actions system
 
 pub struct HitboxEvent {
+    frame: u8,
     position: Vec2,
-    startup: u8,
     active: u8,
     duration: Duration,
 }
@@ -48,10 +68,8 @@ pub struct HurtboxEvent {
     frame: u8,
     head: Option<HurtboxProperties>,
     torso: Option<HurtboxProperties>,
-    forward_arm: Option<HurtboxProperties>,
-    back_arm: Option<HurtboxProperties>,
-    forward_leg: Option<HurtboxProperties>,
-    back_leg: Option<HurtboxProperties>,
+    arms: Option<HurtboxProperties>,
+    legs: Option<HurtboxProperties>,
 }
 
 pub struct HurtboxProperties {
@@ -63,7 +81,7 @@ pub struct HurtboxProperties {
 pub enum CharacterActionType {
     Dash(GroundDashV2),
     AirDash(AirdashV2),
-    Attack(Box<dyn AttackTrait>),
+    Attack(Box<dyn Attack>),
 }
 
 #[derive(Component)]
@@ -72,10 +90,10 @@ pub enum CharacterStateV2 {
     Walking,
     Backwalking,
     AttackingGrounded {
-        attack: Box<dyn AttackTrait>,
+        attack: Box<dyn Attack>,
     },
     AttackingAirborne {
-        attack: Box<dyn AttackTrait>,
+        attack: Box<dyn Attack>,
     },
     Freefall {
         recovery: Recovery,
