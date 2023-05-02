@@ -24,7 +24,7 @@ pub trait Attack: Send + Sync + 'static {
     fn recovery(&self) -> u8;
 }
 
-fn execute_actions(world: &mut World) {
+fn execute_character_actions(world: &mut World) {
     let mut player_query = world.query::<(Entity, &PlayerId, &CharacterStateV2)>();
     for (entity, player_id, character_state) in player_query.iter(world) {
         if let Some((frame, attack)) = character_state.is_attacking() {
@@ -173,7 +173,6 @@ impl CharacterStateV2 {
         }
     }
     pub fn transition_state(&mut self, commands: &mut Commands, entity: Entity) {
-        use StateType::*;
         // Simple transition may not work here,
         // what I need is this:
         // 1. Raw input comes in from any source

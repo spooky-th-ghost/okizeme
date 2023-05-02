@@ -1,4 +1,4 @@
-use crate::{Duration, PlayerId};
+use crate::{Frame, PlayerId};
 use bevy::prelude::{GlobalTransform, *};
 use bevy::render::view::Visibility;
 use bevy::sprite::Sprite;
@@ -32,6 +32,6 @@ impl HitboxBundle {
 
 #[derive(Component, Default)]
 pub struct Hitbox {
-    pub duration: Duration,
+    pub duration: Frame,
     pub base_damage: u8,
 }
