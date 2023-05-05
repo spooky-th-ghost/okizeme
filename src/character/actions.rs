@@ -23,12 +23,29 @@ impl Command for Box<dyn Attack> {
     }
 }
 
-pub trait Airdash: Command + Send + Sync + 'static {
+pub trait Airdash: DynClone + Send + Sync + 'static {
+    fn execute(&self, world: &mut World);
     fn lockout(&self) -> u8;
 }
 
-pub trait Dash: Command + Send + Sync + 'static {
-    fn execute(&self, frame: u8, player: EntityMut);
+dyn_clone::clone_trait_object!(Airdash);
+
+impl Command for Box<dyn Airdash> {
+    fn write(self, world: &mut World) {
+        self.execute(world);
+    }
+}
+
+pub trait Dash: DynClone + Send + Sync + 'static {
+    fn execute(&self, world: &mut World);
+}
+
+dyn_clone::clone_trait_object!(Dash);
+
+impl Command for Box<dyn Dash> {
+    fn write(self, world: &mut World) {
+        self.execute(world);
+    }
 }
 
 #[derive(Clone)]

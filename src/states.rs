@@ -18,29 +18,25 @@ impl CharacterActions {
     /* will need to clone the box that the attacks and dashes live in here*/
 }
 
-pub struct CurrentAttack {
-    pub frame: u8,
-    pub player_id: PlayerId,
-    pub entity: Entity,
-    pub attack: Box<dyn Attack>,
-}
-
-pub fn execute_character_actions(
-    mut commands: Commands,
-    player_query: Query<(Entity, &PlayerId, &CharacterState)>,
-) {
-    for (entity, player_id, character_state) in &player_query {
-        if let Some((frame, attack)) = character_state.is_attacking() {
-            let command_box = commands.add(attack);
-        }
-    }
-}
-
 pub enum CharacterActionType {
     Dash(Box<dyn Dash>),
     Airdash(Box<dyn Airdash>),
     Attack(Box<dyn Attack>),
     Jump,
+}
+
+pub fn execute_character_actions(mut commands: Commands, player_query: Query<&CharacterState>) {
+    for character_state in &player_query {
+        if let Some(attack) = character_state.is_attacking() {
+            commands.add(attack);
+        }
+        if let Some(airdash) = character_state.is_airdashing() {
+            commands.add(airdash);
+        }
+        if let Some(dash) = character_state.is_dashing() {
+            commands.add(dash);
+        }
+    }
 }
 
 #[derive(Component)]
@@ -106,32 +102,26 @@ impl CharacterState {
         }
     }
 
-    pub fn is_attacking(&self) -> Option<(&Frame, Box<dyn Attack>)> {
+    pub fn is_attacking(&self) -> Option<Box<dyn Attack>> {
         match self {
-            CharacterState::AttackingGrounded { frame, attack } => {
-                let cloned_attack = clone_box(attack);
-                Some((frame, *cloned_attack))
-            }
-            CharacterState::AttackingAirborne { frame, attack } => {
-                let cloned_attack = clone_box(attack);
-                Some((frame, *cloned_attack))
-            }
+            CharacterState::AttackingGrounded { frame: _, attack } => Some(*clone_box(attack)),
+            CharacterState::AttackingAirborne { frame: _, attack } => Some(*clone_box(attack)),
             _ => None,
         }
     }
 
-    pub fn is_airdashing(&self) -> Option<(&Frame, &Box<dyn Airdash>)> {
+    pub fn is_airdashing(&self) -> Option<Box<dyn Airdash>> {
         match self {
-            CharacterState::AirDashing { frame, airdash } => Some((frame, airdash)),
-            CharacterState::AirBackDashing { frame, airdash } => Some((frame, airdash)),
+            CharacterState::AirDashing { frame: _, airdash } => Some(*clone_box(airdash)),
+            CharacterState::AirBackDashing { frame: _, airdash } => Some(*clone_box(airdash)),
             _ => None,
         }
     }
 
-    pub fn is_dashing(&self) -> Option<(&Frame, &Box<dyn Dash>)> {
+    pub fn is_dashing(&self) -> Option<Box<dyn Dash>> {
         match self {
-            CharacterState::Dashing { frame, dash } => Some((frame, dash)),
-            CharacterState::BackDashing { frame, dash } => Some((frame, dash)),
+            CharacterState::Dashing { frame: _, dash } => Some(*clone_box(dash)),
+            CharacterState::BackDashing { frame: _, dash } => Some(*clone_box(dash)),
             _ => None,
         }
     }
