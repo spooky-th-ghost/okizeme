@@ -1,8 +1,9 @@
 use bevy::reflect::{FromReflect, Reflect};
 use std::fmt;
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Default, Debug, Eq, PartialEq)]
 pub enum CommandMotion {
+    #[default]
     Dash,
     Backdash,
     Qcf,
@@ -14,17 +15,26 @@ pub enum CommandMotion {
 }
 
 #[derive(Default, Debug, PartialEq, Eq)]
+pub struct CommandInput {
+    motion: CommandMotion,
+    button: ButtonMask,
+}
+
+impl CommandInput {
+    pub fn new(motion: CommandMotion, button: ButtonMask) -> Self {
+        CommandInput { motion, button }
+    }
+}
+
+#[derive(Default, Debug, PartialEq, Eq)]
 pub struct InputTree {
-    motions: Vec<(CommandMotion, usize)>,
+    motion_commands: Vec<CommandInput>,
     last_direction: u8,
+    buffered_button: ButtonMask,
 }
 
 impl InputTree {
-    pub fn from_input(
-        motions: &str,
-        pressed_buttons: Vec<ButtonMask>,
-        held_buttons: Vec<ButtonMask>,
-    ) -> InputTree {
+    pub fn from_input(motions: &str, buttons: ButtonStream) -> InputTree {
         use crate::input::{motion_parsing::*, Parser};
 
         let mut motions_vec = Vec::new();
@@ -39,14 +49,20 @@ impl InputTree {
 
         match dqcf.parse(motions) {
             Ok((remaining, motion)) => {
-                motions_vec.push((motion, motions.len() - remaining.len()));
+                motions_vec.push(CommandInput::new(
+                    motion,
+                    buttons.buffered_at_index(motions.len() - remaining.len()),
+                ));
             }
             _ => (),
         }
         match dp.parse(motions) {
             Ok((remaining, mut found_motions)) => {
                 if let Some(motion) = found_motions.pop() {
-                    motions_vec.push((motion, motions.len() - remaining.len()));
+                    motions_vec.push(CommandInput::new(
+                        motion,
+                        buttons.buffered_at_index(motions.len() - remaining.len()),
+                    ));
                 }
             }
             _ => (),
@@ -54,7 +70,10 @@ impl InputTree {
         match rdp.parse(motions) {
             Ok((remaining, mut found_motions)) => {
                 if let Some(motion) = found_motions.pop() {
-                    motions_vec.push((motion, motions.len() - remaining.len()));
+                    motions_vec.push(CommandInput::new(
+                        motion,
+                        buttons.buffered_at_index(motions.len() - remaining.len()),
+                    ));
                 }
             }
             _ => (),
@@ -62,7 +81,10 @@ impl InputTree {
         match qcf.parse(motions) {
             Ok((remaining, mut found_motions)) => {
                 if let Some(motion) = found_motions.pop() {
-                    motions_vec.push((motion, motions.len() - remaining.len()));
+                    motions_vec.push(CommandInput::new(
+                        motion,
+                        buttons.buffered_at_index(motions.len() - remaining.len()),
+                    ));
                 }
             }
             _ => (),
@@ -70,7 +92,10 @@ impl InputTree {
         match qcb.parse(motions) {
             Ok((remaining, mut found_motions)) => {
                 if let Some(motion) = found_motions.pop() {
-                    motions_vec.push((motion, motions.len() - remaining.len()));
+                    motions_vec.push(CommandInput::new(
+                        motion,
+                        buttons.buffered_at_index(motions.len() - remaining.len()),
+                    ));
                 }
             }
             _ => (),
@@ -78,7 +103,10 @@ impl InputTree {
         match two_two.parse(motions) {
             Ok((remaining, mut found_motions)) => {
                 if let Some(motion) = found_motions.pop() {
-                    motions_vec.push((motion, motions.len() - remaining.len()));
+                    motions_vec.push(CommandInput::new(
+                        motion,
+                        buttons.buffered_at_index(motions.len() - remaining.len()),
+                    ));
                 }
             }
             _ => (),
@@ -86,7 +114,10 @@ impl InputTree {
         match dash.parse(motions) {
             Ok((remaining, mut found_motions)) => {
                 if let Some(motion) = found_motions.pop() {
-                    motions_vec.push((motion, motions.len() - remaining.len()));
+                    motions_vec.push(CommandInput::new(
+                        motion,
+                        buttons.buffered_at_index(motions.len() - remaining.len()),
+                    ));
                 }
             }
             _ => (),
@@ -94,15 +125,21 @@ impl InputTree {
         match backdash.parse(motions) {
             Ok((remaining, mut found_motions)) => {
                 if let Some(motion) = found_motions.pop() {
-                    motions_vec.push((motion, motions.len() - remaining.len()));
+                    motions_vec.push(CommandInput::new(
+                        motion,
+                        buttons.buffered_at_index(motions.len() - remaining.len()),
+                    ));
                 }
             }
             _ => (),
         }
 
+        let last_motion = motions.chars().last().unwrap().to_digit(10).unwrap();
+
         InputTree {
-            motions: motions_vec,
-            last_direction: 5,
+            motion_commands: motions_vec,
+            last_direction: last_motion as u8,
+            buffered_button: buttons.buffered(),
         }
     }
 }
@@ -116,7 +153,7 @@ pub const F: ButtonMask = ButtonMask(0b0010_0000);
 pub const G: ButtonMask = ButtonMask(0b0100_0000);
 pub const H: ButtonMask = ButtonMask(0b1000_0000);
 
-#[derive(Debug, Default, Clone, Copy, Reflect, FromReflect)]
+#[derive(Debug, Default, Clone, Copy, Reflect, FromReflect, Eq, PartialEq)]
 #[repr(transparent)]
 pub struct ButtonMask(pub u8);
 
@@ -239,6 +276,15 @@ pub struct ButtonStream {
 }
 
 impl ButtonStream {
+    pub fn replace(&mut self, held: ButtonMask, pressed: ButtonMask, released: ButtonMask) {
+        self.held_buttons.remove(0);
+        self.held_buttons.push(held);
+        self.pressed_buttons.remove(0);
+        self.pressed_buttons.push(pressed);
+        self.released_buttons.remove(0);
+        self.released_buttons.push(released);
+    }
+
     pub fn held_in_range(&self, start: usize, end: usize) -> ButtonMask {
         let mut held: u8 = 0;
         for button in self.held_buttons[start..end].iter() {
@@ -261,6 +307,19 @@ impl ButtonStream {
             released |= button.raw_value();
         }
         ButtonMask::new(released)
+    }
+
+    pub fn buffered(&self) -> ButtonMask {
+        let pressed_len = self.pressed_buttons.len();
+        let pressed_end = if pressed_len > 0 { pressed_len - 1 } else { 0 };
+        self.buffered_at_index(pressed_end)
+    }
+
+    pub fn buffered_at_index(&self, end: usize) -> ButtonMask {
+        let start = if end < 5 { 0 } else { end - 5 };
+        let pressed_mask = self.pressed_in_range(start, end);
+        let held_mask = self.held_in_range(start, end);
+        ButtonMask::new(pressed_mask.raw_value() & held_mask.raw_value())
     }
 }
 
@@ -451,6 +510,7 @@ impl fmt::Display for InputMask {
 mod test {
     use super::*;
 
+    #[test]
     fn test_button_stream() {
         let stream = ButtonStream {
             held_buttons: vec![
