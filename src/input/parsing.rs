@@ -1,4 +1,4 @@
-use crate::{ButtonMask, CommandMotion};
+use crate::input::types::{ButtonMask, CommandMotion, InputTree};
 
 pub type ParseResult<'a, Output> = Result<(&'a str, Output), &'a str>;
 
@@ -144,7 +144,7 @@ where
     map(pair(parser1, parser2), |(_left, right)| right)
 }
 
-fn one_or_more<'a, P, A>(parser: P) -> impl Parser<'a, Vec<A>>
+pub fn one_or_more<'a, P, A>(parser: P) -> impl Parser<'a, Vec<A>>
 where
     P: Parser<'a, A>,
 {
@@ -239,6 +239,108 @@ fn match_button<'a>(button_to_check: char) -> impl Parser<'a, ()> {
 
 pub mod motion_parsing {
     use super::*;
+
+    pub fn one_or_more<'a, P, A>(parser: P) -> impl Parser<'a, Vec<A>>
+    where
+        P: Parser<'a, A>,
+    {
+        move |mut input| {
+            let mut result = Vec::new();
+
+            if let Ok((next_input, first_item)) = parser.parse(input) {
+                input = next_input;
+                result.push(first_item);
+            } else {
+                return Err(input);
+            }
+
+            while let Ok((next_input, next_item)) = parser.parse(input) {
+                input = next_input;
+                result.push(next_item);
+            }
+
+            Ok((input, result))
+        }
+    }
+    // pub fn capture_all_motions(input: &str, buttons: Vec<ButtonMask>) -> InputTree {
+    //     let mut motions = Vec::new();
+    //     let dqcf = double_qcf();
+    //     let dp = one_or_more(dp());
+    //     let rdp = one_or_more(rdp());
+    //     let qcf = one_or_more(qcf());
+    //     let qcb = one_or_more(qcb());
+    //     let two_two = one_or_more(two_two());
+    //     let dash = one_or_more(dash());
+    //     let backdash = one_or_more(backdash());
+
+    //     match dqcf.parse(input) {
+    //         Ok((remaining, motion)) => {
+    //             motions.push((motion, input.len() - remaining.len()));
+    //         }
+    //         _ => (),
+    //     }
+    //     match dp.parse(input) {
+    //         Ok((remaining, mut found_motions)) => {
+    //             if let Some(motion) = found_motions.pop() {
+    //                 motions.push((motion, input.len() - remaining.len()));
+    //             }
+    //         }
+    //         _ => (),
+    //     }
+    //     match rdp.parse(input) {
+    //         Ok((remaining, mut found_motions)) => {
+    //             if let Some(motion) = found_motions.pop() {
+    //                 motions.push((motion, input.len() - remaining.len()));
+    //             }
+    //         }
+    //         _ => (),
+    //     }
+    //     match qcf.parse(input) {
+    //         Ok((remaining, mut found_motions)) => {
+    //             if let Some(motion) = found_motions.pop() {
+    //                 motions.push((motion, input.len() - remaining.len()));
+    //             }
+    //         }
+    //         _ => (),
+    //     }
+    //     match qcb.parse(input) {
+    //         Ok((remaining, mut found_motions)) => {
+    //             if let Some(motion) = found_motions.pop() {
+    //                 motions.push((motion, input.len() - remaining.len()));
+    //             }
+    //         }
+    //         _ => (),
+    //     }
+    //     match two_two.parse(input) {
+    //         Ok((remaining, mut found_motions)) => {
+    //             if let Some(motion) = found_motions.pop() {
+    //                 motions.push((motion, input.len() - remaining.len()));
+    //             }
+    //         }
+    //         _ => (),
+    //     }
+    //     match dash.parse(input) {
+    //         Ok((remaining, mut found_motions)) => {
+    //             if let Some(motion) = found_motions.pop() {
+    //                 motions.push((motion, input.len() - remaining.len()));
+    //             }
+    //         }
+    //         _ => (),
+    //     }
+    //     match backdash.parse(input) {
+    //         Ok((remaining, mut found_motions)) => {
+    //             if let Some(motion) = found_motions.pop() {
+    //                 motions.push((motion, input.len() - remaining.len()));
+    //             }
+    //         }
+    //         _ => (),
+    //     }
+
+    //     InputTree {
+    //         motions,
+    //         last_direction: 5,
+    //     }
+    // }
 
     pub fn double_qcf<'a>() -> impl Parser<'a, CommandMotion> {
         pair(

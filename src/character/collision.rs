@@ -1,7 +1,5 @@
-use crate::{Frame, PlayerId};
-use bevy::prelude::{GlobalTransform, *};
-use bevy::render::view::Visibility;
-use bevy::sprite::Sprite;
+use crate::types::{Frame, FrameRange, PlayerId};
+use bevy::prelude::*;
 
 #[derive(Bundle, Default)]
 pub struct HitboxBundle {
@@ -30,8 +28,35 @@ impl HitboxBundle {
     }
 }
 
-#[derive(Component, Default)]
+#[derive(Component, Default, Clone, Copy)]
 pub struct Hitbox {
     pub duration: Frame,
+    pub lifetime: FrameRange,
     pub base_damage: u8,
+}
+#[derive(Clone)]
+pub struct HitboxEvent {
+    pub frame: u8,
+    pub position: Vec2,
+    pub size: Vec2,
+    pub hitbox: Hitbox,
+}
+
+pub struct Hurtbox {
+    pub duration: Frame,
+    pub lifetime: FrameRange,
+}
+#[derive(Clone)]
+pub struct HurtboxEvent {
+    frame: Frame,
+    head: Option<HurtboxProperties>,
+    torso: Option<HurtboxProperties>,
+    arms: Option<HurtboxProperties>,
+    legs: Option<HurtboxProperties>,
+}
+#[derive(Clone)]
+pub struct HurtboxProperties {
+    position: Vec2,
+    size: Vec2,
+    invulnerability: bool,
 }

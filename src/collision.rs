@@ -1,4 +1,4 @@
-use crate::{BlockModifier, Hitbox, PlayerId};
+use crate::{character::collision::Hitbox, BlockModifier, PlayerId};
 
 pub struct Hit {
     pub hitbox: Hitbox,

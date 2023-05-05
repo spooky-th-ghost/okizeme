@@ -1,121 +1,50 @@
-use crate::{Hitbox, HitboxBundle, PlayerId};
+use crate::character::actions::{Airdash, Attack, Dash};
+use crate::types::Frame;
+use crate::PlayerId;
 use bevy::prelude::*;
 use bevy::utils::HashMap;
+use dyn_clone::clone_box;
 
 #[derive(Resource)]
 pub struct CharacterActions {
-    forward_ground_dash: GroundDashV2,
-    backward_ground_dash: GroundDashV2,
-    forward_air_dash: AirdashV2,
-    backward_air_dash: AirdashV2,
+    forward_ground_dash: Box<dyn Dash>,
+    backward_ground_dash: Box<dyn Dash>,
+    forward_air_dash: Box<dyn Airdash>,
+    backward_air_dash: Box<dyn Airdash>,
     attacks: HashMap<String, Box<dyn Attack>>,
 }
 
 impl CharacterActions {
-    pub fn get_action_from_input(&self) -> CharacterActionType {
-        CharacterActionType::AirDash(AirdashV2::Straight { speed: Speed(0.5) })
-    }
+    /* will need to clone the box that the attacks and dashes live in here*/
 }
 
-pub trait Attack: Send + Sync + 'static {
-    fn execute(&self, frame: u8, player_id: PlayerId, entity: Entity, world: &mut World);
-    fn startup(&self) -> u8;
-    fn active(&self) -> Vec<u8>;
-    fn recovery(&self) -> u8;
+pub struct CurrentAttack {
+    pub frame: u8,
+    pub player_id: PlayerId,
+    pub entity: Entity,
+    pub attack: Box<dyn Attack>,
 }
 
-fn execute_character_actions(world: &mut World) {
-    let mut player_query = world.query::<(Entity, &PlayerId, &CharacterStateV2)>();
-    for (entity, player_id, character_state) in player_query.iter(world) {
+pub fn execute_character_actions(
+    mut commands: Commands,
+    player_query: Query<(Entity, &PlayerId, &CharacterState)>,
+) {
+    for (entity, player_id, character_state) in &player_query {
         if let Some((frame, attack)) = character_state.is_attacking() {
-            attack.execute(frame.get(), *player_id, entity, world);
+            let command_box = commands.add(attack);
         }
     }
-}
-
-#[derive(Component)]
-pub struct Attacking;
-
-pub struct SingleHitbox {
-    hitbox_event: HitboxEvent,
-    hurtbox_events: Vec<HurtboxEvent>,
-    total_duration: Frame,
-    counter_hit_duration: Frame,
-}
-
-impl Attack for SingleHitbox {
-    fn execute(&self, frame: u8, player_id: PlayerId, entity: Entity, world: &mut World) {
-        let mut player = world.entity_mut(entity);
-
-        if !player.contains::<Attacking>() {
-            player.insert(Attacking);
-        }
-
-        if frame == self.hitbox_event.frame {
-            player.with_children(|parent| {
-                parent.spawn(HitboxBundle::new(
-                    player_id,
-                    self.hitbox_event.hitbox,
-                    self.hitbox_event.position,
-                    self.hitbox_event.size,
-                ));
-            });
-        }
-    }
-
-    fn startup(&self) -> u8 {
-        self.hitbox_event.frame
-    }
-
-    fn active(&self) -> Vec<u8> {
-        vec![self.hitbox_event.hitbox.duration.0]
-    }
-
-    fn recovery(&self) -> u8 {
-        let active_sum: u8 = self.active().iter().sum();
-        self.total_duration.get() - self.startup() - active_sum
-    }
-}
-
-pub struct SingleProjectile {
-    startup: u8,
-    position: Vec2,
-    velocity: Vec2,
-}
-
-/// Build some structs that impl Attack Trait as a starter
-/// write structs for Airdash and Dash and see if it can be done without world access or handle all
-/// of it within a specific execute_actions system
-
-pub struct HitboxEvent {
-    frame: u8,
-    position: Vec2,
-    size: Vec2,
-    hitbox: Hitbox,
-}
-
-pub struct HurtboxEvent {
-    frame: u8,
-    head: Option<HurtboxProperties>,
-    torso: Option<HurtboxProperties>,
-    arms: Option<HurtboxProperties>,
-    legs: Option<HurtboxProperties>,
-}
-
-pub struct HurtboxProperties {
-    position: Vec2,
-    size: Vec2,
-    invulnerability: bool,
 }
 
 pub enum CharacterActionType {
-    Dash(GroundDashV2),
-    AirDash(AirdashV2),
+    Dash(Box<dyn Dash>),
+    Airdash(Box<dyn Airdash>),
     Attack(Box<dyn Attack>),
+    Jump,
 }
 
 #[derive(Component)]
-pub enum CharacterStateV2 {
+pub enum CharacterState {
     Idle,
     Walking,
     Backwalking,
@@ -132,31 +61,35 @@ pub enum CharacterStateV2 {
     },
     Crouching,
     Jumpsquat {
-        duration: Frame,
+        frame: Frame,
         jump_velocity: Vec2,
     },
     Rising,
     Falling,
     Juggle,
     Dashing {
-        dash_type: GroundDashV2,
+        frame: Frame,
+        dash: Box<dyn Dash>,
     },
     BackDashing {
-        dash_type: GroundDashV2,
+        frame: Frame,
+        dash: Box<dyn Dash>,
     },
     AirDashing {
-        airdash_type: AirdashV2,
+        frame: Frame,
+        airdash: Box<dyn Airdash>,
     },
     AirBackDashing {
-        airdash_type: AirdashV2,
+        frame: Frame,
+        airdash: Box<dyn Airdash>,
     },
     Blocking,
     AirBlocking,
 }
 
-impl CharacterStateV2 {
+impl CharacterState {
     pub fn get_state_type(&self) -> StateType {
-        use CharacterStateV2::*;
+        use CharacterState::*;
         match *self {
             Idle
             | Walking
@@ -167,70 +100,72 @@ impl CharacterStateV2 {
                 frame: _,
                 attack: _,
             }
-            | Dashing { dash_type: _ }
-            | BackDashing { dash_type: _ } => StateType::Grounded,
+            | Dashing { frame: _, dash: _ }
+            | BackDashing { frame: _, dash: _ } => StateType::Grounded,
             _ => StateType::Airborne,
         }
     }
-    pub fn transition_state(&mut self, commands: &mut Commands, entity: Entity) {
-        // Simple transition may not work here,
-        // what I need is this:
-        // 1. Raw input comes in from any source
-        // 2. Input is parsed into a list of possible actions ranked by priority
-        // 3. Highest priority that matches a possible character action get's executed
-        // 4. that execution triggers a transition
-        //
-        // This could be an iteratable InputTree type
-        // in a while loop we match against input_tree.next()
-        // as soon as we find anything that triggers a valid transition we load that
-        //
-        // Input tree in it's raw form would contain each possible parsed and sorted combination
-        // example:
-        // if we find a motion, we search 5 frames before it for a button
-        // for each motion we pass an input with that motion and each button that matches in button
-        // priority order eg:
-        // 236D > 236C > 236A
-        // instead of the `until` pattern currently in the parser, each valid input needs to be
-        // recorded, it seems more efficient in the long run to have the whole tree instead of
-        // considering character possible inputs in the parsing step
-        // for normals we need to interpret each possible motion
-        // 4 and 6 generate an additional 5 input when paired with a button
-        // 2 inputs take priority and follow the same logic, coercing 1 and 3 to also send a 2
-        // forward > backward > neutral priority order
-        // once we have the entire tree sorted in priority order we pass that
-        // character actions.parse() method takes in a full input tree and returns an action for
-        // the first valid input it finds
-        // that is the correct action to take that frame
-        //
-    }
 
-    pub fn is_attacking(&self) -> Option<(&Frame, &Box<dyn Attack>)> {
+    pub fn is_attacking(&self) -> Option<(&Frame, Box<dyn Attack>)> {
         match self {
-            CharacterStateV2::AttackingGrounded { frame, attack } => {
-                //attack.execute(frame.get(), *player_id, entity, world);
-                Some((frame, attack))
+            CharacterState::AttackingGrounded { frame, attack } => {
+                let cloned_attack = clone_box(attack);
+                Some((frame, *cloned_attack))
             }
-            CharacterStateV2::AttackingAirborne { frame, attack } => {
-                //attack.execute(frame.get(), *player_id, entity, world);
-                Some((frame, attack))
+            CharacterState::AttackingAirborne { frame, attack } => {
+                let cloned_attack = clone_box(attack);
+                Some((frame, *cloned_attack))
             }
             _ => None,
         }
     }
 
+    pub fn is_airdashing(&self) -> Option<(&Frame, &Box<dyn Airdash>)> {
+        match self {
+            CharacterState::AirDashing { frame, airdash } => Some((frame, airdash)),
+            CharacterState::AirBackDashing { frame, airdash } => Some((frame, airdash)),
+            _ => None,
+        }
+    }
+
+    pub fn is_dashing(&self) -> Option<(&Frame, &Box<dyn Dash>)> {
+        match self {
+            CharacterState::Dashing { frame, dash } => Some((frame, dash)),
+            CharacterState::BackDashing { frame, dash } => Some((frame, dash)),
+            _ => None,
+        }
+    }
+
+    pub fn frame(&self) -> u8 {
+        use CharacterState::*;
+        match self {
+            AttackingAirborne { frame, attack: _ } => frame.get(),
+            AttackingGrounded { frame, attack: _ } => frame.get(),
+            AirDashing { frame, airdash: _ } => frame.get(),
+            AirBackDashing { frame, airdash: _ } => frame.get(),
+            Dashing { frame, dash: _ } => frame.get(),
+            BackDashing { frame, dash: _ } => frame.get(),
+            Jumpsquat {
+                frame,
+                jump_velocity: _,
+            } => frame.get(),
+            _ => 0,
+        }
+    }
+
     pub fn tick(&mut self) {
         match self {
-            CharacterStateV2::AttackingGrounded { frame, attack: _ } => {
+            CharacterState::AttackingGrounded { frame, attack: _ } => {
                 frame.increment();
             }
-            CharacterStateV2::AttackingAirborne { frame, attack: _ } => {
+            CharacterState::AttackingAirborne { frame, attack: _ } => {
                 frame.increment();
             }
-            CharacterStateV2::Jumpsquat {
-                duration,
+            CharacterState::Jumpsquat {
+                frame,
                 jump_velocity: _,
             } => {
-                duration.increment();
+                frame.increment();
             }
             _ => (),
         }
@@ -266,82 +201,3 @@ pub enum StateTransition {
 // cannot be thrown
 
 // When an attack has a counter hit property
-pub struct HurtboxV2 {
-    lifetime: SimpleRange,
-    position: Vec2,
-}
-
-pub enum GroundDashV2 {
-    Run {
-        speed: Speed,
-    },
-    StepDash {
-        speed: Speed,
-        duration: Frame,
-        airborne: SimpleRange,
-    },
-    Teleport {
-        distance: Distance,
-        duration: Frame,
-        invulnerability: SimpleRange,
-    },
-}
-
-pub enum AirdashV2 {
-    Straight { speed: Speed },
-    Hover { direction: Vec2, speed: Speed },
-}
-
-#[derive(Debug, Clone, Copy)]
-pub struct SimpleRange {
-    start: u8,
-    end: u8,
-}
-
-impl SimpleRange {
-    pub fn start(&self) -> u8 {
-        self.start
-    }
-
-    pub fn end(&self) -> u8 {
-        self.end
-    }
-
-    pub fn contains(&self, value: u8) -> bool {
-        value <= self.end || value >= self.start
-    }
-}
-
-#[derive(Default)]
-pub struct Frame(u8);
-impl Frame {
-    pub fn get(&self) -> u8 {
-        self.0
-    }
-    pub fn set(&mut self, value: u8) {
-        self.0 = value;
-    }
-    pub fn increment(&mut self) {
-        self.0 += 1;
-    }
-}
-#[derive(Default)]
-pub struct Speed(f32);
-impl Speed {
-    pub fn get(&self) -> f32 {
-        self.0
-    }
-    pub fn set(&mut self, value: f32) {
-        self.0 = value;
-    }
-}
-#[derive(Default)]
-pub struct Distance(f32);
-impl Distance {
-    pub fn get(&self) -> f32 {
-        self.0
-    }
-    pub fn set(&mut self, value: f32) {
-        self.0 = value;
-    }
-}

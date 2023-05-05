@@ -1,6 +1,111 @@
+use bevy::reflect::{FromReflect, Reflect};
 use std::fmt;
 
-use bevy::reflect::{FromReflect, Reflect};
+#[derive(Debug, Eq, PartialEq)]
+pub enum CommandMotion {
+    Dash,
+    Backdash,
+    Qcf,
+    Qcb,
+    Dp,
+    Rdp,
+    TwoTwo,
+    DoubleQcf,
+}
+
+#[derive(Default, Debug, PartialEq, Eq)]
+pub struct InputTree {
+    motions: Vec<(CommandMotion, usize)>,
+    last_direction: u8,
+}
+
+impl InputTree {
+    pub fn from_input(
+        motions: &str,
+        pressed_buttons: Vec<ButtonMask>,
+        held_buttons: Vec<ButtonMask>,
+    ) -> InputTree {
+        use crate::input::{motion_parsing::*, Parser};
+
+        let mut motions_vec = Vec::new();
+        let dqcf = double_qcf();
+        let dp = one_or_more(dp());
+        let rdp = one_or_more(rdp());
+        let qcf = one_or_more(qcf());
+        let qcb = one_or_more(qcb());
+        let two_two = one_or_more(two_two());
+        let dash = one_or_more(dash());
+        let backdash = one_or_more(backdash());
+
+        match dqcf.parse(motions) {
+            Ok((remaining, motion)) => {
+                motions_vec.push((motion, motions.len() - remaining.len()));
+            }
+            _ => (),
+        }
+        match dp.parse(motions) {
+            Ok((remaining, mut found_motions)) => {
+                if let Some(motion) = found_motions.pop() {
+                    motions_vec.push((motion, motions.len() - remaining.len()));
+                }
+            }
+            _ => (),
+        }
+        match rdp.parse(motions) {
+            Ok((remaining, mut found_motions)) => {
+                if let Some(motion) = found_motions.pop() {
+                    motions_vec.push((motion, motions.len() - remaining.len()));
+                }
+            }
+            _ => (),
+        }
+        match qcf.parse(motions) {
+            Ok((remaining, mut found_motions)) => {
+                if let Some(motion) = found_motions.pop() {
+                    motions_vec.push((motion, motions.len() - remaining.len()));
+                }
+            }
+            _ => (),
+        }
+        match qcb.parse(motions) {
+            Ok((remaining, mut found_motions)) => {
+                if let Some(motion) = found_motions.pop() {
+                    motions_vec.push((motion, motions.len() - remaining.len()));
+                }
+            }
+            _ => (),
+        }
+        match two_two.parse(motions) {
+            Ok((remaining, mut found_motions)) => {
+                if let Some(motion) = found_motions.pop() {
+                    motions_vec.push((motion, motions.len() - remaining.len()));
+                }
+            }
+            _ => (),
+        }
+        match dash.parse(motions) {
+            Ok((remaining, mut found_motions)) => {
+                if let Some(motion) = found_motions.pop() {
+                    motions_vec.push((motion, motions.len() - remaining.len()));
+                }
+            }
+            _ => (),
+        }
+        match backdash.parse(motions) {
+            Ok((remaining, mut found_motions)) => {
+                if let Some(motion) = found_motions.pop() {
+                    motions_vec.push((motion, motions.len() - remaining.len()));
+                }
+            }
+            _ => (),
+        }
+
+        InputTree {
+            motions: motions_vec,
+            last_direction: 5,
+        }
+    }
+}
 
 pub const A: ButtonMask = ButtonMask(0b0000_0001);
 pub const B: ButtonMask = ButtonMask(0b0000_0010);
