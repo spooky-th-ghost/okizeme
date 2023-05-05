@@ -1,6 +1,6 @@
 use crate::character::actions::{Airdash, Attack, Dash};
 use crate::types::Frame;
-use crate::PlayerId;
+use crate::{InputTree, PlayerId};
 use bevy::prelude::*;
 use bevy::utils::HashMap;
 use dyn_clone::clone_box;
@@ -11,7 +11,15 @@ pub struct CharacterActions {
     backward_ground_dash: Box<dyn Dash>,
     forward_air_dash: Box<dyn Airdash>,
     backward_air_dash: Box<dyn Airdash>,
+    attack_library: AttackLibrary,
+}
+
+pub struct AttackLibrary {
     attacks: HashMap<String, Box<dyn Attack>>,
+}
+
+impl AttackLibrary {
+    pub fn find_attack(&self, input_tree: InputTree) {}
 }
 
 impl CharacterActions {

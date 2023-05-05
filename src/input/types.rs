@@ -232,6 +232,38 @@ impl fmt::Display for ButtonMask {
     }
 }
 
+pub struct ButtonStream {
+    pub held_buttons: Vec<ButtonMask>,
+    pub pressed_buttons: Vec<ButtonMask>,
+    pub released_buttons: Vec<ButtonMask>,
+}
+
+impl ButtonStream {
+    pub fn held_in_range(&self, start: usize, end: usize) -> ButtonMask {
+        let mut held: u8 = 0;
+        for button in self.held_buttons[start..end].iter() {
+            held |= button.raw_value();
+        }
+        ButtonMask::new(held)
+    }
+
+    pub fn pressed_in_range(&self, start: usize, end: usize) -> ButtonMask {
+        let mut pressed: u8 = 0;
+        for button in self.pressed_buttons[start..end].iter() {
+            pressed |= button.raw_value();
+        }
+        ButtonMask::new(pressed)
+    }
+
+    pub fn released_in_range(&self, start: usize, end: usize) -> ButtonMask {
+        let mut released: u8 = 0;
+        for button in self.released_buttons[start..end].iter() {
+            released |= button.raw_value();
+        }
+        ButtonMask::new(released)
+    }
+}
+
 pub const LEFT: MotionMask = MotionMask(0b0000_0001);
 pub const RIGHT: MotionMask = MotionMask(0b0000_0010);
 pub const DOWN: MotionMask = MotionMask(0b0000_0100);
@@ -418,6 +450,23 @@ impl fmt::Display for InputMask {
 #[cfg(test)]
 mod test {
     use super::*;
+
+    fn test_button_stream() {
+        let stream = ButtonStream {
+            held_buttons: vec![
+                ButtonMask::with_buttons("d"),
+                ButtonMask::with_buttons(""),
+                ButtonMask::with_buttons("ac"),
+                ButtonMask::with_buttons("g"),
+                ButtonMask::with_buttons("h"),
+                ButtonMask::with_buttons("e"),
+            ],
+            pressed_buttons: Vec::new(),
+            released_buttons: Vec::new(),
+        };
+
+        assert_eq!(stream.held_in_range(0, 5).to_string(), "a".to_string());
+    }
 
     #[test]
     fn input_mask_test() {
