@@ -49,16 +49,6 @@ pub enum OkizemePlayerSet {
     Action,
 }
 
-#[derive(Debug, PartialEq, Eq, Clone, Copy, Hash)]
-pub enum OkizemeSystemLabels {
-    InputPhase,
-    ActionPhase,
-    CollisionPhase,
-    PhysicsPhase,
-    ResultPhase,
-    CleanupPhase,
-}
-
 #[derive(States, Debug, Default, PartialEq, Eq, Clone, Copy, Hash)]
 pub enum OkizemeGameState {
     #[default]
@@ -73,23 +63,19 @@ pub struct OkizemePlugin;
 
 impl Plugin for OkizemePlugin {
     fn build(&self, app: &mut App) {
-        // use OkizemeSystemLabels::*;
         app.add_state::<OkizemeGameState>();
         // Events
-        app.add_event::<InputEvent>()
-            .add_event::<AnimationTransitionEvent>()
+        app.add_event::<AnimationTransitionEvent>()
             .add_event::<BusyEvent>()
             .add_event::<CollisionEvent>()
             .add_event::<ImpactEvent>()
             .add_event::<LandingEvent>();
-
         // Resources
         app.insert_resource(OkizemeConfig::default())
             .insert_resource(PlayerPositions::default())
             .insert_resource(PlayerHealthBars::default());
-        // .insert_resource(PlayerCombos::default());
-        // State
-
+        // Plugins
+        app.add_plugin(OkiInputPlugin);
         // Systems
         // app.add_stage(
         //     "main",
