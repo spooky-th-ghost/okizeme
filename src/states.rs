@@ -19,16 +19,23 @@ pub struct AttackLibrary {
 }
 
 impl AttackLibrary {
-    pub fn find_attack(&self, input_tree: &InputTree) {
+    pub fn find_attack(&self, input_tree: &InputTree) -> Option<Box<dyn Attack>> {
         let mut keys: Vec<&CommandInput> = self.attacks.keys().collect();
         keys.sort_by(|a, b| a.motion().partial_cmp(&b.motion()).unwrap());
 
-        let inputs = input_tree.motions();
         for key in keys {
-            if let Some(input) = inputs.next() {
-                if key == input {}
+            for input in input_tree.command_inputs() {
+                if key.motion() == input.motion() {
+                    let key_button = key.button();
+                    if key_button & input.button() == key_button {
+                        if let Some(attack) = self.attacks.get(&input) {
+                            return Some(*clone_box(attack));
+                        }
+                    }
+                }
             }
         }
+        None
     }
 }
 

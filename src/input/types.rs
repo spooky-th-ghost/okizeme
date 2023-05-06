@@ -1,7 +1,7 @@
 use bevy::reflect::{FromReflect, Reflect};
 use std::fmt;
 
-#[derive(Copy, Clone, Default, Debug, Eq, PartialEq, PartialOrd)]
+#[derive(Copy, Clone, Default, Debug, Eq, PartialEq, PartialOrd, Hash)]
 pub enum CommandMotion {
     #[default]
     Dash,
@@ -14,7 +14,7 @@ pub enum CommandMotion {
     DoubleQcf,
 }
 
-#[derive(Copy, Clone, Default, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, Default, Debug, PartialEq, Eq, Hash)]
 pub struct CommandInput {
     motion: CommandMotion,
     button: ButtonMask,
@@ -158,7 +158,7 @@ impl InputTree {
         }
     }
 
-    pub fn motions(&self) -> Vec<CommandInput> {
+    pub fn command_inputs(&self) -> Vec<CommandInput> {
         let mut inputs = self.motion_commands.clone();
         inputs.sort_by(|a, b| a.motion().partial_cmp(&b.motion()).unwrap());
         inputs
@@ -174,7 +174,7 @@ pub const F: ButtonMask = ButtonMask(0b0010_0000);
 pub const G: ButtonMask = ButtonMask(0b0100_0000);
 pub const H: ButtonMask = ButtonMask(0b1000_0000);
 
-#[derive(Debug, Default, Clone, Copy, Reflect, FromReflect, Eq, PartialEq)]
+#[derive(Debug, Default, Clone, Copy, Reflect, FromReflect, Eq, PartialEq, Hash)]
 #[repr(transparent)]
 pub struct ButtonMask(pub u8);
 
@@ -259,6 +259,14 @@ impl fmt::Display for ButtonMask {
             write!(f, "h")?
         }
         Ok(())
+    }
+}
+
+impl std::ops::BitAnd for ButtonMask {
+    type Output = Self;
+
+    fn bitand(self, rhs: Self) -> Self::Output {
+        Self(self.0 & rhs.0)
     }
 }
 
