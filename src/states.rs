@@ -1,6 +1,6 @@
 use crate::character::actions::{Airdash, Attack, Dash};
 use crate::types::Frame;
-use crate::{CommandInput, InputTree, PlayerId};
+use crate::{CommandInput, CommandMotion, InputTree, PlayerId};
 use bevy::prelude::*;
 use bevy::utils::HashMap;
 use dyn_clone::clone_box;
@@ -19,7 +19,17 @@ pub struct AttackLibrary {
 }
 
 impl AttackLibrary {
-    pub fn find_attack(&self, input_tree: InputTree) {}
+    pub fn find_attack(&self, input_tree: &InputTree) {
+        let mut keys: Vec<&CommandInput> = self.attacks.keys().collect();
+        keys.sort_by(|a, b| a.motion().partial_cmp(&b.motion()).unwrap());
+
+        let inputs = input_tree.motions();
+        for key in keys {
+            if let Some(input) = inputs.next() {
+                if key == input {}
+            }
+        }
+    }
 }
 
 impl CharacterActions {

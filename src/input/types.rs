@@ -1,7 +1,7 @@
 use bevy::reflect::{FromReflect, Reflect};
 use std::fmt;
 
-#[derive(Default, Debug, Eq, PartialEq)]
+#[derive(Copy, Clone, Default, Debug, Eq, PartialEq, PartialOrd)]
 pub enum CommandMotion {
     #[default]
     Dash,
@@ -14,7 +14,7 @@ pub enum CommandMotion {
     DoubleQcf,
 }
 
-#[derive(Default, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, Default, Debug, PartialEq, Eq)]
 pub struct CommandInput {
     motion: CommandMotion,
     button: ButtonMask,
@@ -26,6 +26,14 @@ impl CommandInput {
             motion,
             button: ButtonMask::with_buttons(button_str),
         }
+    }
+
+    pub fn motion(&self) -> CommandMotion {
+        self.motion
+    }
+
+    pub fn button(&self) -> ButtonMask {
+        self.button
     }
 
     fn raw(motion: CommandMotion, button: ButtonMask) -> Self {
@@ -148,6 +156,12 @@ impl InputTree {
             buffered_motion: last_motion as u8,
             buffered_button: buttons.buffered(),
         }
+    }
+
+    pub fn motions(&self) -> Vec<CommandInput> {
+        let mut inputs = self.motion_commands.clone();
+        inputs.sort_by(|a, b| a.motion().partial_cmp(&b.motion()).unwrap());
+        inputs
     }
 }
 
