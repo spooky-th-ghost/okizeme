@@ -7,8 +7,8 @@ pub struct PlayerInputSources(Vec<InputBuffer>);
 impl Default for PlayerInputSources {
     fn default() -> Self {
         PlayerInputSources(vec![
-            InputBuffer::with_player(PlayerId::P1),
-            InputBuffer::with_player(PlayerId::P2),
+            InputBuffer::new(PlayerId::P1),
+            InputBuffer::new(PlayerId::P2),
         ])
     }
 }

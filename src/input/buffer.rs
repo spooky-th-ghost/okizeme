@@ -1,14 +1,16 @@
-use crate::*;
+use crate::{ButtonStream, InputEvent, MotionStream, PlayerId};
 
 pub struct InputBuffer {
     pub player_id: PlayerId,
-    pub inputs: Vec<InputMask>,
+    pub motions: MotionStream,
+    pub buttons: ButtonStream,
 }
 impl InputBuffer {
-    pub fn with_player(player_id: PlayerId) -> Self {
+    pub fn new(player_id: PlayerId) -> Self {
         InputBuffer {
             player_id,
-            inputs: Vec::new(),
+            motions: MotionStream::default(),
+            buttons: ButtonStream::default(),
         }
     }
 
@@ -16,21 +18,29 @@ impl InputBuffer {
         &self.player_id
     }
 
-    pub fn tick(&mut self) {
-        if self.inputs.len() > 15 {
-            self.inputs.remove(0);
-        }
-    }
-
     pub fn update(&mut self, input_event: &InputEvent) {
-        self.tick();
-        self.inputs.push(input_event.input_mask.clone());
+        let InputEvent {
+            player_id: _,
+            input_mask,
+        } = input_event;
+        self.motions.replace(input_mask.motion());
+        self.buttons.replace(
+            input_mask.held_buttons(),
+            input_mask.pressed_buttons(),
+            input_mask.released_buttons(),
+        );
     }
 
     pub fn motions_to_numpad(&self, facing_right: bool) -> String {
-        self.inputs
-            .iter()
-            .map(|i| i.motion.to_numpad(facing_right) as char)
-            .collect()
+        self.motions.to_numpad(facing_right)
     }
+}
+
+#[test]
+fn new_buffer() {
+    let buffer = InputBuffer::new(PlayerId::P1);
+    assert_eq!(
+        buffer.motions_to_numpad(true),
+        "555555555555555".to_string()
+    );
 }

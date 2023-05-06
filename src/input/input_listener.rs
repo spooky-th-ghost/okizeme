@@ -208,12 +208,12 @@ pub fn write_inputs_to_buffer(
 
         let motion_mask = MotionMask::new(motion_byte);
 
-        let input_mask = InputMask {
-            motion: motion_mask,
-            held_buttons: held_button_mask,
-            pressed_buttons: pressed_button_mask,
-            released_buttons: released_button_mask,
-        };
+        let input_mask = InputMask::new(
+            motion_mask,
+            held_button_mask,
+            pressed_button_mask,
+            released_button_mask,
+        );
 
         input_writer.send(InputEvent::new(listener.player_id, input_mask));
     }
