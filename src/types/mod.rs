@@ -4,7 +4,7 @@ use bevy::prelude::*;
 mod config;
 
 pub use config::*;
-/// Used to distinguish which player various game objects belong to
+/// Used to distinguish which player various components belong to
 #[derive(Default, Debug, Clone, Copy, PartialEq, Component, Reflect, FromReflect)]
 pub enum PlayerId {
     #[default]

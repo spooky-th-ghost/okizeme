@@ -21,7 +21,14 @@ pub struct CommandInput {
 }
 
 impl CommandInput {
-    pub fn new(motion: CommandMotion, button: ButtonMask) -> Self {
+    pub fn new(motion: CommandMotion, button_str: &str) -> Self {
+        CommandInput {
+            motion,
+            button: ButtonMask::with_buttons(button_str),
+        }
+    }
+
+    fn raw(motion: CommandMotion, button: ButtonMask) -> Self {
         CommandInput { motion, button }
     }
 }
@@ -29,7 +36,7 @@ impl CommandInput {
 #[derive(Default, Debug, PartialEq, Eq)]
 pub struct InputTree {
     motion_commands: Vec<CommandInput>,
-    last_direction: u8,
+    buffered_motion: u8,
     buffered_button: ButtonMask,
 }
 
@@ -49,7 +56,7 @@ impl InputTree {
 
         match dqcf.parse(motions) {
             Ok((remaining, motion)) => {
-                motions_vec.push(CommandInput::new(
+                motions_vec.push(CommandInput::raw(
                     motion,
                     buttons.buffered_at_index(motions.len() - remaining.len()),
                 ));
@@ -59,7 +66,7 @@ impl InputTree {
         match dp.parse(motions) {
             Ok((remaining, mut found_motions)) => {
                 if let Some(motion) = found_motions.pop() {
-                    motions_vec.push(CommandInput::new(
+                    motions_vec.push(CommandInput::raw(
                         motion,
                         buttons.buffered_at_index(motions.len() - remaining.len()),
                     ));
@@ -70,7 +77,7 @@ impl InputTree {
         match rdp.parse(motions) {
             Ok((remaining, mut found_motions)) => {
                 if let Some(motion) = found_motions.pop() {
-                    motions_vec.push(CommandInput::new(
+                    motions_vec.push(CommandInput::raw(
                         motion,
                         buttons.buffered_at_index(motions.len() - remaining.len()),
                     ));
@@ -81,7 +88,7 @@ impl InputTree {
         match qcf.parse(motions) {
             Ok((remaining, mut found_motions)) => {
                 if let Some(motion) = found_motions.pop() {
-                    motions_vec.push(CommandInput::new(
+                    motions_vec.push(CommandInput::raw(
                         motion,
                         buttons.buffered_at_index(motions.len() - remaining.len()),
                     ));
@@ -92,7 +99,7 @@ impl InputTree {
         match qcb.parse(motions) {
             Ok((remaining, mut found_motions)) => {
                 if let Some(motion) = found_motions.pop() {
-                    motions_vec.push(CommandInput::new(
+                    motions_vec.push(CommandInput::raw(
                         motion,
                         buttons.buffered_at_index(motions.len() - remaining.len()),
                     ));
@@ -103,7 +110,7 @@ impl InputTree {
         match two_two.parse(motions) {
             Ok((remaining, mut found_motions)) => {
                 if let Some(motion) = found_motions.pop() {
-                    motions_vec.push(CommandInput::new(
+                    motions_vec.push(CommandInput::raw(
                         motion,
                         buttons.buffered_at_index(motions.len() - remaining.len()),
                     ));
@@ -114,7 +121,7 @@ impl InputTree {
         match dash.parse(motions) {
             Ok((remaining, mut found_motions)) => {
                 if let Some(motion) = found_motions.pop() {
-                    motions_vec.push(CommandInput::new(
+                    motions_vec.push(CommandInput::raw(
                         motion,
                         buttons.buffered_at_index(motions.len() - remaining.len()),
                     ));
@@ -125,7 +132,7 @@ impl InputTree {
         match backdash.parse(motions) {
             Ok((remaining, mut found_motions)) => {
                 if let Some(motion) = found_motions.pop() {
-                    motions_vec.push(CommandInput::new(
+                    motions_vec.push(CommandInput::raw(
                         motion,
                         buttons.buffered_at_index(motions.len() - remaining.len()),
                     ));
@@ -138,7 +145,7 @@ impl InputTree {
 
         InputTree {
             motion_commands: motions_vec,
-            last_direction: last_motion as u8,
+            buffered_motion: last_motion as u8,
             buffered_button: buttons.buffered(),
         }
     }
