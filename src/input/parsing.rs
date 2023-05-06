@@ -1,4 +1,4 @@
-use crate::input::types::{ButtonMask, CommandMotion, InputTree};
+use crate::input::types::{ButtonMask, CommandMotion};
 
 pub type ParseResult<'a, Output> = Result<(&'a str, Output), &'a str>;
 
@@ -128,22 +128,6 @@ where
     }
 }
 
-fn left<'a, P1, P2, R1, R2>(parser1: P1, parser2: P2) -> impl Parser<'a, R1>
-where
-    P1: Parser<'a, R1>,
-    P2: Parser<'a, R2>,
-{
-    map(pair(parser1, parser2), |(left, _right)| left)
-}
-
-fn right<'a, P1, P2, R1, R2>(parser1: P1, parser2: P2) -> impl Parser<'a, R2>
-where
-    P1: Parser<'a, R1>,
-    P2: Parser<'a, R2>,
-{
-    map(pair(parser1, parser2), |(_left, right)| right)
-}
-
 pub fn one_or_more<'a, P, A>(parser: P) -> impl Parser<'a, Vec<A>>
 where
     P: Parser<'a, A>,
@@ -220,20 +204,6 @@ fn match_literal<'a>(expected: &'static str) -> impl Parser<'a, ()> {
     move |input: &'a str| match input.get(0..expected.len()) {
         Some(next) if next == expected => Ok((&input[expected.len()..], ())),
         _ => Err(input),
-    }
-}
-
-fn match_button<'a>(button_to_check: char) -> impl Parser<'a, ()> {
-    move |input: &'a str| match input.chars().next() {
-        Some(next) => {
-            let button = ButtonMask(next.to_digit(10).unwrap() as u8);
-            if button.contains(button_to_check) {
-                Ok((&input[1..], ()))
-            } else {
-                Err(input)
-            }
-        }
-        None => Err(input),
     }
 }
 

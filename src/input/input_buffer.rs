@@ -1,4 +1,5 @@
 use crate::{ButtonStream, InputEvent, MotionStream, PlayerId};
+use bevy::prelude::*;
 
 pub struct InputBuffer {
     pub player_id: PlayerId,
@@ -33,6 +34,44 @@ impl InputBuffer {
 
     pub fn motions_to_numpad(&self, facing_right: bool) -> String {
         self.motions.to_numpad(facing_right)
+    }
+}
+
+#[derive(Resource)]
+pub struct PlayerInputSources(Vec<InputBuffer>);
+
+impl Default for PlayerInputSources {
+    fn default() -> Self {
+        PlayerInputSources(vec![
+            InputBuffer::new(PlayerId::P1),
+            InputBuffer::new(PlayerId::P2),
+        ])
+    }
+}
+
+impl PlayerInputSources {
+    pub fn get_source_mut(&mut self, player_id: &PlayerId) -> &mut InputBuffer {
+        self.0
+            .iter_mut()
+            .find(|x| x.get_player_id() == player_id)
+            .unwrap()
+    }
+    pub fn get_source(&self, player_id: &PlayerId) -> &InputBuffer {
+        &self
+            .0
+            .iter()
+            .find(|&x| x.get_player_id() == player_id)
+            .unwrap()
+    }
+}
+
+pub fn read_inputs(
+    mut input_reader: EventReader<InputEvent>,
+    mut player_buffers: ResMut<PlayerInputSources>,
+) {
+    for event in input_reader.iter() {
+        let buffer = player_buffers.get_source_mut(&event.player_id);
+        buffer.update(event);
     }
 }
 

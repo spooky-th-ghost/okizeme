@@ -7,13 +7,13 @@ repository = "https://github.com/spooky-th-ghost/okizeme"
 description = "a micro engine for creationg fighting games in bevy"
 
 [dependencies]
-bevy = "0.9.1"
+bevy = "0.10.1"
 regex = "1.4.6"
 lazy_static = "1.4.0"
 serde_json = "1.0"
 serde = "1.0.136"
 bevy-inspector-egui = "0.16"
-leafwing-input-manager = "0.7.2"
+leafwing-input-manager = "0.9.2"
 okizeme_macros = {path = "okizeme_macros"}
 dyn-clone = "1.0.11"
 

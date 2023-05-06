@@ -1,5 +1,3 @@
-use bevy::{prelude::*, time::FixedTimestep};
-use bevy_inspector_egui::quick::WorldInspectorPlugin;
 fn main() {}
 // use okizeme::{
 //     systems::{manage_hitstop, oki_animation_player},

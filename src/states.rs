@@ -14,6 +14,12 @@ pub struct CharacterActions {
     attack_library: AttackLibrary,
 }
 
+impl CharacterActions {
+    pub fn find_attack(&self, input_tree: &InputTree) -> Option<Box<dyn Attack>> {
+        self.attack_library.find_attack(input_tree)
+    }
+}
+
 pub struct AttackLibrary {
     attacks: HashMap<CommandInput, Box<dyn Attack>>,
 }
@@ -39,16 +45,7 @@ impl AttackLibrary {
     }
 }
 
-impl CharacterActions {
-    /* will need to clone the box that the attacks and dashes live in here*/
-}
-
-pub enum CharacterActionType {
-    Dash(Box<dyn Dash>),
-    Airdash(Box<dyn Airdash>),
-    Attack(Box<dyn Attack>),
-    Jump,
-}
+pub fn transition_character_states() {}
 
 pub fn execute_character_actions(mut commands: Commands, player_query: Query<&CharacterState>) {
     for character_state in &player_query {

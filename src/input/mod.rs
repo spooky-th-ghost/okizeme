@@ -1,15 +1,33 @@
-mod actions;
-mod buffer;
-mod commands;
-mod input_event;
+use crate::{OkizemeGameState, OkizemePlayerSet};
+use bevy::prelude::*;
+
+mod input_buffer;
 mod input_listener;
 mod parsing;
 mod types;
 
-pub use actions::*;
-pub use buffer::*;
-pub use commands::*;
-pub use input_event::*;
+pub use input_buffer::*;
 pub use input_listener::*;
 pub use parsing::*;
 pub use types::*;
+
+pub struct OkiInputPlugin;
+
+impl Plugin for OkiInputPlugin {
+    fn build(&self, app: &mut App) {
+        app.configure_set(OkizemePlayerSet::Input.in_set(OnUpdate(OkizemeGameState::Gameplay)));
+
+        // Events
+        app.add_event::<InputEvent>();
+
+        // Resources
+        app.insert_resource(PlayerInputSources::default());
+
+        // Systems
+        app.add_systems(
+            (publish_input_events, read_inputs)
+                .chain()
+                .in_set(OkizemePlayerSet::Input),
+        );
+    }
+}
