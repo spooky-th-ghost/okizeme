@@ -15,17 +15,10 @@ Airdash
 2. Input Buffers are updated						(write_to_input_buffer)
 
 == Action Step (Responding to Input)==
-For each character that's not
-1. if a super is input, start that			(execute_supermoves)
-2. if a special is input do that				(execute_specials)
-3. if a normal is input, do that				(execute_normals)   Without Jumpsquat
-4. if a jump is input, do that,					(execute_jumps)     Without Jumpsquat
-5. if a dash is input do that,					(execute_dashes)    Without Jumpsquat
-6. if basic movement is input do that		(execute_movement)  Without Jumpsquat
-
-== Collision Step ==
-1. Generate hitboxes										(maintain_hitboxes)
-2. Generate hurtboxes										(maintain_hurtboxes)
+For each character that's not busy 
+1. update their state based on input (update_character_state)
+2. [EXCLUSIVE] Execute any actions ie. attacks, dashes, jumps (execute_character_actions) 
+- this includes generating hitboxes initially as well as updating hurtbox positions
 3. Handle collision											(detect_collisions)
 4. resolve collision results            (resolve_collisions)
 

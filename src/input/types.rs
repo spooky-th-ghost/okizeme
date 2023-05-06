@@ -1,6 +1,155 @@
+use bevy::reflect::{FromReflect, Reflect};
 use std::fmt;
 
-use bevy::reflect::{FromReflect, Reflect};
+#[derive(Default, Debug, Eq, PartialEq)]
+pub enum CommandMotion {
+    #[default]
+    Dash,
+    Backdash,
+    Qcf,
+    Qcb,
+    Dp,
+    Rdp,
+    TwoTwo,
+    DoubleQcf,
+}
+
+#[derive(Default, Debug, PartialEq, Eq)]
+pub struct CommandInput {
+    motion: CommandMotion,
+    button: ButtonMask,
+}
+
+impl CommandInput {
+    pub fn new(motion: CommandMotion, button_str: &str) -> Self {
+        CommandInput {
+            motion,
+            button: ButtonMask::with_buttons(button_str),
+        }
+    }
+
+    fn raw(motion: CommandMotion, button: ButtonMask) -> Self {
+        CommandInput { motion, button }
+    }
+}
+
+#[derive(Default, Debug, PartialEq, Eq)]
+pub struct InputTree {
+    motion_commands: Vec<CommandInput>,
+    buffered_motion: u8,
+    buffered_button: ButtonMask,
+}
+
+impl InputTree {
+    pub fn from_input(motions: &str, buttons: ButtonStream) -> InputTree {
+        use crate::input::{motion_parsing::*, Parser};
+
+        let mut motions_vec = Vec::new();
+        let dqcf = double_qcf();
+        let dp = one_or_more(dp());
+        let rdp = one_or_more(rdp());
+        let qcf = one_or_more(qcf());
+        let qcb = one_or_more(qcb());
+        let two_two = one_or_more(two_two());
+        let dash = one_or_more(dash());
+        let backdash = one_or_more(backdash());
+
+        match dqcf.parse(motions) {
+            Ok((remaining, motion)) => {
+                motions_vec.push(CommandInput::raw(
+                    motion,
+                    buttons.buffered_at_index(motions.len() - remaining.len()),
+                ));
+            }
+            _ => (),
+        }
+        match dp.parse(motions) {
+            Ok((remaining, mut found_motions)) => {
+                if let Some(motion) = found_motions.pop() {
+                    motions_vec.push(CommandInput::raw(
+                        motion,
+                        buttons.buffered_at_index(motions.len() - remaining.len()),
+                    ));
+                }
+            }
+            _ => (),
+        }
+        match rdp.parse(motions) {
+            Ok((remaining, mut found_motions)) => {
+                if let Some(motion) = found_motions.pop() {
+                    motions_vec.push(CommandInput::raw(
+                        motion,
+                        buttons.buffered_at_index(motions.len() - remaining.len()),
+                    ));
+                }
+            }
+            _ => (),
+        }
+        match qcf.parse(motions) {
+            Ok((remaining, mut found_motions)) => {
+                if let Some(motion) = found_motions.pop() {
+                    motions_vec.push(CommandInput::raw(
+                        motion,
+                        buttons.buffered_at_index(motions.len() - remaining.len()),
+                    ));
+                }
+            }
+            _ => (),
+        }
+        match qcb.parse(motions) {
+            Ok((remaining, mut found_motions)) => {
+                if let Some(motion) = found_motions.pop() {
+                    motions_vec.push(CommandInput::raw(
+                        motion,
+                        buttons.buffered_at_index(motions.len() - remaining.len()),
+                    ));
+                }
+            }
+            _ => (),
+        }
+        match two_two.parse(motions) {
+            Ok((remaining, mut found_motions)) => {
+                if let Some(motion) = found_motions.pop() {
+                    motions_vec.push(CommandInput::raw(
+                        motion,
+                        buttons.buffered_at_index(motions.len() - remaining.len()),
+                    ));
+                }
+            }
+            _ => (),
+        }
+        match dash.parse(motions) {
+            Ok((remaining, mut found_motions)) => {
+                if let Some(motion) = found_motions.pop() {
+                    motions_vec.push(CommandInput::raw(
+                        motion,
+                        buttons.buffered_at_index(motions.len() - remaining.len()),
+                    ));
+                }
+            }
+            _ => (),
+        }
+        match backdash.parse(motions) {
+            Ok((remaining, mut found_motions)) => {
+                if let Some(motion) = found_motions.pop() {
+                    motions_vec.push(CommandInput::raw(
+                        motion,
+                        buttons.buffered_at_index(motions.len() - remaining.len()),
+                    ));
+                }
+            }
+            _ => (),
+        }
+
+        let last_motion = motions.chars().last().unwrap().to_digit(10).unwrap();
+
+        InputTree {
+            motion_commands: motions_vec,
+            buffered_motion: last_motion as u8,
+            buffered_button: buttons.buffered(),
+        }
+    }
+}
 
 pub const A: ButtonMask = ButtonMask(0b0000_0001);
 pub const B: ButtonMask = ButtonMask(0b0000_0010);
@@ -11,7 +160,7 @@ pub const F: ButtonMask = ButtonMask(0b0010_0000);
 pub const G: ButtonMask = ButtonMask(0b0100_0000);
 pub const H: ButtonMask = ButtonMask(0b1000_0000);
 
-#[derive(Debug, Default, Clone, Copy, Reflect, FromReflect)]
+#[derive(Debug, Default, Clone, Copy, Reflect, FromReflect, Eq, PartialEq)]
 #[repr(transparent)]
 pub struct ButtonMask(pub u8);
 
@@ -124,6 +273,60 @@ impl fmt::Display for ButtonMask {
             write!(f, "h")?
         }
         Ok(())
+    }
+}
+
+pub struct ButtonStream {
+    pub held_buttons: Vec<ButtonMask>,
+    pub pressed_buttons: Vec<ButtonMask>,
+    pub released_buttons: Vec<ButtonMask>,
+}
+
+impl ButtonStream {
+    pub fn replace(&mut self, held: ButtonMask, pressed: ButtonMask, released: ButtonMask) {
+        self.held_buttons.remove(0);
+        self.held_buttons.push(held);
+        self.pressed_buttons.remove(0);
+        self.pressed_buttons.push(pressed);
+        self.released_buttons.remove(0);
+        self.released_buttons.push(released);
+    }
+
+    pub fn held_in_range(&self, start: usize, end: usize) -> ButtonMask {
+        let mut held: u8 = 0;
+        for button in self.held_buttons[start..end].iter() {
+            held |= button.raw_value();
+        }
+        ButtonMask::new(held)
+    }
+
+    pub fn pressed_in_range(&self, start: usize, end: usize) -> ButtonMask {
+        let mut pressed: u8 = 0;
+        for button in self.pressed_buttons[start..end].iter() {
+            pressed |= button.raw_value();
+        }
+        ButtonMask::new(pressed)
+    }
+
+    pub fn released_in_range(&self, start: usize, end: usize) -> ButtonMask {
+        let mut released: u8 = 0;
+        for button in self.released_buttons[start..end].iter() {
+            released |= button.raw_value();
+        }
+        ButtonMask::new(released)
+    }
+
+    pub fn buffered(&self) -> ButtonMask {
+        let pressed_len = self.pressed_buttons.len();
+        let pressed_end = if pressed_len > 0 { pressed_len - 1 } else { 0 };
+        self.buffered_at_index(pressed_end)
+    }
+
+    pub fn buffered_at_index(&self, end: usize) -> ButtonMask {
+        let start = if end < 5 { 0 } else { end - 5 };
+        let pressed_mask = self.pressed_in_range(start, end);
+        let held_mask = self.held_in_range(start, end);
+        ButtonMask::new(pressed_mask.raw_value() & held_mask.raw_value())
     }
 }
 
@@ -313,6 +516,24 @@ impl fmt::Display for InputMask {
 #[cfg(test)]
 mod test {
     use super::*;
+
+    #[test]
+    fn test_button_stream() {
+        let stream = ButtonStream {
+            held_buttons: vec![
+                ButtonMask::with_buttons("d"),
+                ButtonMask::with_buttons(""),
+                ButtonMask::with_buttons("ac"),
+                ButtonMask::with_buttons("g"),
+                ButtonMask::with_buttons("h"),
+                ButtonMask::with_buttons("e"),
+            ],
+            pressed_buttons: Vec::new(),
+            released_buttons: Vec::new(),
+        };
+
+        assert_eq!(stream.held_in_range(0, 5).to_string(), "a".to_string());
+    }
 
     #[test]
     fn input_mask_test() {
