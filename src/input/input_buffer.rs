@@ -1,4 +1,4 @@
-use crate::{ButtonStream, InputEvent, MotionStream, PlayerId};
+use crate::{ButtonStream, InputEvent, InputTree, MotionStream, PlayerId};
 use bevy::prelude::*;
 
 pub struct InputBuffer {
@@ -34,6 +34,15 @@ impl InputBuffer {
 
     pub fn motions_to_numpad(&self, facing_right: bool) -> String {
         self.motions.to_numpad(facing_right)
+    }
+
+    pub fn build_input_tree(&self, facing_right: bool) -> InputTree {
+        let motion_string = self.motions_to_numpad(facing_right);
+        InputTree::from_input(
+            &motion_string,
+            self.buttons.clone(),
+            self.motions.last_motion(),
+        )
     }
 }
 

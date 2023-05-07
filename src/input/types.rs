@@ -3,6 +3,7 @@ use std::fmt;
 
 #[derive(Copy, Clone, Default, Debug, Eq, PartialEq, PartialOrd, Hash)]
 pub enum CommandMotion {
+    Direction(MotionMask),
     #[default]
     Dash,
     Backdash,
@@ -44,12 +45,12 @@ impl CommandInput {
 #[derive(Default, Debug, PartialEq, Eq)]
 pub struct InputTree {
     motion_commands: Vec<CommandInput>,
-    buffered_motion: u8,
+    buffered_motion: MotionMask,
     buffered_button: ButtonMask,
 }
 
 impl InputTree {
-    pub fn from_input(motions: &str, buttons: ButtonStream) -> InputTree {
+    pub fn from_input(motions: &str, buttons: ButtonStream, last_motion: MotionMask) -> InputTree {
         use crate::input::{motion_parsing::*, Parser};
 
         let mut motions_vec = Vec::new();
@@ -149,11 +150,9 @@ impl InputTree {
             _ => (),
         }
 
-        let last_motion = motions.chars().last().unwrap().to_digit(10).unwrap();
-
         InputTree {
             motion_commands: motions_vec,
-            buffered_motion: last_motion as u8,
+            buffered_motion: last_motion,
             buffered_button: buttons.buffered(),
         }
     }
@@ -163,6 +162,27 @@ impl InputTree {
         inputs.sort_by(|a, b| a.motion().partial_cmp(&b.motion()).unwrap());
         inputs
     }
+
+    pub fn is_dashing(&self) -> Option<DashType> {
+        if let Some(dash) = self
+            .motion_commands
+            .iter()
+            .find(|m| matches!(m.motion(), CommandMotion::Dash | CommandMotion::Backdash))
+        {
+            match dash.motion() {
+                CommandMotion::Dash => Some(DashType::Forward),
+                CommandMotion::Backdash => Some(DashType::Back),
+                _ => None,
+            }
+        } else {
+            None
+        }
+    }
+}
+
+pub enum DashType {
+    Forward,
+    Back,
 }
 
 pub const A: ButtonMask = ButtonMask(0b0000_0001);
@@ -270,6 +290,7 @@ impl std::ops::BitAnd for ButtonMask {
     }
 }
 
+#[derive(Clone)]
 pub struct ButtonStream {
     held_buttons: Vec<ButtonMask>,
     pressed_buttons: Vec<ButtonMask>,
@@ -346,7 +367,7 @@ pub const UP_LEFT: MotionMask = MotionMask(0b0000_1001);
 pub const UP_RIGHT: MotionMask = MotionMask(0b0000_1010);
 pub const NEUTRAL: MotionMask = MotionMask(0b0000_0000);
 
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Reflect, FromReflect)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Hash, Reflect, FromReflect)]
 #[repr(transparent)]
 pub struct MotionMask(u8);
 
@@ -489,6 +510,9 @@ impl MotionStream {
             .iter()
             .map(|i| i.to_numpad(facing_right).to_string())
             .collect()
+    }
+    pub fn last_motion(&self) -> MotionMask {
+        *self.motions.last().unwrap()
     }
 }
 
