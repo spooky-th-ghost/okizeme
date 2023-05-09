@@ -1,48 +1,20 @@
 use crate::character::collision::{HitboxBundle, HitboxEvent, HurtboxEvent};
-use crate::types::{Busy, Frame, PlayerId};
-use crate::{CharacterState, Velocity};
+use crate::types::{Frame, PlayerId};
+use crate::CharacterState;
 use bevy::ecs::system::Command;
-use bevy::ecs::world::EntityMut;
 use bevy::prelude::*;
 use dyn_clone::DynClone;
 
-use super::collision::Hitbox;
-
-pub trait Attack: DynClone + Send + Sync + 'static {
+pub trait Action: DynClone + Send + Sync + 'static {
     fn execute(&self, world: &mut World);
     fn startup(&self) -> u8;
     fn active(&self) -> Vec<u8>;
     fn recovery(&self) -> u8;
 }
 
-dyn_clone::clone_trait_object!(Attack);
+dyn_clone::clone_trait_object!(Action);
 
-impl Command for Box<dyn Attack> {
-    fn write(self, world: &mut World) {
-        self.execute(world);
-    }
-}
-
-pub trait Airdash: DynClone + Send + Sync + 'static {
-    fn execute(&self, world: &mut World);
-    fn lockout(&self) -> u8;
-}
-
-dyn_clone::clone_trait_object!(Airdash);
-
-impl Command for Box<dyn Airdash> {
-    fn write(self, world: &mut World) {
-        self.execute(world);
-    }
-}
-
-pub trait Dash: DynClone + Send + Sync + 'static {
-    fn execute(&self, world: &mut World);
-}
-
-dyn_clone::clone_trait_object!(Dash);
-
-impl Command for Box<dyn Dash> {
+impl Command for Box<dyn Action> {
     fn write(self, world: &mut World) {
         self.execute(world);
     }
@@ -57,7 +29,7 @@ pub struct SingleHitbox {
     pub counter_hit_duration: Frame,
 }
 
-impl Attack for SingleHitbox {
+impl Action for SingleHitbox {
     fn execute(&self, world: &mut World) {
         let mut my_entity: Entity = Entity::from_raw(10);
         let mut frame: u8 = 0;

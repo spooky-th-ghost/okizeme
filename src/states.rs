@@ -1,32 +1,28 @@
-use crate::character::actions::{Airdash, Attack, Dash};
+use crate::character::actions::Action;
 use crate::types::Frame;
-use crate::{CommandInput, CommandMotion, InputTree, PlayerId};
+use crate::{CommandInput, InputTree};
 use bevy::prelude::*;
 use bevy::utils::HashMap;
 use dyn_clone::clone_box;
 
 #[derive(Resource)]
 pub struct CharacterActions {
-    forward_ground_dash: Box<dyn Dash>,
-    backward_ground_dash: Box<dyn Dash>,
-    forward_air_dash: Box<dyn Airdash>,
-    backward_air_dash: Box<dyn Airdash>,
-    attack_library: AttackLibrary,
+    action_library: ActionLibrary,
 }
 
 impl CharacterActions {
-    pub fn find_attack(&self, input_tree: &InputTree) -> Option<Box<dyn Attack>> {
-        self.attack_library.find_attack(input_tree)
+    pub fn find_action(&self, input_tree: &InputTree) -> Option<Box<dyn Action>> {
+        self.action_library.find_action(input_tree)
     }
 }
 
-pub struct AttackLibrary {
-    attacks: HashMap<CommandInput, Box<dyn Attack>>,
+pub struct ActionLibrary {
+    actions: HashMap<CommandInput, Box<dyn Action>>,
 }
 
-impl AttackLibrary {
-    pub fn find_attack(&self, input_tree: &InputTree) -> Option<Box<dyn Attack>> {
-        let mut keys: Vec<&CommandInput> = self.attacks.keys().collect();
+impl ActionLibrary {
+    pub fn find_action(&self, input_tree: &InputTree) -> Option<Box<dyn Action>> {
+        let mut keys: Vec<&CommandInput> = self.actions.keys().collect();
         keys.sort_by(|a, b| a.motion().partial_cmp(&b.motion()).unwrap());
 
         for key in keys {
@@ -34,8 +30,8 @@ impl AttackLibrary {
                 if key.motion() == input.motion() {
                     let key_button = key.button();
                     if key_button & input.button() == key_button {
-                        if let Some(attack) = self.attacks.get(&input) {
-                            return Some(*clone_box(attack));
+                        if let Some(actions) = self.actions.get(&input) {
+                            return Some(*clone_box(actions));
                         }
                     }
                 }
@@ -68,11 +64,11 @@ pub enum CharacterState {
     Backwalking,
     AttackingGrounded {
         frame: Frame,
-        attack: Box<dyn Attack>,
+        attack: Box<dyn Action>,
     },
     AttackingAirborne {
         frame: Frame,
-        attack: Box<dyn Attack>,
+        attack: Box<dyn Action>,
     },
     Freefall {
         recovery: Frame,
@@ -87,19 +83,19 @@ pub enum CharacterState {
     Juggle,
     Dashing {
         frame: Frame,
-        dash: Box<dyn Dash>,
+        dash: Box<dyn Action>,
     },
     BackDashing {
         frame: Frame,
-        dash: Box<dyn Dash>,
+        dash: Box<dyn Action>,
     },
     AirDashing {
         frame: Frame,
-        airdash: Box<dyn Airdash>,
+        airdash: Box<dyn Action>,
     },
     AirBackDashing {
         frame: Frame,
-        airdash: Box<dyn Airdash>,
+        airdash: Box<dyn Action>,
     },
     Blocking,
     AirBlocking,
@@ -124,7 +120,7 @@ impl CharacterState {
         }
     }
 
-    pub fn is_attacking(&self) -> Option<Box<dyn Attack>> {
+    pub fn is_attacking(&self) -> Option<Box<dyn Action>> {
         match self {
             CharacterState::AttackingGrounded { frame: _, attack } => Some(*clone_box(attack)),
             CharacterState::AttackingAirborne { frame: _, attack } => Some(*clone_box(attack)),
@@ -132,7 +128,7 @@ impl CharacterState {
         }
     }
 
-    pub fn is_airdashing(&self) -> Option<Box<dyn Airdash>> {
+    pub fn is_airdashing(&self) -> Option<Box<dyn Action>> {
         match self {
             CharacterState::AirDashing { frame: _, airdash } => Some(*clone_box(airdash)),
             CharacterState::AirBackDashing { frame: _, airdash } => Some(*clone_box(airdash)),
@@ -140,7 +136,7 @@ impl CharacterState {
         }
     }
 
-    pub fn is_dashing(&self) -> Option<Box<dyn Dash>> {
+    pub fn is_dashing(&self) -> Option<Box<dyn Action>> {
         match self {
             CharacterState::Dashing { frame: _, dash } => Some(*clone_box(dash)),
             CharacterState::BackDashing { frame: _, dash } => Some(*clone_box(dash)),
