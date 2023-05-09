@@ -20,7 +20,7 @@ impl Command for Box<dyn Action> {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct SingleHitbox {
     pub player_id: PlayerId,
     pub hitbox_event: HitboxEvent,

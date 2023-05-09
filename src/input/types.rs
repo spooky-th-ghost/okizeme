@@ -307,6 +307,14 @@ impl ButtonStream {
         self.released_buttons.push(released);
     }
 
+    pub fn with_buttons(held: ButtonMask, pressed: ButtonMask, released: ButtonMask) -> Self {
+        ButtonStream {
+            held_buttons: vec![held; 15],
+            pressed_buttons: vec![pressed; 15],
+            released_buttons: vec![released; 15],
+        }
+    }
+
     pub fn held_in_range(&self, start: usize, end: usize) -> ButtonMask {
         let mut held: u8 = 0;
         for button in self.held_buttons[start..end].iter() {

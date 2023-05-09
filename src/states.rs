@@ -21,6 +21,10 @@ pub struct ActionLibrary {
 }
 
 impl ActionLibrary {
+    pub fn new(actions: HashMap<CommandInput, Box<dyn Action>>) -> Self {
+        ActionLibrary { actions }
+    }
+
     pub fn find_action(&self, input_tree: &InputTree) -> Option<Box<dyn Action>> {
         let mut keys: Vec<&CommandInput> = self.actions.keys().collect();
         keys.sort_by(|a, b| a.motion().partial_cmp(&b.motion()).unwrap());
