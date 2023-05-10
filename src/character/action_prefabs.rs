@@ -31,7 +31,7 @@ impl Action for SingleHitbox {
                 player.insert(Attacking);
             }
 
-            if frame == self.hitbox_event.frame {
+            if frame == self.hitbox_event.frame.get() {
                 player.with_children(|parent| {
                     parent.spawn(HitboxBundle::new(
                         self.player_id,
@@ -44,7 +44,7 @@ impl Action for SingleHitbox {
         }
     }
     fn startup(&self) -> Vec<u8> {
-        vec![self.hitbox_event.frame]
+        vec![self.hitbox_event.frame.get()]
     }
 
     fn active(&self) -> Vec<u8> {

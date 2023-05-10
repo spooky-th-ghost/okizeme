@@ -36,7 +36,7 @@ pub struct Hitbox {
 }
 #[derive(Clone, Default)]
 pub struct HitboxEvent {
-    pub frame: u8,
+    pub frame: Frame,
     pub position: Vec2,
     pub size: Vec2,
     pub hitbox: Hitbox,
