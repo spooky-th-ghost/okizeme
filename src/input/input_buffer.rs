@@ -32,17 +32,8 @@ impl InputBuffer {
         );
     }
 
-    pub fn motions_to_numpad(&self, facing_right: bool) -> String {
-        self.motions.to_numpad(facing_right)
-    }
-
     pub fn build_input_tree(&self, facing_right: bool) -> InputTree {
-        let motion_string = self.motions_to_numpad(facing_right);
-        InputTree::from_input(
-            &motion_string,
-            self.buttons.clone(),
-            self.motions.last_motion(),
-        )
+        InputTree::from_input(self.motions.clone(), self.buttons.clone(), facing_right)
     }
 }
 
@@ -82,13 +73,4 @@ pub fn read_inputs(
         let buffer = player_buffers.get_source_mut(&event.player_id);
         buffer.update(event);
     }
-}
-
-#[test]
-fn new_buffer() {
-    let buffer = InputBuffer::new(PlayerId::P1);
-    assert_eq!(
-        buffer.motions_to_numpad(true),
-        "555555555555555".to_string()
-    );
 }

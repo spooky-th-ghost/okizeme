@@ -3,7 +3,7 @@ use std::fmt;
 
 #[derive(Copy, Clone, Default, Debug, Eq, PartialEq, PartialOrd, Hash)]
 pub enum CommandMotion {
-    Direction(MotionMask),
+    Direction(u8),
     #[default]
     Dash,
     Backdash,
@@ -45,13 +45,18 @@ impl CommandInput {
 #[derive(Default, Debug, PartialEq, Eq)]
 pub struct InputTree {
     motion_commands: Vec<CommandInput>,
-    buffered_motion: MotionMask,
+    buffered_motion: u8,
     buffered_button: ButtonMask,
 }
 
 impl InputTree {
-    pub fn from_input(motions: &str, buttons: ButtonStream, last_motion: MotionMask) -> InputTree {
+    pub fn from_input(
+        motions_raw: MotionStream,
+        buttons: ButtonStream,
+        facing_right: bool,
+    ) -> InputTree {
         use crate::input::{motion_parsing::*, Parser};
+        let motions = &motions_raw.to_numpad(facing_right);
 
         let mut motions_vec = Vec::new();
         let dqcf = double_qcf();
@@ -149,6 +154,12 @@ impl InputTree {
             }
             _ => (),
         }
+        let last_motion = motions[..1].parse::<u8>().unwrap();
+
+        motions_vec.push(CommandInput::raw(
+            CommandMotion::Direction(last_motion),
+            buttons.buffered(),
+        ));
 
         InputTree {
             motion_commands: motions_vec,
@@ -432,6 +443,19 @@ impl MotionMask {
         matches!(self, UP | UP_LEFT | UP_RIGHT)
     }
 
+    pub fn from_numpad(motion: char) -> Self {
+        match motion {
+            '1' => DOWN_LEFT,
+            '2' => DOWN,
+            '3' => DOWN_RIGHT,
+            '4' => LEFT,
+            '6' => RIGHT,
+            '7' => UP_LEFT,
+            '8' => UP,
+            '9' => UP_RIGHT,
+            _ => NEUTRAL,
+        }
+    }
     pub fn with_direction(motion: &str) -> Self {
         let mut binary_representation = 0_u8;
         for dir in motion.chars().into_iter() {
@@ -503,11 +527,20 @@ impl fmt::Display for MotionMask {
     }
 }
 
+#[derive(Clone)]
 pub struct MotionStream {
     motions: Vec<MotionMask>,
 }
 
 impl MotionStream {
+    pub fn from_numpad(numpad_motions: &str) -> Self {
+        let mut motions = Vec::new();
+        for c in numpad_motions.chars() {
+            motions.push(MotionMask::from_numpad(c));
+        }
+        MotionStream { motions }
+    }
+
     pub fn replace(&mut self, motion: MotionMask) {
         self.motions.remove(0);
         self.motions.push(motion);
