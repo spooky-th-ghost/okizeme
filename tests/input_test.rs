@@ -4,7 +4,8 @@ mod test {
     #[test]
     fn test_action_library() {
         use bevy::utils::HashMap;
-        use okizeme::character::actions::{Action, SingleHitbox};
+        use okizeme::character::action_prefabs::SingleHitbox;
+        use okizeme::character::actions::Action;
         use okizeme::{
             ActionLibrary, ButtonMask, ButtonStream, CommandInput, InputTree, MotionStream,
         };
