@@ -1,6 +1,6 @@
 use crate::character::actions::{Action, Attacking};
 use crate::character::collision::{HitboxBundle, HitboxEvent, HurtboxEvent};
-use crate::{CharacterState, Frame, PlayerId};
+use crate::{CharacterState, Frame, PlayerId, Velocity};
 use bevy::prelude::*;
 #[derive(Clone, Default)]
 pub struct SingleHitbox {
@@ -57,13 +57,18 @@ impl Action for SingleHitbox {
     }
 }
 
+pub struct VelocityEvent {
+    pub frame: Frame,
+    pub velocity: Velocity,
+    pub duration: Frame,
+}
+
 #[derive(Default)]
 pub struct Attack {
     pub player_id: Option<PlayerId>,
-    pub hitbox_events: Vec<HitboxEvent>,
-    pub hurtbox_events: Vec<HurtboxEvent>,
-    // pub transform_events: Vec<>,
-    // pub velocity_events: Vec<>
+    hitbox_events: Vec<HitboxEvent>,
+    hurtbox_events: Vec<HurtboxEvent>,
+    velocity_events: Vec<VelocityEvent>,
 }
 
 impl Attack {
@@ -78,6 +83,11 @@ impl Attack {
 
     pub fn with_hurtbox(mut self, hurtbox_event: HurtboxEvent) -> Self {
         self.hurtbox_events.push(hurtbox_event);
+        self
+    }
+
+    pub fn with_velocity(mut self, velocity_event: VelocityEvent) -> Self {
+        self.velocity_events.push(velocity_event);
         self
     }
 }
