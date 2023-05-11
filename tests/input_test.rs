@@ -22,7 +22,7 @@ mod test {
             Box::new(SingleHitbox::default()),
         );
 
-        let action_library = ActionLibrary::new(actions);
+        let action_library = ActionLibrary::new("Test".to_string(), actions);
 
         assert!(action_library.find_action(&input_tree).is_some());
     }

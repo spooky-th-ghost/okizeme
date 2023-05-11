@@ -53,6 +53,10 @@ impl PlayerPositions {
         }
     }
 
+    pub fn get_facing_right(&self, player_id: &PlayerId) -> bool {
+        self.get_facing_vector(player_id) > 0.0
+    }
+
     pub fn set_position(&mut self, player_id: &PlayerId, position: Vec3) {
         self.0
             .iter_mut()

@@ -2,20 +2,18 @@ use criterion::{black_box, criterion_group, criterion_main, Criterion};
 
 fn input_to_action_benchmark(c: &mut Criterion) {
     use bevy::utils::HashMap;
-    use okizeme::character::actions::{Action, SingleHitbox};
-    use okizeme::{ActionLibrary, ButtonMask, ButtonStream, CommandInput, InputTree, MotionMask};
+    use okizeme::character::action_prefabs::SingleHitbox;
+    use okizeme::character::actions::Action;
+    use okizeme::{ActionLibrary, ButtonMask, ButtonStream, CommandInput, InputTree, MotionStream};
 
+    let m_stream = MotionStream::from_numpad("22333655222336");
     let b_stream = black_box(ButtonStream::with_buttons(
         ButtonMask::new(1),
         ButtonMask::new(1),
         ButtonMask::new(0),
     ));
 
-    let input_tree = black_box(InputTree::from_input(
-        "22333655222336",
-        b_stream,
-        MotionMask::new(1),
-    ));
+    let input_tree = black_box(InputTree::from_input(m_stream, b_stream, true));
 
     let mut actions: HashMap<CommandInput, Box<dyn Action>> = black_box(HashMap::new());
     actions.insert(
@@ -23,7 +21,7 @@ fn input_to_action_benchmark(c: &mut Criterion) {
         Box::new(SingleHitbox::default()),
     );
 
-    let action_library = black_box(ActionLibrary::new(actions));
+    let action_library = black_box(ActionLibrary::new("Empty".to_string(), actions));
 
     c.bench_function("find action", |b| {
         b.iter(|| action_library.find_action(&input_tree))

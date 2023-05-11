@@ -1,28 +1,70 @@
 use crate::character::actions::Action;
-use crate::types::Frame;
-use crate::{CommandInput, InputTree};
+use crate::types::{Frame, PlayerId};
+use crate::{CommandInput, InputTree, PlayerInputSources, PlayerPositions};
 use bevy::prelude::*;
 use bevy::utils::HashMap;
 use dyn_clone::clone_box;
 
-#[derive(Resource)]
-pub struct CharacterActions {
+pub struct PlayerActions(Vec<PlayerActionLibrary>);
+
+impl PlayerActions {
+    pub fn get_library_mut(&mut self, player_id: &PlayerId) -> &mut PlayerActionLibrary {
+        self.0
+            .iter_mut()
+            .find(|x| x.get_player_id() == player_id)
+            .unwrap()
+    }
+
+    pub fn get_library(&self, player_id: &PlayerId) -> &PlayerActionLibrary {
+        self.0
+            .iter()
+            .find(|x| x.get_player_id() == player_id)
+            .unwrap()
+    }
+}
+
+impl Default for PlayerActions {
+    fn default() -> Self {
+        PlayerActions(vec![
+            PlayerActionLibrary::new(PlayerId::P1),
+            PlayerActionLibrary::new(PlayerId::P2),
+        ])
+    }
+}
+
+pub struct PlayerActionLibrary {
+    pub player_id: PlayerId,
     action_library: ActionLibrary,
 }
 
-impl CharacterActions {
+impl PlayerActionLibrary {
+    pub fn new(player_id: PlayerId) -> Self {
+        PlayerActionLibrary {
+            player_id,
+            action_library: ActionLibrary::default(),
+        }
+    }
+    pub fn get_player_id(&self) -> &PlayerId {
+        &self.player_id
+    }
+
     pub fn find_action(&self, input_tree: &InputTree) -> Option<Box<dyn Action>> {
         self.action_library.find_action(input_tree)
     }
 }
 
+#[derive(Clone)]
 pub struct ActionLibrary {
+    pub character_id: String,
     actions: HashMap<CommandInput, Box<dyn Action>>,
 }
 
 impl ActionLibrary {
-    pub fn new(actions: HashMap<CommandInput, Box<dyn Action>>) -> Self {
-        ActionLibrary { actions }
+    pub fn new(character_id: String, actions: HashMap<CommandInput, Box<dyn Action>>) -> Self {
+        ActionLibrary {
+            character_id,
+            actions,
+        }
     }
 
     pub fn find_action(&self, input_tree: &InputTree) -> Option<Box<dyn Action>> {
@@ -45,7 +87,25 @@ impl ActionLibrary {
     }
 }
 
-pub fn transition_character_states() {}
+impl Default for ActionLibrary {
+    fn default() -> Self {
+        ActionLibrary {
+            character_id: "Empty".to_string(),
+            actions: HashMap::new(),
+        }
+    }
+}
+
+pub fn transition_character_states(
+    player_buffers: Res<PlayerInputSources>,
+    player_positions: Res<PlayerPositions>,
+    mut player_query: Query<(&PlayerId, &mut CharacterState)>,
+) {
+    for (player_id, mut character_state) in &mut player_query {
+        let buffer = player_buffers.get_source(player_id);
+        let tree = buffer.build_input_tree(player_positions.get_facing_right(player_id));
+    }
+}
 
 pub fn execute_character_actions(mut commands: Commands, player_query: Query<&CharacterState>) {
     for character_state in &player_query {
