@@ -34,7 +34,7 @@ pub struct Hitbox {
     pub lifetime: FrameRange,
     pub base_damage: u8,
 }
-#[derive(Clone, Default)]
+#[derive(Clone, Copy, Default)]
 pub struct HitboxEvent {
     pub frame: Frame,
     pub position: Vec2,

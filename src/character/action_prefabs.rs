@@ -56,3 +56,28 @@ impl Action for SingleHitbox {
         self.total_duration.get() - self.startup()[0] - active_sum
     }
 }
+
+#[derive(Default)]
+pub struct Attack {
+    pub player_id: Option<PlayerId>,
+    pub hitbox_events: Vec<HitboxEvent>,
+    pub hurtbox_events: Vec<HurtboxEvent>,
+    // pub transform_events: Vec<>,
+    // pub velocity_events: Vec<>
+}
+
+impl Attack {
+    pub fn new() -> Self {
+        Attack::default()
+    }
+
+    pub fn with_hitbox(mut self, hitbox_event: HitboxEvent) -> Self {
+        self.hitbox_events.push(hitbox_event);
+        self
+    }
+
+    pub fn with_hurtbox(mut self, hurtbox_event: HurtboxEvent) -> Self {
+        self.hurtbox_events.push(hurtbox_event);
+        self
+    }
+}
