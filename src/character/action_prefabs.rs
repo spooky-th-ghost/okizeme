@@ -57,18 +57,20 @@ impl Action for SingleHitbox {
     }
 }
 
+#[derive(Clone)]
 pub struct VelocityEvent {
     pub frame: Frame,
     pub velocity: Velocity,
     pub duration: Frame,
 }
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct Attack {
     pub player_id: Option<PlayerId>,
     hitbox_events: Vec<HitboxEvent>,
     hurtbox_events: Vec<HurtboxEvent>,
     velocity_events: Vec<VelocityEvent>,
+    total_duration: Frame,
 }
 
 impl Attack {
@@ -89,5 +91,58 @@ impl Attack {
     pub fn with_velocity(mut self, velocity_event: VelocityEvent) -> Self {
         self.velocity_events.push(velocity_event);
         self
+    }
+}
+
+impl Action for Attack {
+    fn execute(&self, world: &mut World) {
+        let my_player_id = self.player_id.unwrap();
+        let mut my_entity: Option<Entity> = None;
+        let mut frame: u8 = 0;
+        for (entity, player_id, character_state) in world
+            .query::<(Entity, &PlayerId, &CharacterState)>()
+            .iter(world)
+        {
+            if *player_id == my_player_id {
+                my_entity = Some(entity);
+                frame = character_state.frame();
+            }
+        }
+        if let Some(entity) = my_entity {
+            let mut player = world.entity_mut(entity);
+
+            if !player.contains::<Attacking>() {
+                player.insert(Attacking);
+            }
+
+            for hitbox_event in self.hitbox_events.iter() {
+                if frame == hitbox_event.frame.get() {
+                    player.with_children(|parent| {
+                        parent.spawn(HitboxBundle::new(
+                            my_player_id,
+                            hitbox_event.hitbox,
+                            hitbox_event.position,
+                            hitbox_event.size,
+                        ));
+                    });
+                }
+            }
+        }
+    }
+
+    fn startup(&self) -> Vec<u8> {
+        self.hitbox_events.iter().map(|he| he.frame.get()).collect()
+    }
+
+    fn active(&self) -> Vec<u8> {
+        self.hitbox_events
+            .iter()
+            .map(|he| he.hitbox.duration.get())
+            .collect()
+    }
+
+    fn recovery(&self) -> u8 {
+        let active_sum: u8 = self.active().iter().sum();
+        self.total_duration.get() - self.startup()[0] - active_sum
     }
 }

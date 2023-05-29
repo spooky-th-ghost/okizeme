@@ -5,7 +5,7 @@ pub struct LandingEvent {
     pub player_id: PlayerId,
 }
 /// Component used to move transforms
-#[derive(Component, Reflect)]
+#[derive(Component, Reflect, Clone)]
 pub struct Velocity {
     pub force: Vec2,
     pub gravity: f32,
