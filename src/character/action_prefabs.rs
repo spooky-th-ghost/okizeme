@@ -78,6 +78,11 @@ impl Attack {
         Attack::default()
     }
 
+    pub fn with_duration(mut self, duration: Frame) -> Self {
+        self.total_duration = duration;
+        self
+    }
+
     pub fn with_hitbox(mut self, hitbox_event: HitboxEvent) -> Self {
         self.hitbox_events.push(hitbox_event);
         self
